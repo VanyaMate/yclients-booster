@@ -31,4 +31,14 @@ export class Button extends Component<HTMLButtonElement> {
             this.element.classList.add(css.fullWidth);
         }
     }
+
+    setLoading (status: boolean) {
+        if (status) {
+            this.element.classList.add(css.loading);
+            this.element.disabled = true;
+        } else {
+            this.element.classList.remove(css.loading);
+            this.element.disabled = false;
+        }
+    }
 }

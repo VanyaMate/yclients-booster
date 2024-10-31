@@ -1,0 +1,9 @@
+.container {
+    th {
+        background : var(--bg-second);
+    }
+
+    th, td {
+        padding : var(--offset-small);
+    }
+}

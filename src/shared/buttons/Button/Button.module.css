@@ -1,3 +1,15 @@
+@keyframes loadingAnimation {
+    0% {
+        opacity : .7;
+    }
+    50% {
+        opacity : .4;
+    }
+    100% {
+        opacity : .7;
+    }
+}
+
 .container {
     padding       : var(--offset-small);
     border-radius : var(--offset-small);
@@ -30,6 +42,10 @@
         width     : 30px;
         max-width : 30px;
         min-width : 30px;
+    }
+
+    &.loading {
+        animation : loadingAnimation infinite ease-in-out .5s;
     }
 
     &:focus {

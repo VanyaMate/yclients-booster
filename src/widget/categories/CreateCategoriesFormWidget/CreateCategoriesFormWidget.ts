@@ -5,6 +5,10 @@ import {
 import { Button } from '@/shared/buttons/Button/Button.ts';
 import css from './CreateCategoriesFormWidget.module.css';
 import { Logger } from '@/entity/logger/Logger/Logger.ts';
+import {
+    RequestData,
+    RequestSplitter,
+} from '@/service/RequestSplitter/RequestSplitter.ts';
 
 
 export type CreateCategoriesFormWidgetProps =
@@ -17,6 +21,7 @@ export type CreateCategoriesFormWidgetProps =
 export class CreateCategoriesFormWidget extends Component<HTMLFormElement> {
     private _clientId: string;
     private _logger = new Logger({});
+    private _requestSplitter: RequestSplitter<string>;
 
     constructor (props: CreateCategoriesFormWidgetProps) {
         const { clientId, ...other } = props;
@@ -33,20 +38,39 @@ export class CreateCategoriesFormWidget extends Component<HTMLFormElement> {
         this.element.classList.add(css.container);
 
         const textarea = this.element.querySelector('textarea')!;
-        new Button({
-            innerHTML: 'Сохранить', onclick: () => {
+
+        const button = new Button({
+            innerHTML: 'Создать', onclick: () => {
+                button.setLoading(true);
                 const value      = textarea.value;
-                const categories = value.split(',').map((category) => category.trim());
-                this.createCategories(categories).then(() => textarea.value = '');
+                const categories = value.split('\n').map((category) => category.trim()).filter(Boolean);
+                this.createCategories(categories);
             },
             isPrimary: true,
             fullWidth: true,
-        }).insert(this.element.querySelector('#left')!, 'beforeend');
+        });
+
+        this._requestSplitter = new RequestSplitter<string>(
+            (data: any) => data?.success ? '' : data?.meta?.message,
+            (categoryName: string) => this._logger.log(`категория "${ categoryName }" создается...`),
+            (categoryName: string) => this._logger.success(`категория "${ categoryName }" создана.`),
+            (categoryName: string, retry: number) => this._logger.log(`категория "${ categoryName }" не создана. Попытка ${ retry }`),
+            (categoryName: string, error: unknown) => this._logger.error(`категория "${ categoryName }" не создана. Ошибка ${ error }`),
+            (success, error) => {
+                console.log('Success', success, 'Error', error);
+                textarea.value = error.join('\n');
+                button.setLoading(false);
+            },
+            5,
+            1,
+        );
+
+        button.insert(this.element.querySelector('#left')!, 'beforeend');
 
         this._logger.insert(this.element.querySelector('#logs')!, 'afterbegin');
     }
 
-    private async createCategory (categoryName: string, tryCount = 0): Promise<void> {
+    private createCategoryRequestData (categoryName: string): RequestData<string> {
         const requestFormData = new FormData();
 
         requestFormData.append('title', categoryName);
@@ -54,36 +78,20 @@ export class CreateCategoriesFormWidget extends Component<HTMLFormElement> {
         requestFormData.append('article', '');
         requestFormData.append('comment', '');
 
-
-        this._logger.log(`${ categoryName } сохранение..`);
-        return fetch(this.getActionUrl(this._clientId), {
-            method: 'POST',
-            body  : requestFormData,
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data?.success) {
-                    this._logger.success(`${ categoryName } -> Сохранена`);
-                } else if (tryCount < 2) {
-                    this._logger.log(`${ categoryName } не сохранено -> Дополнительная попытка`);
-                    return this.createCategory(categoryName, tryCount + 1);
-                } else {
-                    this._logger.error(`${ categoryName } -> Не сохранено`);
-                }
-                return;
-            })
-            .catch((e) => {
-                if (tryCount < 2) {
-                    this._logger.log(`${ categoryName } не сохранено -> Дополнительная попытка`);
-                } else {
-                    this._logger.error(`${ categoryName } -> Не сохранено`);
-                }
-                throw e;
-            });
+        return {
+            data   : categoryName,
+            url    : this.getActionUrl(this._clientId),
+            options: {
+                method: 'POST',
+                body  : requestFormData,
+            },
+        };
     }
 
     private createCategories (categoryNames: Array<string>) {
-        return Promise.all(categoryNames.map(this.createCategory.bind(this)));
+        this._requestSplitter.requests(
+            categoryNames.map((categoryName) => this.createCategoryRequestData(categoryName)),
+        );
     }
 
     private getActionUrl (id: string): string {
