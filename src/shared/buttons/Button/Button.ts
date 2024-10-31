@@ -5,22 +5,29 @@ import {
 import css from './Button.module.css';
 
 
+export enum ButtonStyleType {
+    PRIMARY,
+    DANGER,
+}
+
 export type ButtonProps =
     ComponentPropsOptional<HTMLButtonElement>
     & {
-        isPrimary?: boolean;
+        styleType?: ButtonStyleType;
         quad?: boolean;
         fullWidth?: boolean;
     };
 
 export class Button extends Component<HTMLButtonElement> {
     constructor (props: ButtonProps) {
-        const { isPrimary, quad, fullWidth, ...other } = props;
+        const { styleType, quad, fullWidth, ...other } = props;
         super('button', other);
 
         this.element.classList.add(css.container);
-        if (isPrimary) {
+        if (styleType === ButtonStyleType.PRIMARY) {
             this.element.classList.add(css.primary);
+        } else if (styleType === ButtonStyleType.DANGER) {
+            this.element.classList.add(css.danger);
         }
 
         if (quad) {

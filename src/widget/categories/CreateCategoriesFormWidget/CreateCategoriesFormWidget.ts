@@ -2,7 +2,7 @@ import {
     Component,
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
-import { Button } from '@/shared/buttons/Button/Button.ts';
+import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import css from './CreateCategoriesFormWidget.module.css';
 import { Logger } from '@/entity/logger/Logger/Logger.ts';
 import {
@@ -46,7 +46,7 @@ export class CreateCategoriesFormWidget extends Component<HTMLFormElement> {
                 const categories = value.split('\n').map((category) => category.trim()).filter(Boolean);
                 this.createCategories(categories);
             },
-            isPrimary: true,
+            styleType: ButtonStyleType.PRIMARY,
             fullWidth: true,
         });
 

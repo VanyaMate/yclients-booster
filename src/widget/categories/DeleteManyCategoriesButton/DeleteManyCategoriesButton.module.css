@@ -1,0 +1,13 @@
+.container {
+    width   : 600px;
+    display : flex;
+    gap     : var(--offset-small);
+
+    .left {
+        width : 350px;
+    }
+
+    .right {
+
+    }
+}

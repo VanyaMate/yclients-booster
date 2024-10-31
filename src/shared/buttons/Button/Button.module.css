@@ -34,6 +34,16 @@
         }
     }
 
+    &.danger {
+        border     : 1px solid var(--danger-color);
+        background : var(--danger-color);
+        color      : var(--on-primary-color);
+
+        &:hover {
+            background : var(--color-black);
+        }
+    }
+
     &.fullWidth {
         width : 100%;
     }

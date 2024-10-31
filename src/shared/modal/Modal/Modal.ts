@@ -3,7 +3,7 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import css from './Modal.module.css';
-import { Button } from '@/shared/buttons/Button/Button.ts';
+import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 
 
 export type ModalProps =
@@ -37,7 +37,7 @@ export class Modal extends Component<HTMLDivElement> {
         new Button({
             innerHTML: 'X',
             onclick  : this.hide.bind(this),
-            isPrimary: true,
+            styleType: ButtonStyleType.PRIMARY,
             quad     : true,
         }).insert(closeButtonContainer, 'beforeend');
     }

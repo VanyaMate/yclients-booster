@@ -8,15 +8,15 @@ import css from './Col.module.css';
 export type ColProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        cols: Array<Component<HTMLElement>>;
+        rows: Array<Component<HTMLElement>>;
     }
 
 export class Col extends Component<HTMLDivElement> {
     constructor (props: ColProps) {
-        const { cols, ...other } = props;
+        const { rows, ...other } = props;
         super('div', other);
         this.element.classList.add(css.container);
 
-        cols.forEach((child) => child.insert(this.element, 'beforeend'));
+        rows.forEach((row) => row.insert(this.element, 'beforeend'));
     }
 }

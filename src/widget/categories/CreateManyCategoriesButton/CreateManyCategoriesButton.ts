@@ -1,4 +1,4 @@
-import { Button } from '@/shared/buttons/Button/Button.ts';
+import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import { Modal } from '@/shared/modal/Modal/Modal.ts';
 import {
     CreateCategoriesFormWidget,
@@ -9,7 +9,7 @@ export class CreateManyCategoriesButton extends Button {
     constructor () {
         super({
             innerHTML: 'Добавить много категорий',
-            isPrimary: true,
+            styleType: ButtonStyleType.PRIMARY,
             fullWidth: true,
         });
 

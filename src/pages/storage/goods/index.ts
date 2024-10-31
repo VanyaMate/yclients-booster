@@ -5,6 +5,9 @@ import {
     GetCategoriesIdsButton,
 } from '@/widget/categories/GetCategoriesIdsButton/GetCategoriesIdsButton.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
+import {
+    DeleteManyCategoriesButton,
+} from '@/widget/categories/DeleteManyCategoriesButton/DeleteManyCategoriesButton.ts';
 
 
 const getCategoriesCreateButtonPlace = function () {
@@ -19,18 +22,20 @@ export const goodsPageHandler = function () {
     if (document.readyState === 'complete') {
         const position = getCategoriesCreateButtonPlace() as Element;
         new Col({
-            cols: [
+            rows: [
                 new CreateManyCategoriesButton(),
                 new GetCategoriesIdsButton(),
+                new DeleteManyCategoriesButton(),
             ],
         }).insert(position, 'beforeend');
     } else {
         document.addEventListener('DOMContentLoaded', () => {
             const position = getCategoriesCreateButtonPlace() as Element;
             new Col({
-                cols: [
+                rows: [
                     new CreateManyCategoriesButton(),
                     new GetCategoriesIdsButton(),
+                    new DeleteManyCategoriesButton(),
                 ],
             }).insert(position, 'beforeend');
         });

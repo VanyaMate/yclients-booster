@@ -22,4 +22,8 @@ export class Logger extends Component<HTMLDivElement> {
     log (log: string) {
         this.element.insertAdjacentHTML('beforeend', `<div class="${ css.neutral }">${ log }</div>`);
     }
+
+    reset () {
+        this.element.innerHTML = '';
+    }
 }

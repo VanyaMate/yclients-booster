@@ -1,4 +1,4 @@
-import { Button } from '@/shared/buttons/Button/Button.ts';
+import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import { Modal } from '@/shared/modal/Modal/Modal.ts';
 import { Table } from '@/shared/table/Table/Table.ts';
 
@@ -7,7 +7,7 @@ export class GetCategoriesIdsButton extends Button {
     constructor () {
         super({
             innerHTML: 'Узнать все ID',
-            isPrimary: true,
+            styleType: ButtonStyleType.PRIMARY,
             fullWidth: true,
         });
 
