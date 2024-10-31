@@ -1,0 +1,38 @@
+.container {
+    padding       : var(--offset-small);
+    border-radius : var(--offset-small);
+    background    : var(--bg-second);
+    border        : 1px solid var(--border-color);
+    outline       : none;
+    transition    : var(--transition-fast);
+    height        : 30px;
+    min-height    : fit-content;
+
+    &:hover {
+        background : var(--bg-main);
+    }
+
+    &.primary {
+        border     : 1px solid var(--primary-color);
+        background : var(--primary-color);
+        color      : var(--on-primary-color);
+
+        &:hover {
+            background : var(--color-black);
+        }
+    }
+
+    &.fullWidth {
+        width : 100%;
+    }
+
+    &.quad {
+        width     : 30px;
+        max-width : 30px;
+        min-width : 30px;
+    }
+
+    &:focus {
+        outline : 1px solid var(--primary-color);
+    }
+}

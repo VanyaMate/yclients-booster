@@ -1,0 +1,75 @@
+.container {
+    position        : fixed;
+    top             : 0;
+    left            : 0;
+    z-index         : 9999;
+    width           : 100dvw;
+    height          : 100dvh;
+    display         : flex;
+    align-items     : safe center;
+    justify-content : safe center;
+
+    .back {
+        position   : absolute;
+        top        : 0;
+        left       : 0;
+        width      : 100dvw;
+        height     : 100dvh;
+        background : var(--bg-main-opacity);
+        z-index    : 0;
+        cursor     : pointer;
+    }
+
+    .modal {
+        position       : relative;
+        z-index        : 1;
+        width          : fit-content;
+        max-width      : calc(100% - var(--offset-medium) * 2);
+        min-width      : 300px;
+        max-height     : calc(100% - var(--offset-medium) * 2);
+        background     : var(--bg-main);
+        border-radius  : var(--offset-medium);
+        border         : 1px solid var(--border-color);
+        padding        : var(--offset-medium);
+        display        : flex;
+        flex-direction : column;
+        gap            : var(--offset-big);
+        overflow       : auto;
+
+        header {
+            position        : sticky;
+            top             : 0;
+            left            : 0;
+            display         : flex;
+            align-items     : center;
+            justify-content : space-between;
+            gap             : var(--offset-medium);
+            background      : var(--bg-second);
+            padding         : var(--offset-small);
+            border-radius   : var(--offset-small);
+            border          : 1px solid var(--border-color);
+            box-shadow      : 0 5px 15px -5px rgba(0, 0, 0, .3);
+
+            h2 {
+                font-size : 20px;
+                margin    : 0;
+                padding   : 0;
+            }
+        }
+
+        .content {
+            width      : 100%;
+            max-width  : 100%;
+            min-width  : fit-content;
+            height     : fit-content;
+            max-height : 100%;
+            padding    : 0 5px;
+        }
+    }
+}
+
+.scrollDisable {
+    overflow   : hidden;
+    max-width  : 100dvw;
+    max-height : 100dvh;
+}

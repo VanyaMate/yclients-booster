@@ -1,0 +1,20 @@
+{
+  "name": "yclients-booster",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/jquery": "^3.5.32",
+    "typescript": "~5.6.2",
+    "vite": "^5.4.10"
+  },
+  "dependencies": {
+    "-": "^0.0.1",
+    "@crxjs/vite-plugin": "^2.0.0-beta.28"
+  }
+}

@@ -1,0 +1,24 @@
+{
+    "manifest_version": 3,
+    "name": "YCLIENTS Booster",
+    "version": "0.0.1",
+    "action": {
+        "default_popup": "index.html"
+    },
+    "content_scripts": [
+        {
+            "js": [
+                "src/main.ts"
+            ],
+            "matches": [
+                "https://www.yclients.com/*",
+                "https://yclients.com/*"
+            ]
+        }
+    ],
+    "permissions": [
+        "activeTab",
+        "contentSettings",
+        "tabs"
+    ]
+}

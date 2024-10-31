@@ -1,0 +1,29 @@
+.container {
+    width          : 600px;
+    max-width      : 100%;
+    display        : flex;
+    flex-direction : row;
+    gap            : var(--offset-small);
+    position       : relative;
+
+    #left {
+        width    : 300px;
+        position : sticky;
+        top      : 0;
+        left     : 0;
+    }
+
+    textarea {
+        width         : 100%;
+        max-width     : 100%;
+        min-width     : 100%;
+        height        : 200px;
+        border        : 1px solid var(--border-color);
+        border-radius : var(--bg-second);
+        outline       : none;
+
+        &:focus {
+            border : 1px solid var(--primary-color);
+        }
+    }
+}

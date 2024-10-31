@@ -1,0 +1,14 @@
+:root {
+    --color-white              : #FFF;
+    --color-light-gray         : #F2F2F2;
+    --color-white-opacity      : #FFF5;
+    --color-gray               : #D2D2D2;
+    --color-dark-gray          : #A2A2A2;
+    --color-blue               : #55F;
+    --color-red                : #F55;
+    --color-green              : #5F5;
+    --color-dark-black         : #000;
+    --color-black              : #111;
+    --color-dark-black-opacity : #00077;
+    --color-light-black        : #222;
+}

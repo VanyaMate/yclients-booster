@@ -1,0 +1,19 @@
+.container {
+    display        : flex;
+    flex-direction : column;
+    gap            : var(--offset-small);
+
+    .success {
+        color       : var(--success-color);
+        font-weight : bold;
+    }
+
+    .error {
+        color       : var(--danger-color);
+        font-weight : bold;
+    }
+
+    .neutral {
+        color : var(--color-dark-gray);
+    }
+}
