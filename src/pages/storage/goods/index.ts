@@ -8,6 +8,7 @@ import { Col } from '@/shared/box/Col/Col.ts';
 import {
     DeleteManyCategoriesButton,
 } from '@/widget/categories/DeleteManyCategoriesButton/DeleteManyCategoriesButton.ts';
+import { startHandler } from '@/shared/lib/startHandler.ts';
 
 
 const getCategoriesCreateButtonPlace = function () {
@@ -19,7 +20,7 @@ export const isGoodsPage = function (pathNameParts: Array<string>) {
 };
 
 export const goodsPageHandler = function () {
-    if (document.readyState === 'complete') {
+    startHandler(() => {
         const position = getCategoriesCreateButtonPlace() as Element;
         new Col({
             rows: [
@@ -28,16 +29,5 @@ export const goodsPageHandler = function () {
                 new DeleteManyCategoriesButton(),
             ],
         }).insert(position, 'beforeend');
-    } else {
-        document.addEventListener('DOMContentLoaded', () => {
-            const position = getCategoriesCreateButtonPlace() as Element;
-            new Col({
-                rows: [
-                    new CreateManyCategoriesButton(),
-                    new GetCategoriesIdsButton(),
-                    new DeleteManyCategoriesButton(),
-                ],
-            }).insert(position, 'beforeend');
-        });
-    }
+    });
 };

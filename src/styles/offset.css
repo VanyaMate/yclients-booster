@@ -1,5 +1,6 @@
 :root {
-    --offset-small  : 5px;
-    --offset-medium : 10px;
-    --offset-big    : 20px;
+    --offset-extra-small : 2px;
+    --offset-small       : 5px;
+    --offset-medium      : 10px;
+    --offset-big         : 20px;
 }

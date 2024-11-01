@@ -10,17 +10,25 @@ export enum ButtonStyleType {
     DANGER,
 }
 
+export enum ButtonSizeType {
+    SMALL,
+    MEDIUM,
+    LARGE,
+}
+
+
 export type ButtonProps =
     ComponentPropsOptional<HTMLButtonElement>
     & {
         styleType?: ButtonStyleType;
+        size?: ButtonSizeType;
         quad?: boolean;
         fullWidth?: boolean;
     };
 
 export class Button extends Component<HTMLButtonElement> {
     constructor (props: ButtonProps) {
-        const { styleType, quad, fullWidth, ...other } = props;
+        const { styleType, size, quad, fullWidth, ...other } = props;
         super('button', other);
 
         this.element.classList.add(css.container);
@@ -28,6 +36,10 @@ export class Button extends Component<HTMLButtonElement> {
             this.element.classList.add(css.primary);
         } else if (styleType === ButtonStyleType.DANGER) {
             this.element.classList.add(css.danger);
+        }
+
+        if (size === ButtonSizeType.SMALL) {
+            this.element.classList.add(css.small);
         }
 
         if (quad) {

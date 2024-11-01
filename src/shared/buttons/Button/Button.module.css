@@ -58,6 +58,12 @@
         animation : loadingAnimation infinite ease-in-out .5s;
     }
 
+    &.small {
+        padding   : var(--offset-extra-small) var(--offset-small);
+        height    : 20px;
+        font-size : 10px;
+    }
+
     &:focus {
         outline : 1px solid var(--primary-color);
     }

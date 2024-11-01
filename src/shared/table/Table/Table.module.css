@@ -1,6 +1,39 @@
 .container {
     th {
         background : var(--bg-second);
+        transition : var(--transition-fast);
+
+        &.success {
+            background : var(--success-color);
+            color      : var(--on-success-color);
+
+            &:before {
+                content       : '✓';
+                padding-right : var(--offset-small);
+                user-select   : none;
+            }
+        }
+
+        &.error {
+            background : var(--danger-color);
+            color      : var(--on-danger-color);
+
+            &:before {
+                content       : 'x';
+                padding-right : var(--offset-small);
+                user-select   : none;
+            }
+        }
+
+        &:hover:not(.success):not(.error) {
+            cursor     : pointer;
+            background : var(--primary-color);
+            color      : var(--on-primary-color);
+        }
+
+        & > *:not(:last-child) {
+            padding-right : var(--offset-small);
+        }
     }
 
     th, td {
