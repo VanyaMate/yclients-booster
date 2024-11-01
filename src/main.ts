@@ -8,6 +8,10 @@ import {
     isNetServiceMigrationPage,
     netServiceMigrationPageHandler,
 } from '@/pages/net/service/migration';
+import {
+    isSalaryParamsListPage,
+    salaryParamsListHandler,
+} from '@/pages/salary_params/list';
 
 
 const pathParts = location.pathname.split('/');
@@ -16,4 +20,6 @@ if (isGoodsPage(pathParts)) {
     goodsPageHandler();
 } else if (isNetServiceMigrationPage(pathParts)) {
     netServiceMigrationPageHandler();
+} else if (isSalaryParamsListPage(pathParts)) {
+    salaryParamsListHandler();
 }

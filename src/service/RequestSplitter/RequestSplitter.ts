@@ -26,8 +26,9 @@ export class RequestSplitter<Data> {
         private readonly _onRetry: RequestRetryHandler<Data>,
         private readonly _onError: RequestErrorHandler<Data>,
         private readonly _onFinish: RequestFinish<Data>,
-        private readonly _limit: number = 10,
-        private readonly _retry: number = 2,
+        private readonly _limit: number   = 10,
+        private readonly _retry: number   = 2,
+        private readonly _isJson: boolean = true,
     ) {
     }
 
@@ -64,7 +65,8 @@ export class RequestSplitter<Data> {
     }
 
     private async _responseHandler (response: Response) {
-        const responseData = await response.json();
+        const responseData = this._isJson ? await response.json()
+                                          : await response.text();
         if (response.ok) {
             const validation = this._requestValidator(responseData);
             if (validation.length === 0) {
@@ -79,6 +81,9 @@ export class RequestSplitter<Data> {
     private _request (request: RequestData<Data>, index: number, error: unknown = null, retry: number = 0) {
         if (retry > this._retry) {
             this._onError(request.data, error);
+            this._errorFinished.push(request.data);
+            this._finishedAmount += 1;
+            this._next();
             return;
         }
 
@@ -97,9 +102,6 @@ export class RequestSplitter<Data> {
             })
             .then(this._next.bind(this))
             .catch((error: unknown) => {
-                this._onError(request.data, error);
-                this._errorFinished.push(request.data);
-                this._finishedAmount += 1;
                 this._request(request, index, error, retry + 1);
             });
     }

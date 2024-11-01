@@ -1,0 +1,13 @@
+.container {
+    width   : 900px;
+    display : flex;
+    gap     : var(--offset-small);
+
+    .left {
+        width : 300px;
+
+        input {
+
+        }
+    }
+}
