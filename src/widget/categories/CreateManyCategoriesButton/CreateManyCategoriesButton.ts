@@ -1,8 +1,8 @@
 import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import { Modal } from '@/shared/modal/Modal/Modal.ts';
 import {
-    CreateCategoriesFormWidget,
-} from '@/widget/categories/CreateCategoriesFormWidget/CreateCategoriesFormWidget.ts';
+    CreateManyGoodsCategoriesForm,
+} from '@/widget/goods/list/CreateManyGoodsCategoriesForm/CreateManyGoodsCategoriesForm.ts';
 
 
 export class CreateManyCategoriesButton extends Button {
@@ -14,7 +14,7 @@ export class CreateManyCategoriesButton extends Button {
         });
 
         const modal = new Modal({
-            content: new CreateCategoriesFormWidget({
+            content: new CreateManyGoodsCategoriesForm({
                 clientId: this.getClientId(),
             }),
             label  : 'Создание категорий',

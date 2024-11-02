@@ -1,0 +1,13 @@
+.container {
+    padding    : var(--offset-small);
+    background : var(--bg-main);
+    border     : 1px solid var(--border-color);
+    outline    : none;
+    transition : var(--transition-fast);
+    box-shadow : 0 0 0 0 transparent;
+
+    &:focus {
+        border     : 1px solid var(--primary-color);
+        box-shadow : 0 0 15px -5px var(--primary-color);
+    }
+}

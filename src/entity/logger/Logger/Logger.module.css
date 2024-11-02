@@ -1,7 +1,13 @@
 .container {
     display        : flex;
-    flex-direction : column;
-    gap            : var(--offset-small);
+    flex-direction : column-reverse;
+    gap            : var(--offset-extra-small);
+    max-height     : 400px;
+    background     : var(--color-black);
+    padding        : var(--offset-small);
+    overflow       : auto;
+    border-radius  : var(--offset-small);
+    font-family    : Consolas, monospace;
 
     .success {
         color       : var(--success-color);

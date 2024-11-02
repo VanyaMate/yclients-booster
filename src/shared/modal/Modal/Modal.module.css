@@ -15,7 +15,7 @@
         left       : 0;
         width      : 100dvw;
         height     : 100dvh;
-        background : var(--bg-main-opacity);
+        background : var(--bg-inverse-opacity);
         z-index    : 0;
         cursor     : pointer;
     }
