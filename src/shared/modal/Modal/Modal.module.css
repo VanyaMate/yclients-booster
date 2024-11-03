@@ -44,11 +44,11 @@
             align-items     : center;
             justify-content : space-between;
             gap             : var(--offset-medium);
-            background      : var(--bg-second);
+            background      : var(--bg-main);
             padding         : var(--offset-small);
             border-radius   : var(--offset-small);
-            border          : 1px solid var(--border-color);
-            box-shadow      : 0 5px 15px -5px rgba(0, 0, 0, .3);
+            border          : 2px dotted var(--border-color);
+            z-index         : 1;
 
             h2 {
                 font-size : 20px;
@@ -60,7 +60,6 @@
         .content {
             width      : 100%;
             max-width  : 100%;
-            min-width  : fit-content;
             height     : fit-content;
             max-height : 100%;
             padding    : 0 5px;

@@ -9,6 +9,11 @@
     border-radius  : var(--offset-small);
     font-family    : Consolas, monospace;
 
+    .item {
+        display : flex;
+        gap     : var(--offset-small);
+    }
+
     .success {
         color       : var(--success-color);
         font-weight : bold;

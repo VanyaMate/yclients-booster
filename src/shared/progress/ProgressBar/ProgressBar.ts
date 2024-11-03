@@ -47,6 +47,10 @@ export class ProgressBar extends Component<HTMLDivElement> {
         this._rerender();
     }
 
+    setLabelValue (value: string) {
+        this._percentProgressElement.textContent = value;
+    }
+
     private _rerender () {
         const leftProgressPercent  = Math.floor(100 / this._max * this._leftProgress);
         const rightProgressPercent = Math.ceil(100 / this._max * this._rightProgress);

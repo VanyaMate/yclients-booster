@@ -34,6 +34,7 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
 
         this._textarea = new TextArea({
             placeholder: 'Введите категории через Enter (\\n)',
+            oninput    : this._onTextareaChange.bind(this),
         });
         this._textarea.insert(this.element, 'afterbegin');
 
@@ -41,6 +42,7 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
             max: 100,
         });
         this._progressBar.insert(this.element, 'afterbegin');
+        this._progressBar.setLabelValue(`0 шт`);
 
         this._createButton = new Button({
             styleType: ButtonStyleType.PRIMARY,
@@ -52,6 +54,11 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
 
         this._logger = new Logger({});
         this._logger.insert(this.element, 'beforeend');
+    }
+
+    private _onTextareaChange () {
+        const categories = this._getCategoriesTitle();
+        this._progressBar.setLabelValue(`${ categories.length.toString() } шт`);
     }
 
     private _createCategories () {

@@ -13,15 +13,15 @@ export class Logger extends Component<HTMLDivElement> {
     }
 
     success (log: string) {
-        this.element.insertAdjacentHTML('afterbegin', `<div class="${ css.success }">> ${ log }</div>`);
+        this.element.insertAdjacentHTML('afterbegin', `<div class="${ css.success } ${ css.item }"><span>></span><span>${ log }</span></div>`);
     }
 
     error (log: string) {
-        this.element.insertAdjacentHTML('afterbegin', `<div class="${ css.error }">> ${ log }</div>`);
+        this.element.insertAdjacentHTML('afterbegin', `<div class="${ css.error } ${ css.item }"><span>></span><span>${ log }</span></div>`);
     }
 
     log (log: string) {
-        this.element.insertAdjacentHTML('afterbegin', `<div class="${ css.neutral }">> ${ log }</div>`);
+        this.element.insertAdjacentHTML('afterbegin', `<div class="${ css.neutral } ${ css.item }"><span>></span><span>${ log }</span></div>`);
     }
 
     reset () {
