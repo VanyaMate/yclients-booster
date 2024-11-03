@@ -93,11 +93,16 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
             ).finally(() => {
                 this._createButton.setLoading(false);
                 this._textarea.setDisable(false);
+                this._setCategoriesToTextarea([]); // TODO: Set error categories
             });
         }
     }
 
     private _getCategoriesTitle (): Array<string> {
         return this._textarea.getValue().trim().split('\n').filter(Boolean);
+    }
+
+    private _setCategoriesToTextarea (categories: Array<string>) {
+        return this._textarea.setValue(categories.join('\n'));
     }
 }
