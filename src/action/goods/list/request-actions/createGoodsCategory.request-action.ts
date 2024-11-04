@@ -1,15 +1,12 @@
 import {
-    GoodsCategoryCreateData, GoodsCategoryFullData,
+    GoodsCategoryCreateData,
 } from '@/action/goods/list/types/goods-category.types.ts';
-import {
-    getGoodsCategoryRequestAction,
-} from '@/action/goods/list/request-actions/getGoodsCategory.request-action.ts';
 import {
     ERROR_GOODS_CATEGORY_CREATION,
 } from '@/action/goods/list/errors/goods-category.errors.ts';
 
 
-export const createGoodsCategoryRequestAction = function (clientId: string, createData: GoodsCategoryCreateData): Promise<GoodsCategoryFullData> {
+export const createGoodsCategoryRequestAction = function (clientId: string, createData: GoodsCategoryCreateData): Promise<string> {
     const formData = new FormData();
 
     formData.append('title', createData.title);
@@ -31,10 +28,7 @@ export const createGoodsCategoryRequestAction = function (clientId: string, crea
         .then((data: any) => {
             if (data?.success) {
                 const categoryId: string = data?.meta?.redirect_url?.split('/').slice(-2)[0] ?? '';
-
-                if (categoryId) {
-                    return getGoodsCategoryRequestAction(clientId, categoryId);
-                }
+                return categoryId;
             }
 
             throw new Error(ERROR_GOODS_CATEGORY_CREATION);
