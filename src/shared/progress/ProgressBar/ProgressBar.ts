@@ -12,7 +12,7 @@ export type ProgressBarProps =
     }
 
 export class ProgressBar extends Component<HTMLDivElement> {
-    private readonly _max: number  = 0;
+    private _max: number           = 0;
     private _leftProgress: number  = 0;
     private _rightProgress: number = 0;
     private _leftProgressElement: HTMLDivElement;
@@ -35,6 +35,13 @@ export class ProgressBar extends Component<HTMLDivElement> {
         this._leftProgressElement    = this.element.querySelector(`.${ css.left }`)!;
         this._rightProgressElement   = this.element.querySelector(`.${ css.right }`)!;
         this._percentProgressElement = this.element.querySelector(`.${ css.percent }`)!;
+    }
+
+    reset (max: number) {
+        this._leftProgress  = 0;
+        this._rightProgress = 0;
+        this._max           = max;
+        this._rerender();
     }
 
     setLeftProgress (value: number) {

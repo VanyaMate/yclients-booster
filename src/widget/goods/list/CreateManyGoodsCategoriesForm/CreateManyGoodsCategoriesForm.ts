@@ -11,9 +11,11 @@ import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import { ProgressBar } from '@/shared/progress/ProgressBar/ProgressBar.ts';
 import { TextArea } from '@/shared/input/TextArea/TextArea.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
+import { Select } from '@/shared/input/Select/Select.ts';
+import { TextInput } from '@/shared/input/TextInput/TextInput.ts';
 import {
-    getGoodsCategoryRequestAction,
-} from '@/action/goods/list/request-actions/getGoodsCategory.request-action.ts';
+    getGoodsCategoriesDomAction,
+} from '@/action/goods/list/dom-actions/getGoodsCategories.dom-action.ts';
 
 
 export type CreateManyGoodsCategoriesFormProps =
@@ -23,14 +25,16 @@ export type CreateManyGoodsCategoriesFormProps =
     }
 
 export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
-    private readonly _MAX_REQUESTS_AT_TIME = 5;
-    private readonly _MAX_REQUESTS_RETRY   = 2;
+    private readonly _MAX_REQUESTS_AT_TIME      = 5;
+    private readonly _MAX_REQUESTS_RETRY        = 2;
     private readonly _logger: Logger;
     private readonly _textarea: TextArea;
-    private readonly _clientId: string     = '';
-    private _progressBar: ProgressBar;
-    private _createButton: Button;
-    private _splitter: PromiseSplitter     = new PromiseSplitter(this._MAX_REQUESTS_AT_TIME, this._MAX_REQUESTS_RETRY);
+    private readonly _comment: TextInput;
+    private readonly _clientId: string          = '';
+    private readonly _progressBar: ProgressBar;
+    private readonly _createButton: Button;
+    private readonly _selectCategories: Select;
+    private readonly _splitter: PromiseSplitter = new PromiseSplitter(this._MAX_REQUESTS_AT_TIME, this._MAX_REQUESTS_RETRY);
 
     constructor (props: CreateManyGoodsCategoriesFormProps) {
         const { clientId, ...other } = props;
@@ -44,6 +48,21 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
             oninput    : this._onTextareaChange.bind(this),
         });
         this._textarea.insert(this.element, 'afterbegin');
+        this._comment = new TextInput({
+            type       : 'text',
+            placeholder: 'Комментарий для всех (не обязателен)',
+        });
+        this._comment.insert(this._textarea.element, 'afterend');
+        this._selectCategories = new Select({
+            list        : getGoodsCategoriesDomAction().map((category) => ({
+                value: category.id,
+                label: category.title,
+            })),
+            withSearch  : true,
+            defaultLabel: 'Без категории',
+            defaultValue: '0',
+        });
+        this._selectCategories.insert(this._textarea.element, 'beforebegin');
 
         this._progressBar = new ProgressBar({
             max: 100,
@@ -57,7 +76,7 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
             fullWidth: true,
             innerHTML: 'Создать',
         });
-        this._createButton.insert(this._textarea.element, 'afterend');
+        this._createButton.insert(this.element, 'beforeend');
 
         this._logger = new Logger({});
         this._logger.insert(this.element, 'beforeend');
@@ -72,23 +91,24 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
         const categories = this._getCategoriesTitle();
 
         if (categories.length) {
-            this._progressBar.remove();
-            this._progressBar = new ProgressBar({
-                max: categories.length,
-            });
-            this._progressBar.insert(this.element, 'afterbegin');
+            this._progressBar.reset(categories.length);
             let successProgress: number = 0;
             let errorProgress: number   = 0;
             this._createButton.setLoading(true);
             this._textarea.setDisable(true);
 
+            const errorCategories: Array<string> = [];
+            const parentCategoryId: string       = this._selectCategories.getValue();
+            const comment: string                = this._comment.getValue();
             this._splitter.exec(
                 categories.map((category) => ({
                         chain    : [
                             async () => {
                                 this._logger.log(`категория "${ category }" создается`);
                                 return createGoodsCategoryRequestAction(this._clientId, {
-                                    title: category,
+                                    title  : category,
+                                    pid    : parentCategoryId,
+                                    comment: comment,
                                 })
                                     .then((categoryId: string) => {
                                         this._logger.success(`категория "${ category }" создана`);
@@ -99,29 +119,13 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
                                         throw e;
                                     });
                             },
-                            async (categoryId: string) => {
-                                this._logger.log(`получение информации для категории "${ category }"`);
-                                return getGoodsCategoryRequestAction(this._clientId, categoryId)
-                                    .then(() => {
-                                        this._logger.success(`данные для категории "${ category }" получены`);
-                                    })
-                                    .catch((e) => {
-                                        this._logger.error(`данные для категории "${ category }" не получены`);
-                                        throw e;
-                                    });
-                            },
                         ],
                         onSuccess: () => {
                             this._progressBar.setLeftProgress(++successProgress);
                         },
                         onError  : () => {
                             this._progressBar.setRightProgress(++errorProgress);
-                        },
-                        onBefore : () => {
-                            this._logger.log(`работа с категорией ${ category } начата`);
-                        },
-                        onFinally: () => {
-                            this._logger.log(`работа с категорией ${ category } закончена`);
+                            errorCategories.push(category);
                         },
                     }),
                 ),
@@ -129,7 +133,7 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
                 .finally(() => {
                     this._createButton.setLoading(false);
                     this._textarea.setDisable(false);
-                    this._setCategoriesToTextarea([]); // TODO: Set error categories
+                    this._setCategoriesToTextarea(errorCategories);
                 });
         }
     }

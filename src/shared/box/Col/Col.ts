@@ -19,4 +19,8 @@ export class Col extends Component<HTMLDivElement> {
 
         rows.forEach((row) => row.insert(this.element, 'beforeend'));
     }
+
+    add (row: Component<HTMLElement>) {
+        row.insert(this.element, 'beforeend');
+    }
 }

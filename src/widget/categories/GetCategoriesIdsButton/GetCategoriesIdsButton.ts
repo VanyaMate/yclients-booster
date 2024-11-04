@@ -1,6 +1,9 @@
 import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import { Modal } from '@/shared/modal/Modal/Modal.ts';
 import { Table } from '@/shared/table/Table/Table.ts';
+import {
+    getGoodsCategoriesDomAction,
+} from '@/action/goods/list/dom-actions/getGoodsCategories.dom-action.ts';
 
 
 export class GetCategoriesIdsButton extends Button {
@@ -15,7 +18,7 @@ export class GetCategoriesIdsButton extends Button {
     }
 
     showIds () {
-        const categories = this.getAllCategories();
+        const categories = getGoodsCategoriesDomAction();
         const table      = new Table({ header: [ 'title', 'id' ] });
         const modal      = new Modal({
             content: table,
@@ -24,13 +27,5 @@ export class GetCategoriesIdsButton extends Button {
 
         categories.forEach((category) => table.addRow([ category.title, category.id ]));
         modal.show();
-    }
-
-    private getAllCategories () {
-        const categories = [ ...document.querySelectorAll('.dd-item') ];
-        return categories.map((category) => ({
-            id   : category.getAttribute('data-id') ?? '-',
-            title: category.textContent!.trim(),
-        }));
     }
 }

@@ -6,6 +6,7 @@ import css from './Button.module.css';
 
 
 export enum ButtonStyleType {
+    DEFAULT,
     PRIMARY,
     DANGER,
 }
@@ -32,10 +33,9 @@ export class Button extends Component<HTMLButtonElement> {
         super('button', other);
 
         this.element.classList.add(css.container);
-        if (styleType === ButtonStyleType.PRIMARY) {
-            this.element.classList.add(css.primary);
-        } else if (styleType === ButtonStyleType.DANGER) {
-            this.element.classList.add(css.danger);
+
+        if (styleType !== undefined) {
+            this.setStyleType(styleType);
         }
 
         if (size === ButtonSizeType.SMALL) {
@@ -58,6 +58,17 @@ export class Button extends Component<HTMLButtonElement> {
         } else {
             this.element.classList.remove(css.loading);
             this.element.disabled = false;
+        }
+    }
+
+    setStyleType (styleType: ButtonStyleType) {
+        this.element.classList.remove(css.primary);
+        this.element.classList.remove(css.danger);
+
+        if (styleType === ButtonStyleType.PRIMARY) {
+            this.element.classList.add(css.primary);
+        } else if (styleType === ButtonStyleType.DANGER) {
+            this.element.classList.add(css.danger);
         }
     }
 }

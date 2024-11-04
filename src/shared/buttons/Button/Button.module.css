@@ -67,4 +67,9 @@
     &:focus {
         outline : 1px solid var(--primary-color);
     }
+
+    &:disabled {
+        pointer-events : none;
+        opacity        : .5;
+    }
 }

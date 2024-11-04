@@ -30,9 +30,10 @@ export class PromiseSplitter {
                 reject(new Error(ERROR_PROMISE_SPLITTER_IS_ACTIVE));
             }
 
-            this._chains         = chains;
-            this._finishedChains = 0;
-            this._chainsIsActive = true;
+            this._chains           = chains;
+            this._finishedChains   = 0;
+            this._chainsIsActive   = true;
+            this._activeChainIndex = 0;
 
             for (let i = 0; i < this._limit; i++) {
                 this._nextChain(resolve);

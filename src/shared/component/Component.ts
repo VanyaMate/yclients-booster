@@ -26,4 +26,8 @@ export class Component<T extends HTMLElement> implements IComponent<T> {
     remove (): void {
         this._element.remove();
     }
+
+    clear (): void {
+        this.element.innerHTML = ``;
+    }
 }
