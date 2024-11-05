@@ -20,26 +20,24 @@ export const getGoodsCategoryRequestAction = function (clientId: string, categor
 
             if (form) {
                 const titleElement   = form.querySelector<HTMLInputElement>('input[name="title"]');
-                const pidElement     = form.querySelector<HTMLSelectElement>('select[name="pid"]');
+                const pidElement     = form.querySelector<HTMLSelectElement>('select[name="pid"], input[name="pid"]');
                 const articleElement = form.querySelector<HTMLInputElement>('input[name="article"]');
                 const commentElement = form.querySelector<HTMLInputElement>('input[name="comment"]');
 
                 if (titleElement && pidElement && articleElement && commentElement) {
                     const option = pidElement.querySelector<HTMLOptionElement>(`option[value="${ pidElement.value }"]`);
 
-                    if (option) {
-                        return {
-                            id             : categoryId,
-                            isChainCategory: titleElement.disabled,
-                            title          : titleElement.value,
-                            article        : articleElement.value,
-                            comment        : commentElement.value,
-                            parent         : {
-                                id   : pidElement.value,
-                                title: option.textContent!.trim(),
-                            },
-                        };
-                    }
+                    return {
+                        id             : categoryId,
+                        isChainCategory: titleElement.disabled,
+                        title          : titleElement.value,
+                        article        : articleElement.value,
+                        comment        : commentElement.value,
+                        parent         : {
+                            id   : pidElement.value,
+                            title: option?.textContent!.trim() ?? '',
+                        },
+                    };
                 }
             }
 

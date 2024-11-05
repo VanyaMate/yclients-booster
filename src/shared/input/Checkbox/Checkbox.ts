@@ -14,12 +14,26 @@ export class Checkbox extends Component<HTMLInputElement> {
         this.element.classList.add(css.container);
     }
 
-    setChecked (status: boolean) {
-        this.element.checked = status;
-        this.element.dispatchEvent(new CustomEvent('change', {
-            detail: {
-                target: this.element,
-            },
-        }));
+    setChecked (status: boolean, force: boolean = false) {
+        if (!this.element.disabled || force) {
+            this.element.checked = status;
+            this.element.dispatchEvent(new CustomEvent('change', {
+                detail: {
+                    target: this.element,
+                },
+            }));
+        }
+    }
+
+    setDisable (state: boolean) {
+        this.element.disabled = state;
+    }
+
+    getState () {
+        return this.element.checked;
+    }
+
+    getValue () {
+        return this.element.value;
     }
 }

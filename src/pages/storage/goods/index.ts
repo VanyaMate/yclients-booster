@@ -15,8 +15,12 @@ const getCategoriesCreateButtonPlace = function () {
     return document.querySelector('#nestable')!.parentNode;
 };
 
+let clientId: string = '';
+
 export const isGoodsPage = function (pathNameParts: Array<string>) {
-    return pathNameParts[1] === 'goods' && pathNameParts[3]?.match(/\d+/);
+    const isGoods = pathNameParts[1] === 'goods';
+    clientId      = pathNameParts[3];
+    return isGoods && clientId?.match(/\d+/);
 };
 
 export const goodsPageHandler = function () {
@@ -25,7 +29,7 @@ export const goodsPageHandler = function () {
         new Col({
             rows: [
                 new CreateManyCategoriesButton(),
-                new GetCategoriesIdsButton(),
+                new GetCategoriesIdsButton({ clientId: clientId }),
                 new DeleteManyCategoriesButton(),
             ],
         }).insert(position, 'beforeend');

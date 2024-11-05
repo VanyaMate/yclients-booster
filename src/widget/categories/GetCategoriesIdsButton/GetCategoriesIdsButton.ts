@@ -1,31 +1,41 @@
-import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
-import { Modal } from '@/shared/modal/Modal/Modal.ts';
-import { Table } from '@/shared/table/Table/Table.ts';
 import {
-    getGoodsCategoriesDomAction,
-} from '@/action/goods/list/dom-actions/getGoodsCategories.dom-action.ts';
+    Button,
+    ButtonStyleType,
+} from '@/shared/buttons/Button/Button.ts';
+import { Modal } from '@/shared/modal/Modal/Modal.ts';
+import {
+    GetGoodsCategoriesIdsTable,
+} from '@/widget/goods/list/GetGoodsCategoriesIdsTable/GetGoodsCategoriesIdsTable.ts';
 
+
+export type GetCategoriesIdsButtonProps = {
+    clientId: string;
+}
 
 export class GetCategoriesIdsButton extends Button {
-    constructor () {
+    private readonly _clientId: string                           = '';
+    private _modal: Modal | null                        = null;
+    private _content: GetGoodsCategoriesIdsTable | null = null;
+
+    constructor (props: GetCategoriesIdsButtonProps) {
         super({
             innerHTML: 'Узнать все ID',
             styleType: ButtonStyleType.PRIMARY,
             fullWidth: true,
         });
-
+        this._clientId = props.clientId;
         this.element.addEventListener('click', this.showIds.bind(this));
     }
 
     showIds () {
-        const categories = getGoodsCategoriesDomAction();
-        const table      = new Table({ header: [ 'title', 'id' ] });
-        const modal      = new Modal({
-            content: table,
-            label  : 'IDs категорий',
-        });
+        if (!this._modal) {
+            this._content = new GetGoodsCategoriesIdsTable({ clientId: this._clientId });
+            this._modal   = new Modal({
+                content: this._content,
+                label  : 'IDs категорий',
+            });
+        }
 
-        categories.forEach((category) => table.addRow([ category.title, category.id ]));
-        modal.show();
+        this._modal.show();
     }
 }

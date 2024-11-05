@@ -1,13 +1,115 @@
 .container {
-    display     : flex;
-    align-items : center;
-    gap         : var(--offset-small);
+    display   : inline-flex;
+    text-wrap : nowrap;
+    max-width : 100%;
+
+    input {
+        background : none;
+        outline    : none;
+        border     : none;
+        opacity    : 0;
+        width      : 0;
+        height     : 0;
+        overflow   : hidden;
+    }
 
     label {
-        cursor      : pointer;
-        margin      : 0;
-        padding     : 0;
-        box-sizing  : border-box;
-        font-weight : normal;
+        font-weight   : normal;
+        display       : inline-flex;
+        align-items   : center;
+        gap           : var(--offset-small);
+        padding       : var(--offset-extra-small);
+        border-radius : var(--offset-small);
+        background    : var(--bg-main);
+        width         : 100%;
+        overflow      : hidden;
+        text-overflow : ellipsis;
+        white-space   : nowrap;
+        color         : var(--color-light-black);
+        cursor        : pointer;
+        transition    : var(--transition-fast);
+        user-select   : none;
+        margin        : 0 !important;
+        border        : 1px solid transparent;
+
+        span:nth-child(1) {
+            color : var(--color-dark-gray);
+        }
+
+        &:hover {
+            border : 1px solid var(--border-color);
+        }
+
+        &:active {
+            background : var(--bg-second);
+        }
+
+        &::before {
+            content         : '\2718';
+            display         : inline-flex;
+            align-items     : center;
+            justify-content : center;
+            width           : 20px;
+            overflow        : hidden;
+            height          : 20px;
+            background      : var(--bg-second);
+            border          : 1px solid var(--border-color);
+            transition      : var(--transition-fast);
+            border-radius   : var(--offset-small);
+            color           : var(--color-light-black);
+            font-size       : 10px;
+        }
+    }
+
+
+    input {
+        background : none;
+        outline    : none;
+        border     : none;
+        opacity    : 0;
+        width      : 0;
+        height     : 0;
+        overflow   : hidden;
+
+        &:disabled {
+            & ~ label {
+                pointer-events : none;
+                opacity        : .2;
+                background     : var(--bg-second);
+            }
+        }
+
+        &:checked {
+            & ~ label {
+                color  : var(--color-light-black);
+                border : 1px solid var(--success-color);
+
+                &::before {
+                    content    : '\2714';
+                    background : var(--success-color);
+                    color      : var(--on-success-color);
+                    border     : 1px solid var(--success-color);
+                }
+            }
+        }
+
+        &:focus {
+            &:checked {
+                & ~ label {
+                    border     : 1px solid var(--success-color);
+                    background : var(--bg-main);
+
+                    &::before {
+                        border : 1px solid var(--success-color);
+                    }
+                }
+            }
+
+            &:not(:checked) {
+                & ~ label {
+                    border : 1px solid var(--color-dark-black-opacity);
+                }
+            }
+        }
     }
 }

@@ -16,6 +16,10 @@ import { TextInput } from '@/shared/input/TextInput/TextInput.ts';
 import {
     getGoodsCategoriesDomAction,
 } from '@/action/goods/list/dom-actions/getGoodsCategories.dom-action.ts';
+import {
+    PROMISE_SPLITTER_MAX_REQUESTS,
+    PROMISE_SPLITTER_MAX_RETRY,
+} from '@/service/PromiseSplitter/const/const.ts';
 
 
 export type CreateManyGoodsCategoriesFormProps =
@@ -25,8 +29,6 @@ export type CreateManyGoodsCategoriesFormProps =
     }
 
 export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
-    private readonly _MAX_REQUESTS_AT_TIME      = 5;
-    private readonly _MAX_REQUESTS_RETRY        = 2;
     private readonly _logger: Logger;
     private readonly _textarea: TextArea;
     private readonly _comment: TextInput;
@@ -34,7 +36,7 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
     private readonly _progressBar: ProgressBar;
     private readonly _createButton: Button;
     private readonly _selectCategories: Select;
-    private readonly _splitter: PromiseSplitter = new PromiseSplitter(this._MAX_REQUESTS_AT_TIME, this._MAX_REQUESTS_RETRY);
+    private readonly _splitter: PromiseSplitter = new PromiseSplitter(PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY);
 
     constructor (props: CreateManyGoodsCategoriesFormProps) {
         const { clientId, ...other } = props;

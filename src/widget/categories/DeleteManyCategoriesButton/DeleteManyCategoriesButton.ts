@@ -1,11 +1,14 @@
 import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import { Modal } from '@/shared/modal/Modal/Modal.ts';
 import {
-    DeleteManyCategoriesFormWidget,
-} from '@/widget/categories/DeleteManyCategoriesFormWidget/DeleteManyCategoriesFormWidget.ts';
+    DeleteManyGoodsCategoriesForm,
+} from '@/widget/goods/list/DeleteManyGoodsCategoriesForm/DeleteManyGoodsCategoriesForm.ts';
 
 
 export class DeleteManyCategoriesButton extends Button {
+    private _modal: Modal | null                           = null;
+    private _content: DeleteManyGoodsCategoriesForm | null = null;
+
     constructor () {
         super({
             innerHTML: 'Удалить множество',
@@ -16,28 +19,20 @@ export class DeleteManyCategoriesButton extends Button {
     }
 
     showModal () {
-        const categories = this.getAllCategories();
-        const deleteForm = new DeleteManyCategoriesFormWidget({
-            clientId: this.getClientId(),
-        });
-        deleteForm.setCategories(categories);
-        const modal = new Modal({
-            content: deleteForm,
-            label  : 'Удаление категорий',
-        });
+        if (!this._modal) {
+            this._content = new DeleteManyGoodsCategoriesForm({
+                clientId: this.getClientId(),
+            });
+            this._modal   = new Modal({
+                content: this._content,
+                label  : 'Удаление категорий',
+            });
+        }
 
-        modal.show();
+        this._modal.show();
     }
 
     private getClientId () {
         return location.pathname.split('/')[3];
-    }
-
-    private getAllCategories () {
-        const categories = [ ...document.querySelectorAll('.dd-item') ];
-        return categories.map((category) => ({
-            id   : category.getAttribute('data-id') ?? '-',
-            title: category.textContent!.trim(),
-        }));
     }
 }

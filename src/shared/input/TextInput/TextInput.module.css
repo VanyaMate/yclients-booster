@@ -6,6 +6,7 @@
     transition    : var(--transition-fast);
     box-shadow    : 0 0 0 0 transparent;
     border-radius : var(--offset-small);
+    height        : 30px;
 
     &:focus {
         border     : 1px solid var(--primary-color);

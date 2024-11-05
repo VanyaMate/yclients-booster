@@ -8,6 +8,7 @@
     overflow       : auto;
     border-radius  : var(--offset-small);
     font-family    : Consolas, monospace;
+    min-height     : 30px;
 
     .item {
         display : flex;

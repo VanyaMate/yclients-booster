@@ -1,8 +1,8 @@
 .container {
     display         : flex;
     justify-content : space-between;
-    background      : var(--bg-second);
-    border          : 1px solid var(--border-color);
+    background      : var(--bg-main);
+    border          : 1px dotted var(--border-color);
     border-radius   : var(--offset-small);
     overflow        : hidden;
     position        : relative;
@@ -25,7 +25,7 @@
         top           : 50%;
         left          : 50%;
         transform     : translate(-50%, -50%);
-        background    : var(--bg-main);
+        background    : var(--bg-second);
         border-radius : var(--offset-small);
         padding       : var(--offset-extra-small) var(--offset-small);
         height        : 20px;

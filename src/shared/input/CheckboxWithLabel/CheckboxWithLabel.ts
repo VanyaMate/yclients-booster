@@ -7,25 +7,45 @@ export type CheckboxWithLabelProps =
     CheckboxProps
     & {
         label: string;
+        labelPrefix?: string;
     }
 
 export class CheckboxWithLabel extends Component<HTMLInputElement> {
     private _checkbox: Checkbox;
+    private readonly _label: string;
 
     constructor (props: CheckboxWithLabelProps) {
-        const { label, ...other } = props;
-        const uniqueId            = Math.random().toString();
+        const { label, labelPrefix, ...other } = props;
+        const uniqueId                         = Math.random().toString();
 
         super('div', {
             className: css.container,
-            innerHTML: `<label for="${ uniqueId }">${ label }</label>`,
+            innerHTML: `<label for="${ uniqueId }"><span>${ labelPrefix }</span><span>${ label }</span></label>`,
         });
+
+        this._label = label;
 
         this._checkbox = new Checkbox({ ...other, id: uniqueId });
         this._checkbox.insert(this.element, 'afterbegin');
     }
 
-    setChecked (status: boolean) {
-        this._checkbox.setChecked(status);
+    setChecked (status: boolean, force: boolean = false) {
+        this._checkbox.setChecked(status, force);
+    }
+
+    setDisable (state: boolean) {
+        this._checkbox.setDisable(state);
+    }
+
+    getLabel (): string {
+        return this._label;
+    }
+
+    getValue () {
+        return this._checkbox.getValue();
+    }
+
+    getState () {
+        return this._checkbox.getState();
     }
 }

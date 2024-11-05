@@ -33,6 +33,13 @@ export class Table extends Component<HTMLTableElement> {
         `);
     }
 
+    updateRow (rowIndex: number, items: Array<string>) {
+        const row = this._tbody.children[rowIndex];
+        if (row) {
+            row.innerHTML = items.map((item) => `<td>${ item }</td>`).join('');
+        }
+    }
+
     private setHeader (header: Array<string>) {
         const tr     = document.createElement('tr');
         const titles = header.map((title) => `<th>${ title }</th>`);

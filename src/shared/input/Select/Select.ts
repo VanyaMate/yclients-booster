@@ -61,6 +61,7 @@ export class Select extends Component<HTMLDivElement> {
             textContent: this._currentLabel,
             styleType  : ButtonStyleType.DEFAULT,
             fullWidth  : true,
+            className  : css.label,
             onclick    : this._toggle.bind(this),
         });
         this._selectButton.insert(this.element, 'afterbegin');
@@ -125,12 +126,12 @@ export class Select extends Component<HTMLDivElement> {
             );
         }
         this._list
-            .filter((item) => item.label.match(new RegExp(this._search, 'gi')))
+            .filter((item) => item.label.match(new RegExp(this._search, 'gi')) || item.value.match(this._search))
             .forEach((item) => {
                 selected = item.value === this._currentValue;
                 this._optionsBox.add(
                     new Button({
-                        textContent: item.label,
+                        textContent: `${ item.label } (${ item.value })`,
                         styleType  : selected ? ButtonStyleType.PRIMARY
                                               : undefined,
                         disabled   : selected,

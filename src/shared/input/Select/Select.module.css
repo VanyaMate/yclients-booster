@@ -2,7 +2,15 @@
     position : relative;
 
     .label {
+        position : relative;
 
+        &:after {
+            content   : '▼';
+            position  : absolute;
+            right     : var(--offset-small);
+            top       : 50%;
+            transform : translateY(-50%);
+        }
     }
 
     .dropdown {
@@ -29,14 +37,6 @@
         }
     }
 
-    &:after {
-        content   : '▼';
-        position  : absolute;
-        right     : var(--offset-small);
-        top       : 50%;
-        transform : translateY(-50%);
-    }
-
     &.show {
         .dropdown {
             visibility : visible;
@@ -44,7 +44,7 @@
             transform  : translateY(calc(-1 * var(--offset-small)));
         }
 
-        &:after {
+        .label:after {
             content : '▲';
         }
     }
