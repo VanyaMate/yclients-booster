@@ -4,17 +4,16 @@ import {
 import {
     ERROR_GOODS_CATEGORY_GETTING,
 } from '@/action/goods/list/errors/goods-category.errors.ts';
+import {
+    fetchResponseToDom,
+} from '@/helper/action/fetchResponseToDom/fetchResponseToDom.ts';
 
 
 export const getGoodsCategoryRequestAction = function (clientId: string, categoryId: string): Promise<GoodsCategoryFullData> {
     return fetch(`https://yclients.com/goods/category_edit/${ clientId }/${ categoryId }/`, {
         method: 'GET',
     })
-        .then((response) => response.text())
-        .then((text: string) => {
-            const domParser = new DOMParser();
-            return domParser.parseFromString(text, 'text/html');
-        })
+        .then(fetchResponseToDom)
         .then((dom: Document) => {
             const form = dom.querySelector('#goods_form');
 
