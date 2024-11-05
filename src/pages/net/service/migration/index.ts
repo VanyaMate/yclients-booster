@@ -31,7 +31,6 @@ export const netServiceMigrationPageHandler = function () {
 
             container.querySelectorAll<HTMLElement>(`tbody tr:not(.service-row)`).forEach((category) => {
                 const id = category.getAttribute('data-category-id') ?? '';
-                console.log(category.textContent, category.querySelector('td'));
                 new Row({
                     cols  : [
                         new SelectAllChildCategoriesButton(container, id),
