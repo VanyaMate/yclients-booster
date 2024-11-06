@@ -4,13 +4,16 @@ export type  SalaryCriteriaShortData = {
 };
 
 export type SalaryCriteriaContextCategory = {
-    category: string;
-    item: string;
+    categoryId: string;
+    title: string;
+    children: Array<SalaryCriteriaContextItem>;
 }
 
 export type SalaryCriteriaContextItem = {
-    category: string;
-    item: string;
+    categoryId: string;
+    categoryTitle: string;
+    itemId: string;
+    title: string;
 }
 
 export type SalaryCriteriaContext = {
@@ -22,7 +25,7 @@ export type SalaryCriteriaContext = {
 
 export type SalaryCriteriaRuleData = {
     id: string;
-    useNetCost: number;
+    useNetCost: string;
     individualType: string;
     targetType: string;
     amount: string;

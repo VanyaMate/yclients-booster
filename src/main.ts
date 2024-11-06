@@ -23,3 +23,11 @@ if (isGoodsPage(pathParts)) {
 } else if (isSalaryParamsListPage(pathParts)) {
     salaryParamsListHandler();
 }
+
+/*
+ getSalaryCriteriaRequestAction('1092329', '42919')
+ .then((data) => console.log(data));
+
+ getSettingsServiceCategoriesFullDataRequestAction('BEARER_TOKEN', '1092329')
+ .then((data) => console.log(data))
+ .catch((e) => console.error(e));*/
