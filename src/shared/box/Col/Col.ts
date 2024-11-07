@@ -14,10 +14,8 @@ export type ColProps =
 export class Col extends Component<HTMLDivElement> {
     constructor (props: ColProps) {
         const { rows, ...other } = props;
-        super('div', other);
+        super('div', other, rows);
         this.element.classList.add(css.container);
-
-        rows.forEach((row) => row.insert(this.element, 'beforeend'));
     }
 
     add (row: Component<HTMLElement>) {

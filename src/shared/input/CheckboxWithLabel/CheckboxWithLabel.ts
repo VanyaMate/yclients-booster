@@ -18,10 +18,13 @@ export class CheckboxWithLabel extends Component<HTMLInputElement> {
         const { label, labelPrefix, ...other } = props;
         const uniqueId                         = Math.random().toString();
 
-        super('div', {
-            className: css.container,
-            innerHTML: `<label for="${ uniqueId }"><span>${ labelPrefix }</span><span>${ label }</span></label>`,
-        });
+        super(
+            'div',
+            {
+                className: css.container,
+                innerHTML: `<label for="${ uniqueId }"><span>${ labelPrefix }</span><span>${ label }</span></label>`,
+            },
+        );
 
         this._label = label;
 

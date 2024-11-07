@@ -15,13 +15,11 @@ export type RowProps =
 export class Row extends Component<HTMLDivElement> {
     constructor (props: RowProps) {
         const { cols, inline, ...other } = props;
-        super('div', other);
+        super('div', other, cols);
         this.element.classList.add(css.container);
 
         if (inline) {
             this.element.classList.add(css.inline);
         }
-
-        cols.forEach((col) => col.insert(this.element, 'beforeend'));
     }
 }
