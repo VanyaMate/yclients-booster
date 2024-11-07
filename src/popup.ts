@@ -11,11 +11,9 @@ new Component<HTMLDivElement>('div', { id: 'app' }, [
             }
         
             body {
-                display: flex;
-                flex-direction: column;
-                align-items: safe center;
-                justify-content: safe center;
                 background: #fee;
+                width: fit-content;
+                height: fit-content;
             }
             
             #app {
