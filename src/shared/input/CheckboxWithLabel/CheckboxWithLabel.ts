@@ -18,16 +18,25 @@ export class CheckboxWithLabel extends Component<HTMLInputElement> {
         const { label, labelPrefix, ...other } = props;
         const uniqueId                         = Math.random().toString();
 
-        super(
-            'div',
-            {
-                className: css.container,
-                innerHTML: `<label for="${ uniqueId }"><span>${ labelPrefix }</span><span>${ label }</span></label>`,
-            },
-        );
+        super('div', { className: css.container });
 
-        this._label = label;
+        const children = [
+            new Component<HTMLSpanElement>('span', { textContent: label }),
+        ];
 
+        if (labelPrefix !== undefined) {
+            children.unshift(
+                new Component<HTMLSpanElement>('span', {
+                    textContent: labelPrefix,
+                    className  : css.prefix,
+                }),
+            );
+        }
+
+        new Component<HTMLLabelElement>('label', { htmlFor: uniqueId }, children)
+            .insert(this.element, 'afterbegin');
+
+        this._label    = label;
         this._checkbox = new Checkbox({ ...other, id: uniqueId });
         this._checkbox.insert(this.element, 'afterbegin');
     }
