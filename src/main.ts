@@ -12,6 +12,11 @@ import {
     isSalaryParamsListPage,
     salaryParamsListHandler,
 } from '@/pages/salary_params/list';
+import {
+    isSalaryCriteriaPage,
+    salaryCriteriaPageHandler,
+} from '@/pages/salary_criteria';
+import { commonPageHandler } from '@/pages/_common';
 
 
 const pathParts = location.pathname.split('/');
@@ -22,12 +27,8 @@ if (isGoodsPage(pathParts)) {
     netServiceMigrationPageHandler();
 } else if (isSalaryParamsListPage(pathParts)) {
     salaryParamsListHandler();
+} else if (isSalaryCriteriaPage(pathParts)) {
+    salaryCriteriaPageHandler();
 }
 
-/*
- getSalaryCriteriaRequestAction('1092329', '42919')
- .then((data) => console.log(data));
-
- getSettingsServiceCategoriesFullDataRequestAction('BEARER_TOKEN', '1092329')
- .then((data) => console.log(data))
- .catch((e) => console.error(e));*/
+commonPageHandler();
