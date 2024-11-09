@@ -15,15 +15,17 @@ import {
 import {
     ERROR_SETTINGS_SERVICE_CATEGORIES_CANNOT_GET_DATA,
 } from '@/action/settings/service_categories/errors/settings-service_categories.errors.ts';
+import { Logger } from '@/entity/logger/Logger/Logger.ts';
 
 
-export const getSettingsServiceCategoriesFullDataRequestAction = async function (bearer: string, clientId: string): Promise<SettingsServiceCategoryResponse> {
+export const getSettingsServiceCategoriesFullDataRequestAction = async function (bearer: string, clientId: string, logger?: Logger): Promise<SettingsServiceCategoryResponse> {
+    logger?.log(`получение списка категорий услуг и списка услуг с полными данными для клиента "${ clientId }"`);
     const response: SettingsServiceCategoryResponse = {
         list          : [],
         serviceMapper : {},
         categoryMapper: {},
     };
-    const categories                                = await getSettingsServiceCategoriesRequestAction(bearer, clientId);
+    const categories                                = await getSettingsServiceCategoriesRequestAction(bearer, clientId, logger);
     const promiseSplitter: PromiseSplitter          = new PromiseSplitter(1, PROMISE_SPLITTER_MAX_RETRY);
     return await promiseSplitter.exec(
         categories.data.map((category) => {
@@ -37,7 +39,7 @@ export const getSettingsServiceCategoriesFullDataRequestAction = async function 
             return {
                 chain: [
                     async () => {
-                        const services        = await getSettingsServicesByCategoryRequestAction(bearer, clientId, category.id.toString());
+                        const services        = await getSettingsServicesByCategoryRequestAction(bearer, clientId, category.id.toString(), logger);
                         categoryItem.children = services.data;
                         services.data.forEach((service) => {
                             response.serviceMapper[service.id.toString()] = service;
@@ -47,8 +49,12 @@ export const getSettingsServiceCategoriesFullDataRequestAction = async function 
             };
         }),
     )
-        .then(() => response)
+        .then(() => {
+            logger?.success(`список категорий услуг и список услуг с полными данными для клиента "${ clientId }" получены`);
+            return response;
+        })
         .catch(() => {
+            logger?.error(`список категорий услуг и список услуг с полными данными для клиента "${ clientId }" не получены`);
             throw new Error(ERROR_SETTINGS_SERVICE_CATEGORIES_CANNOT_GET_DATA);
         });
 };

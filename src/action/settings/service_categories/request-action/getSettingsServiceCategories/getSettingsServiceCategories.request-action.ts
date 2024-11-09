@@ -1,16 +1,26 @@
 import {
     SettingsServiceCategoriesApiResponse,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
+import { Logger } from '@/entity/logger/Logger/Logger.ts';
 
 
-export const getSettingsServiceCategoriesRequestAction = function (bearer: string, clientId: string): Promise<SettingsServiceCategoriesApiResponse> {
+export const getSettingsServiceCategoriesRequestAction = function (bearer: string, clientId: string, logger?: Logger): Promise<SettingsServiceCategoriesApiResponse> {
+    logger?.log(`получение списка категорий услуг для клиента "${ clientId }"`);
     return fetch(`https://yclients.com/api/v1/company/${ clientId }/service_categories?include=services_count`, {
         method : 'GET',
         headers: {
             'Authorization': `Bearer ${ bearer }`,
         },
     })
-        .then((response) => response.json());
+        .then((response) => {
+            if (response.ok) {
+                logger?.success(`список категорий услуг для клиента "${ clientId }" получен`);
+                return response.json();
+            } else {
+                logger?.error(`список категорий услуг для клиента "${ clientId }" не получен`);
+                throw response.json();
+            }
+        });
 
     /*    return fetch(`https://yclients.com/settings/service_categories/${ clientId }/`, {
      method: 'GET',

@@ -11,6 +11,7 @@ import {
     ERROR_SALARY_CRITERIA_CANNOT_GET_DATA,
     ERROR_SALARY_CRITERIA_CANNOT_GET_RULES,
 } from '@/action/salary_criteria/errors/salary-criteria.errors.ts';
+import { Logger } from '@/entity/logger/Logger/Logger.ts';
 
 
 const getSalaryCriteriaContextData = function (contextJson: string): SalaryCriteriaContext {
@@ -60,20 +61,24 @@ const getSalaryCriteriaContextData = function (contextJson: string): SalaryCrite
     }
 };
 
-export const getSalaryCriteriaRequestAction = function (clientId: string, criteriaId: string): Promise<SalaryCriteriaFullData> {
+export const getSalaryCriteriaRequestAction = function (clientId: string, criteriaId: string, logger?: Logger): Promise<SalaryCriteriaFullData> {
+    logger?.log(`получение полных данных для критерия "${ criteriaId }" для клиента "${ clientId }"`);
     return fetch(`https://yclients.com/salary_criteria/edit/${ clientId }/${ criteriaId }/`, {
         method: 'GET',
     })
         .then(fetchResponseToDom)
         .then((dom: Document) => {
+            logger?.log(`есть ответ от сервера для критерия "${ criteriaId }" для клиента "${ clientId }"`);
             const form = dom.querySelector('#salary_criteria_form');
 
             if (form) {
+                logger?.success(`ответ от сервера для критерия "${ criteriaId }" для клиента "${ clientId }" содержит форму`);
                 const title             = form.querySelector<HTMLInputElement>('input[name="title"]');
                 const period            = form.querySelector<HTMLSelectElement>('select[name="period_type"]');
                 const criteriaContainer = form.querySelector('#criteria_items_container');
 
                 if (title && period && criteriaContainer) {
+                    logger?.success(`ответ от сервера для критерия "${ criteriaId }" для клиента "${ clientId }" содержит основные поля`);
                     const criteriaList                         = [ ...criteriaContainer.querySelectorAll<HTMLTableRowElement>(`tr.criteria_item_row`) ];
                     const rules: Array<SalaryCriteriaRuleData> = [];
 
@@ -115,6 +120,7 @@ export const getSalaryCriteriaRequestAction = function (clientId: string, criter
                                 amount,
                             });
                         } else {
+                            logger?.error(`ошибка "${ ERROR_SALARY_CRITERIA_CANNOT_GET_RULES }" для критерия "${ criteriaId }" для клиента "${ clientId }"`);
                             throw new Error(ERROR_SALARY_CRITERIA_CANNOT_GET_RULES);
                         }
                     }
@@ -128,6 +134,7 @@ export const getSalaryCriteriaRequestAction = function (clientId: string, criter
                 }
             }
 
+            logger?.error(`ошибка "${ ERROR_SALARY_CRITERIA_CANNOT_GET_DATA }" для критерия "${ criteriaId }" для клиента "${ clientId }"`);
             throw new Error(ERROR_SALARY_CRITERIA_CANNOT_GET_DATA);
         });
 };

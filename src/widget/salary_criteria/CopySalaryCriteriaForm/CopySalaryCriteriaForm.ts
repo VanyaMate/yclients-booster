@@ -25,6 +25,8 @@ import {
     CheckboxWithLabel,
 } from '@/shared/input/CheckboxWithLabel/CheckboxWithLabel.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
+import { TextInput } from '@/shared/input/TextInput/TextInput.ts';
+import { Button } from '@/shared/buttons/Button/Button.ts';
 
 
 export type CopySalaryCriteriaFormProps =
@@ -51,13 +53,37 @@ export class CopySalaryCriteriaForm extends Component<HTMLDivElement> {
 
         this._logger.insert(this.element, 'afterbegin');
 
+        const control = new Col({
+            rows: [],
+        });
 
-        this._getCriteriaListData(this._clientId)
-            .then(this._renderSalaryCriteriaCompare.bind(this));
+        const copyToInput = new TextInput({
+            type       : 'text',
+            placeholder: 'Введите ID филиала для сравнения',
+        });
+        const checkButton = new Button({
+            innerHTML: 'Сравнить',
+            onclick  : async () => {
+                const copyToId = copyToInput.getValue();
 
+                if (copyToId) {
+                    control.remove();
+                    const copyFromData = await this._getCriteriaListData(this._clientId);
+                    const copyToData   = await this._getCriteriaListData(copyToId);
 
-        // get copyFrom criteria
+                    console.log('Compare:', copyFromData, 'with', copyToData);
+                }
+            },
+        });
+
+        control.add(copyToInput);
+        control.add(checkButton);
+        control.insert(this.element, 'beforeend');
+
+        console.log(this._renderSalaryCriteriaCompare);
+
         // input copyTo
+        // get copyFrom criteria
         // get copyTo criteria
         // compare criteria
         // предоставить действия
@@ -163,38 +189,20 @@ export class CopySalaryCriteriaForm extends Component<HTMLDivElement> {
         }).insert(this.element, 'beforeend');
     }
 
-    private async _getCriteriaListData (id: string): Promise<Array<SalaryCriteriaFullData>> {
-        this._logger.log(`получение списка критериев для клиента "${ id }"`);
-        const list                                  = await getSalaryCriteriaListRequestAction(id)
-            .then((data) => {
-                this._logger.success(`список критериев для клиента "${ id }" получен`);
-                return data;
-            })
-            .catch((e) => {
-                this._logger.error(`список критериев для клиента "${ id }" не получен`);
-                throw e;
-            });
+    private async _getCriteriaListData (clientId: string): Promise<Array<SalaryCriteriaFullData>> {
+        const list                                  = await getSalaryCriteriaListRequestAction(clientId, this._logger);
         let fullData: Array<SalaryCriteriaFullData> = [];
         let needGetServices: boolean                = false;
         return await this._promiseSplitter.exec(
             list.map((criteria) => {
                 return {
-                    chain    : [
-                        () => getSalaryCriteriaRequestAction(id, criteria.id),
+                    chain: [
+                        () => getSalaryCriteriaRequestAction(clientId, criteria.id, this._logger),
                         async (data: SalaryCriteriaFullData) => {
                             fullData.push(data);
                             needGetServices = data.rules.some((rule) => !!rule.context.services);
                         },
                     ],
-                    onBefore : () => {
-                        this._logger.log(`получение данных для критерия "${ criteria.title }"`);
-                    },
-                    onSuccess: () => {
-                        this._logger.success(`данные для критерия "${ criteria.title }" получены`);
-                    },
-                    onError  : () => {
-                        this._logger.error(`данные для критерия "${ criteria.title }" не получены`);
-                    },
                 };
             }),
         )
@@ -208,28 +216,17 @@ export class CopySalaryCriteriaForm extends Component<HTMLDivElement> {
                 }
 
                 if (needGetServices) {
-                    this._logger.success(`нужно загрузить услуги: Да`);
-                } else {
-                    this._logger.log(`нужно загрузить услуги: Нет`);
+                    this._logger.log('нужно загрузить услуги: Да');
                 }
 
-
                 if (needGetServices && fullData) {
-                    this._logger.log('загрузка услуг');
                     const services = await getSettingsServiceCategoriesFullDataRequestAction(
                         this._bearer,
-                        id,
-                    )
-                        .then((services) => {
-                            this._logger.success('услуги загружены');
-                            return services;
-                        })
-                        .catch((e) => {
-                            this._logger.error('услуги не загружены');
-                            throw e;
-                        });
+                        clientId,
+                        this._logger,
+                    );
 
-                    this._logger.log('заполнение критериев данными услуг');
+                    this._logger.log(`заполнение критериев клиента "${ clientId }" данными услуг`);
 
                     fullData.forEach((data) => data.rules.forEach((rule) => {
                         rule.context.services?.items.forEach((item) => {
@@ -254,7 +251,7 @@ export class CopySalaryCriteriaForm extends Component<HTMLDivElement> {
                         });
                     }));
 
-                    this._logger.success('все критерии успешно заполнены');
+                    this._logger.success(`все критерии клиента "${ clientId }" успешно заполнены`);
                     console.log('fullData', fullData);
                 }
 

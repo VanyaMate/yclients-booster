@@ -1,4 +1,4 @@
-import { Button } from '@/shared/buttons/Button/Button.ts';
+import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import { Modal } from '@/shared/modal/Modal/Modal.ts';
 import {
     CopySalaryCriteriaForm,
@@ -14,6 +14,7 @@ export class CopySalaryCriteriaFromThisToOtherButton extends Button {
     ) {
         super({
             innerHTML: 'Копировать критерии в другой филиал',
+            styleType: ButtonStyleType.PRIMARY,
         });
 
         this.element.addEventListener('click', this._show.bind(this));
