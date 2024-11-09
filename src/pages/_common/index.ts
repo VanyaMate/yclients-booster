@@ -16,6 +16,18 @@ export const commonPageHandler = function () {
 
             if (pageSizeSelect) {
                 new Component<HTMLOptionElement>('option', {
+                    value    : `1000`,
+                    innerHTML: `1000`,
+                }).insert(pageSizeSelect, 'beforeend');
+                new Component<HTMLOptionElement>('option', {
+                    value    : `2000`,
+                    innerHTML: `2000`,
+                }).insert(pageSizeSelect, 'beforeend');
+                new Component<HTMLOptionElement>('option', {
+                    value    : `5000`,
+                    innerHTML: `5000`,
+                }).insert(pageSizeSelect, 'beforeend');
+                new Component<HTMLOptionElement>('option', {
                     value    : `999999`,
                     innerHTML: `Все`,
                 }).insert(pageSizeSelect, 'beforeend');

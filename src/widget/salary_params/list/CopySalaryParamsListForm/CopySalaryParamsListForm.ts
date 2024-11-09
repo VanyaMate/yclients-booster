@@ -15,51 +15,53 @@ export type SalaryItem = {
     title: string;
 }
 
+// * - обязательный
+
 export type SalaryCreateData = {
-    title: string;
-    service_value: string;
-    service_type: string;
-    group_id: string;
-    service_changed_value: string;
-    service_changed_value_type: string;
-    'activity[min][amount]': string;
-    'activity[min][type]': string;
-    'activity[perform][amount]': string;
-    'activity[perform][type]': string;
-    'activity[every_client][enabled]': string;
-    'activity[every_client][min_limit][amount]': string;
-    record_created_fix: string;
-    record_created_each_service_value: string;
-    record_created_each_service_type: string;
-    record_created_service_changed_value: string;
-    record_created_service_changed_value_type: string;
-    record_closed_each_service_value: string;
-    record_closed_each_service_type: string;
-    record_closed_service_changed_value: string;
-    record_closed_service_changed_value_type: string;
-    product_value: string;
-    product_type: string;
-    good_changed_value: string;
-    good_changed_value_type: string;
-    loyalty_discount_value: string;
-    loyalty_discount_type: string;
-    loyalty_program_option_value: string;
-    loyalty_program_option_value_type: string;
-    fix_for_period: string;
-    period_name: string;
-    min_salary_fix: string;
-    min_salary_period_type: string;
-    percent_retro_bonus: string;
-    retro_bonus_use_net_cost: string;
-    retro_bonus_targets_type: string;
-    use_discount: string;
-    use_loyalty_discount: string;
-    use_loyalty_bonus: string;
-    use_loyalty_certificate: string;
-    use_loyalty_abonement: string;
-    use_net_cost_service: string;
-    use_net_cost_good: string;
-    calc_cost_with_discount_after_minus_net_cost: string;
+    title: string;// *
+    service_value: string;// *
+    service_type: string;// *
+    group_id: string;// *
+    service_changed_value: string;// *
+    service_changed_value_type: string;// *
+    'activity[min][amount]': string;// *
+    'activity[min][type]': string;// *
+    'activity[perform][amount]': string;// *
+    'activity[perform][type]': string;// *
+    'activity[every_client][enabled]'?: string;// не указывать / on
+    'activity[every_client][min_limit][amount]': string;// *
+    record_created_fix: string;// *
+    record_created_each_service_value: string;// *
+    record_created_each_service_type: string;// *
+    record_created_service_changed_value: string;// *
+    record_created_service_changed_value_type: string;// *
+    record_closed_each_service_value: string;// *
+    record_closed_each_service_type: string;// *
+    record_closed_service_changed_value: string;// *
+    record_closed_service_changed_value_type: string;// *
+    product_value: string;// *
+    product_type: string;// *
+    good_changed_value: string;// *
+    good_changed_value_type: string;// *
+    loyalty_discount_value: string;// *
+    loyalty_discount_type: string;// *
+    loyalty_program_option_value: string;// *
+    loyalty_program_option_value_type: string;// *
+    fix_for_period: string;// *
+    period_name: string;// *
+    min_salary_fix: string;// *
+    min_salary_period_type: string;// *
+    percent_retro_bonus: string;// *
+    retro_bonus_use_net_cost: string;// *
+    retro_bonus_targets_type: string;// *
+    use_discount?: string;
+    use_loyalty_discount?: string;
+    use_loyalty_bonus?: string;
+    use_loyalty_certificate?: string;
+    use_loyalty_abonement?: string;
+    use_net_cost_service?: string;
+    use_net_cost_good?: string;
+    calc_cost_with_discount_after_minus_net_cost?: string;
 }
 
 export class CopySalaryParamsListForm extends Component<HTMLDivElement> {
@@ -221,59 +223,80 @@ export class CopySalaryParamsListForm extends Component<HTMLDivElement> {
     }
 
     private parseSalaryDataFromDom (form: HTMLFormElement): SalaryCreateData {
-        return {
-            title                                       : form.querySelector<HTMLInputElement>('input[name="title"]')!?.value,
-            service_value                               : form.querySelector<HTMLInputElement>('input[name="service_value"]')!?.value,
-            service_type                                : form.querySelector<HTMLInputElement>('select[name="service_type"]')!?.value,
-            group_id                                    : form.querySelector<HTMLInputElement>('select[name="group_id"]')!?.value,
-            service_changed_value                       : form.querySelector<HTMLInputElement>('input[name="service_changed_value"]')!?.value,
-            service_changed_value_type                  : form.querySelector<HTMLInputElement>('select[name="service_changed_value_type"]')!?.value,
-            'activity[min][amount]'                     : form.querySelector<HTMLInputElement>('input[name="activity[min][amount]"]')!?.value,
-            'activity[min][type]'                       : form.querySelector<HTMLInputElement>('select[name="activity[min][type]"]')!?.value,
-            'activity[perform][amount]'                 : form.querySelector<HTMLInputElement>('input[name="activity[perform][amount]"]')!?.value,
-            'activity[perform][type]'                   : form.querySelector<HTMLInputElement>('select[name="activity[perform][type]"]')!?.value,
-            'activity[every_client][enabled]'           : form.querySelector<HTMLInputElement>('input[name="activity[every_client][enabled]"]')!?.checked
-                                                          ? 'on' : '',
-            'activity[every_client][min_limit][amount]' : form.querySelector<HTMLInputElement>('input[name="activity[every_client][min_limit][amount]"]')!?.value,
-            record_created_fix                          : form.querySelector<HTMLInputElement>('input[name="record_created_fix"]')!?.value,
-            record_created_each_service_value           : form.querySelector<HTMLInputElement>('input[name="record_created_each_service_value"]')!?.value,
-            record_created_each_service_type            : form.querySelector<HTMLInputElement>('select[name="record_created_each_service_type"]')!?.value,
-            record_created_service_changed_value        : form.querySelector<HTMLInputElement>('input[name="record_created_service_changed_value"]')!?.value,
-            record_created_service_changed_value_type   : form.querySelector<HTMLInputElement>('select[name="record_created_service_changed_value_type"]')!?.value,
-            record_closed_each_service_value            : form.querySelector<HTMLInputElement>('input[name="record_closed_each_service_value"]')!?.value,
-            record_closed_each_service_type             : form.querySelector<HTMLInputElement>('select[name="record_closed_each_service_type"]')!?.value,
-            record_closed_service_changed_value         : form.querySelector<HTMLInputElement>('input[name="record_closed_service_changed_value"]')!?.value,
-            record_closed_service_changed_value_type    : form.querySelector<HTMLInputElement>('select[name="record_closed_service_changed_value_type"]')!?.value,
-            product_value                               : form.querySelector<HTMLInputElement>('input[name="product_value"]')!?.value,
-            product_type                                : form.querySelector<HTMLInputElement>('select[name="product_type"]')!?.value,
-            good_changed_value                          : form.querySelector<HTMLInputElement>('input[name="good_changed_value"]')!?.value,
-            good_changed_value_type                     : form.querySelector<HTMLInputElement>('select[name="good_changed_value_type"]')!?.value,
-            loyalty_discount_value                      : form.querySelector<HTMLInputElement>('input[name="loyalty_discount_value"]')!?.value,
-            loyalty_discount_type                       : form.querySelector<HTMLInputElement>('select[name="loyalty_discount_type"]')!?.value,
-            loyalty_program_option_value                : form.querySelector<HTMLInputElement>('input[name="loyalty_program_option_value"]')!?.value,
-            loyalty_program_option_value_type           : form.querySelector<HTMLInputElement>('select[name="loyalty_program_option_value_type"]')!?.value,
-            fix_for_period                              : form.querySelector<HTMLInputElement>('input[name="fix_for_period"]')!?.value,
-            period_name                                 : form.querySelector<HTMLInputElement>('select[name="period_name"]')!?.value,
-            min_salary_fix                              : form.querySelector<HTMLInputElement>('input[name="min_salary_fix"]')!?.value,
-            min_salary_period_type                      : form.querySelector<HTMLInputElement>('select[name="min_salary_period_type"]')!?.value,
-            percent_retro_bonus                         : form.querySelector<HTMLInputElement>('input[name="percent_retro_bonus"]')!?.value,
-            retro_bonus_use_net_cost                    : form.querySelector<HTMLInputElement>('select[name="retro_bonus_use_net_cost"]')!?.value,
-            retro_bonus_targets_type                    : form.querySelector<HTMLInputElement>('select[name="retro_bonus_targets_type"]')!?.value,
-            use_discount                                : form.querySelector<HTMLInputElement>('input[name="use_discount"]')!?.checked
-                                                          ? '1' : '0',
-            use_loyalty_discount                        : form.querySelector<HTMLInputElement>('input[name="use_loyalty_discount"]')!?.checked
-                                                          ? '1' : '0',
-            use_loyalty_bonus                           : form.querySelector<HTMLInputElement>('input[name="use_loyalty_bonus"]')!?.checked
-                                                          ? '1' : '0',
-            use_loyalty_certificate                     : form.querySelector<HTMLInputElement>('input[name="use_loyalty_certificate"]')!?.checked
-                                                          ? '1' : '0',
-            use_loyalty_abonement                       : form.querySelector<HTMLInputElement>('input[name="use_loyalty_abonement"]')!?.checked
-                                                          ? '1' : '0',
-            use_net_cost_service                        : form.querySelector<HTMLInputElement>('input[name="use_net_cost_service"]')!?.checked
-                                                          ? '1' : '0',
-            use_net_cost_good                           : form.querySelector<HTMLInputElement>('input[name="use_net_cost_good"]')!?.checked
-                                                          ? '1' : '0',
-            calc_cost_with_discount_after_minus_net_cost: form.querySelector<HTMLInputElement>('input[name="calc_cost_with_discount_after_minus_net_cost"]')!?.value,
+        const data: SalaryCreateData = {
+            title                                      : form.querySelector<HTMLInputElement>('input[name="title"]')!?.value,
+            service_value                              : form.querySelector<HTMLInputElement>('input[name="service_value"]')!?.value,
+            service_type                               : form.querySelector<HTMLInputElement>('select[name="service_type"]')!?.value,
+            group_id                                   : form.querySelector<HTMLInputElement>('select[name="group_id"]')!?.value,
+            service_changed_value                      : form.querySelector<HTMLInputElement>('input[name="service_changed_value"]')!?.value,
+            service_changed_value_type                 : form.querySelector<HTMLInputElement>('select[name="service_changed_value_type"]')!?.value,
+            'activity[min][amount]'                    : form.querySelector<HTMLInputElement>('input[name="activity[min][amount]"]')!?.value,
+            'activity[min][type]'                      : form.querySelector<HTMLInputElement>('select[name="activity[min][type]"]')!?.value,
+            'activity[perform][amount]'                : form.querySelector<HTMLInputElement>('input[name="activity[perform][amount]"]')!?.value,
+            'activity[perform][type]'                  : form.querySelector<HTMLInputElement>('select[name="activity[perform][type]"]')!?.value,
+            'activity[every_client][min_limit][amount]': form.querySelector<HTMLInputElement>('input[name="activity[every_client][min_limit][amount]"]')!?.value,
+            record_created_fix                         : form.querySelector<HTMLInputElement>('input[name="record_created_fix"]')!?.value,
+            record_created_each_service_value          : form.querySelector<HTMLInputElement>('input[name="record_created_each_service_value"]')!?.value,
+            record_created_each_service_type           : form.querySelector<HTMLInputElement>('select[name="record_created_each_service_type"]')!?.value,
+            record_created_service_changed_value       : form.querySelector<HTMLInputElement>('input[name="record_created_service_changed_value"]')!?.value,
+            record_created_service_changed_value_type  : form.querySelector<HTMLInputElement>('select[name="record_created_service_changed_value_type"]')!?.value,
+            record_closed_each_service_value           : form.querySelector<HTMLInputElement>('input[name="record_closed_each_service_value"]')!?.value,
+            record_closed_each_service_type            : form.querySelector<HTMLInputElement>('select[name="record_closed_each_service_type"]')!?.value,
+            record_closed_service_changed_value        : form.querySelector<HTMLInputElement>('input[name="record_closed_service_changed_value"]')!?.value,
+            record_closed_service_changed_value_type   : form.querySelector<HTMLInputElement>('select[name="record_closed_service_changed_value_type"]')!?.value,
+            product_value                              : form.querySelector<HTMLInputElement>('input[name="product_value"]')!?.value,
+            product_type                               : form.querySelector<HTMLInputElement>('select[name="product_type"]')!?.value,
+            good_changed_value                         : form.querySelector<HTMLInputElement>('input[name="good_changed_value"]')!?.value,
+            good_changed_value_type                    : form.querySelector<HTMLInputElement>('select[name="good_changed_value_type"]')!?.value,
+            loyalty_discount_value                     : form.querySelector<HTMLInputElement>('input[name="loyalty_discount_value"]')!?.value,
+            loyalty_discount_type                      : form.querySelector<HTMLInputElement>('select[name="loyalty_discount_type"]')!?.value,
+            loyalty_program_option_value               : form.querySelector<HTMLInputElement>('input[name="loyalty_program_option_value"]')!?.value,
+            loyalty_program_option_value_type          : form.querySelector<HTMLInputElement>('select[name="loyalty_program_option_value_type"]')!?.value,
+            fix_for_period                             : form.querySelector<HTMLInputElement>('input[name="fix_for_period"]')!?.value,
+            period_name                                : form.querySelector<HTMLInputElement>('select[name="period_name"]')!?.value,
+            min_salary_fix                             : form.querySelector<HTMLInputElement>('input[name="min_salary_fix"]')!?.value,
+            min_salary_period_type                     : form.querySelector<HTMLInputElement>('select[name="min_salary_period_type"]')!?.value,
+            percent_retro_bonus                        : form.querySelector<HTMLInputElement>('input[name="percent_retro_bonus"]')!?.value,
+            retro_bonus_use_net_cost                   : form.querySelector<HTMLInputElement>('select[name="retro_bonus_use_net_cost"]')!?.value,
+            retro_bonus_targets_type                   : form.querySelector<HTMLInputElement>('select[name="retro_bonus_targets_type"]')!?.value,
         };
+
+        if (form.querySelector<HTMLInputElement>('input[name="activity[every_client][enabled]"]')!?.checked) {
+            data['activity[every_client][enabled]'] = 'on';
+        }
+
+        if (form.querySelector<HTMLInputElement>('input[name="calc_cost_with_discount_after_minus_net_cost"]')!?.checked) {
+            data.calc_cost_with_discount_after_minus_net_cost = '1';
+        }
+
+        if (form.querySelector<HTMLInputElement>('input[name="use_discount"]')!?.checked) {
+            data.use_discount = '1';
+        }
+
+        if (form.querySelector<HTMLInputElement>('input[name="use_loyalty_discount"]')!?.checked) {
+            data.use_loyalty_discount = '1';
+        }
+
+        if (form.querySelector<HTMLInputElement>('input[name="use_loyalty_bonus"]')!?.checked) {
+            data.use_loyalty_bonus = '1';
+        }
+
+        if (form.querySelector<HTMLInputElement>('input[name="use_loyalty_certificate"]')!?.checked) {
+            data.use_loyalty_certificate = '1';
+        }
+
+        if (form.querySelector<HTMLInputElement>('input[name="use_loyalty_abonement"]')!?.checked) {
+            data.use_loyalty_abonement = '1';
+        }
+
+        if (form.querySelector<HTMLInputElement>('input[name="use_net_cost_service"]')!?.checked) {
+            data.use_net_cost_service = '1';
+        }
+
+        if (form.querySelector<HTMLInputElement>('input[name="use_net_cost_good"]')!?.checked) {
+            data.use_net_cost_good = '1';
+        }
+
+        return data;
     }
 }
