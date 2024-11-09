@@ -11,7 +11,7 @@ import {
     ERROR_SALARY_CRITERIA_CANNOT_GET_DATA,
     ERROR_SALARY_CRITERIA_CANNOT_GET_RULES,
 } from '@/action/salary_criteria/errors/salary-criteria.errors.ts';
-import { Logger } from '@/entity/logger/Logger/Logger.ts';
+import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 
 const getSalaryCriteriaContextData = function (contextJson: string): SalaryCriteriaContext {
@@ -61,7 +61,7 @@ const getSalaryCriteriaContextData = function (contextJson: string): SalaryCrite
     }
 };
 
-export const getSalaryCriteriaRequestAction = function (clientId: string, criteriaId: string, logger?: Logger): Promise<SalaryCriteriaFullData> {
+export const getSalaryCriteriaRequestAction = function (clientId: string, criteriaId: string, logger?: ILogger): Promise<SalaryCriteriaFullData> {
     logger?.log(`получение полных данных для критерия "${ criteriaId }" для клиента "${ clientId }"`);
     return fetch(`https://yclients.com/salary_criteria/edit/${ clientId }/${ criteriaId }/`, {
         method: 'GET',

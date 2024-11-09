@@ -3,9 +3,10 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import css from './Logger.module.css';
+import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 
-export class Logger extends Component<HTMLDivElement> {
+export class Logger extends Component<HTMLDivElement> implements ILogger {
     constructor (props: ComponentPropsOptional<HTMLDivElement>) {
         super('div', props);
         this.element.classList.add(css.container);

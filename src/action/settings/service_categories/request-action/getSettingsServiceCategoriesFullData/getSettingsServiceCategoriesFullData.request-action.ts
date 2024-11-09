@@ -15,10 +15,10 @@ import {
 import {
     ERROR_SETTINGS_SERVICE_CATEGORIES_CANNOT_GET_DATA,
 } from '@/action/settings/service_categories/errors/settings-service_categories.errors.ts';
-import { Logger } from '@/entity/logger/Logger/Logger.ts';
+import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 
-export const getSettingsServiceCategoriesFullDataRequestAction = async function (bearer: string, clientId: string, logger?: Logger): Promise<SettingsServiceCategoryResponse> {
+export const getSettingsServiceCategoriesFullDataRequestAction = async function (bearer: string, clientId: string, logger?: ILogger): Promise<SettingsServiceCategoryResponse> {
     logger?.log(`получение списка категорий услуг и списка услуг с полными данными для клиента "${ clientId }"`);
     const response: SettingsServiceCategoryResponse = {
         list          : [],
