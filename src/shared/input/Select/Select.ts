@@ -21,18 +21,20 @@ export type SelectProps =
         defaultLabel: string;
         list: Array<SelectOption>;
         withSearch?: boolean;
+        styleType?: ButtonStyleType;
     }
 
 export class Select extends Component<HTMLDivElement> {
-    private readonly _defaultLabel: string      = '';
-    private readonly _defaultValue: string      = '';
-    private readonly _list: Array<SelectOption> = [];
+    private readonly _defaultLabel: string              = '';
+    private readonly _defaultValue: string              = '';
+    private readonly _defaultStyleType: ButtonStyleType = ButtonStyleType.DEFAULT;
+    private readonly _list: Array<SelectOption>         = [];
     private readonly _selectButton: Button;
     private readonly _dropdown: Col;
     private readonly _optionsBox: Col;
-    private _search: string                     = '';
-    private _currentLabel: string               = '';
-    private _currentValue: string               = '';
+    private _search: string                             = '';
+    private _currentLabel: string                       = '';
+    private _currentValue: string                       = '';
 
     constructor (props: SelectProps) {
         const {
@@ -40,14 +42,16 @@ export class Select extends Component<HTMLDivElement> {
                   withSearch,
                   defaultLabel,
                   defaultValue,
+                  styleType,
                   ...other
               } = props;
 
         super('div', other);
 
-        this._defaultValue = this._currentValue = defaultValue;
-        this._defaultLabel = this._currentLabel = defaultLabel;
-        this._list         = list;
+        this._defaultValue     = this._currentValue = defaultValue;
+        this._defaultLabel     = this._currentLabel = defaultLabel;
+        this._defaultStyleType = styleType ?? ButtonStyleType.DEFAULT;
+        this._list             = list;
 
         this.element.classList.add(css.container);
         this._list.forEach((item) => {
@@ -59,7 +63,7 @@ export class Select extends Component<HTMLDivElement> {
 
         this._selectButton = new Button({
             textContent: this._currentLabel,
-            styleType  : ButtonStyleType.DEFAULT,
+            styleType  : this._defaultStyleType,
             fullWidth  : true,
             className  : css.label,
             onclick    : this._toggle.bind(this),
@@ -148,7 +152,7 @@ export class Select extends Component<HTMLDivElement> {
         this.hide();
         this._selectButton.element.textContent = this._currentLabel;
         if (this._currentValue === this._defaultValue) {
-            this._selectButton.setStyleType(ButtonStyleType.DEFAULT);
+            this._selectButton.setStyleType(this._defaultStyleType);
         } else {
             this._selectButton.setStyleType(ButtonStyleType.PRIMARY);
         }

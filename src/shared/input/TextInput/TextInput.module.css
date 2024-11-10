@@ -1,6 +1,7 @@
 .container {
     padding       : var(--offset-small);
     background    : var(--bg-main);
+    color         : var(--color-black);
     border        : 1px solid var(--border-color);
     outline       : none;
     transition    : var(--transition-fast);

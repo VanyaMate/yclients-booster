@@ -2,7 +2,8 @@
     position : relative;
 
     .label {
-        position : relative;
+        position      : relative;
+        padding-right : 25px;
 
         &:after {
             content   : '▼';
@@ -20,6 +21,7 @@
         left          : 0;
         top           : calc(100% + var(--offset-small) * 2);
         position      : absolute;
+        z-index       : 1;
         visibility    : hidden;
         opacity       : 0;
         transition    : var(--transition-fast);

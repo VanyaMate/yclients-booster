@@ -16,9 +16,14 @@ import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 const getSalaryCriteriaContextData = function (contextJson: string): SalaryCriteriaContext {
     try {
-        const context                         = JSON.parse(contextJson);
-        const categories                      = context?.services?.categories;
-        const items                           = context?.services?.items;
+        const context    = JSON.parse(contextJson);
+        const categories = context?.services?.categories;
+        const items      = context?.services?.items;
+
+        if (!(categories?.length || items?.length)) {
+            return {};
+        }
+
         const response: SalaryCriteriaContext = {
             services: {
                 categories: [],
@@ -33,8 +38,6 @@ const getSalaryCriteriaContextData = function (contextJson: string): SalaryCrite
                 if (category?.category) {
                     response.services?.categories.push({
                         categoryId: category.category,
-                        title     : '',
-                        children  : [],
                     });
                 }
             }
@@ -46,10 +49,8 @@ const getSalaryCriteriaContextData = function (contextJson: string): SalaryCrite
                 item = items[i];
                 if (item?.category && item?.item) {
                     response.services?.items.push({
-                        categoryId   : item.category,
-                        categoryTitle: '',
-                        itemId       : item.item,
-                        title        : '',
+                        categoryId: item.category,
+                        itemId    : item.item,
                     });
                 }
             }

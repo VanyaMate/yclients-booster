@@ -1,0 +1,27 @@
+.container {
+    padding         : var(--offset-small);
+    border-radius   : var(--offset-small);
+    display         : flex;
+    justify-content : space-between;
+    align-items     : center;
+    gap             : var(--offset-small);
+
+    .label {
+        opacity : .6;
+    }
+
+    &.valid {
+        background : var(--success-color);
+        color      : var(--on-success-color);
+    }
+
+    &.warning {
+        background : var(--warning-color);
+        color      : var(--on-warning-color);
+    }
+
+    &.critical {
+        background : var(--danger-color);
+        color      : var(--on-danger-color);
+    }
+}

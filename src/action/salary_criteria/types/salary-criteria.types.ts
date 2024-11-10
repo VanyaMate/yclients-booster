@@ -1,3 +1,10 @@
+import {
+    SettingsServiceCategoryData,
+    SettingsServiceCategoryDataWithChildren,
+    SettingsServiceCategoryServiceData,
+} from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
+
+
 export type  SalaryCriteriaShortData = {
     id: string;
     title: string;
@@ -5,15 +12,11 @@ export type  SalaryCriteriaShortData = {
 
 export type SalaryCriteriaContextCategory = {
     categoryId: string;
-    title: string;
-    children: Array<SalaryCriteriaContextItem>;
 }
 
 export type SalaryCriteriaContextItem = {
     categoryId: string;
-    categoryTitle: string;
     itemId: string;
-    title: string;
 }
 
 export type SalaryCriteriaContext = {
@@ -38,4 +41,11 @@ export type SalaryCriteriaFullData = {
     title: string;
     period: string;
     rules: Array<SalaryCriteriaRuleData>;
+}
+
+export type SalaryCriteriaListDataForCopy = {
+    criteriaList: Array<SalaryCriteriaFullData>;
+    serviceTree: Array<SettingsServiceCategoryDataWithChildren>;
+    serviceCategoriesMapper: Record<string, SettingsServiceCategoryData>;
+    servicesMapper: Record<string, SettingsServiceCategoryServiceData>;
 }

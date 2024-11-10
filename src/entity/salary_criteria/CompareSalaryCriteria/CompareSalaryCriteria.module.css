@@ -1,0 +1,24 @@
+.container {
+    header {
+        .icon {
+
+        }
+
+        &.valid {
+
+        }
+
+        &.warning {
+
+        }
+
+        &.critical {
+
+        }
+    }
+
+    .inside {
+        border-left  : 1px dotted var(--border-color);
+        padding-left : var(--offset-big);
+    }
+}
