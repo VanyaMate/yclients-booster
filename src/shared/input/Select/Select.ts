@@ -63,7 +63,7 @@ export class Select extends Component<HTMLDivElement> {
 
         this._defaultValue     = this._currentValue = defaultValue;
         this._defaultLabel     = this._currentLabel = defaultLabel;
-        this._defaultStyleType = styleType ?? ButtonStyleType.DEFAULT;
+        this._defaultStyleType = this._defaultStyleType ?? ButtonStyleType.DEFAULT;
         this._onChangeHandler  = onChange;
         this._isModal          = isModal ?? false;
         this._list             = list;
@@ -197,9 +197,9 @@ export class Select extends Component<HTMLDivElement> {
         this.hide();
         this._selectButton.element.textContent = this._currentLabel;
         if (this._currentValue === this._defaultValue) {
-            this._selectButton.setStyleType(this._defaultStyleType);
+            this._selectButton.setStyleType(ButtonStyleType.DEFAULT);
         } else {
-            this._selectButton.setStyleType(ButtonStyleType.PRIMARY);
+            this._selectButton.setStyleType(this._defaultStyleType);
         }
     }
 

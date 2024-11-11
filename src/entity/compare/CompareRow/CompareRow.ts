@@ -33,7 +33,7 @@ export class CompareRow extends Component<HTMLDivElement> implements ICompareIte
             this.element.classList.add(css.critical);
             this._valid = false;
         } else if (valueFrom !== valueTo) {
-            this.element.classList.add(css.warning);
+            this.element.classList.add(css.critical);
             this.element.title = valueTo;
             this._valid        = false;
         } else {

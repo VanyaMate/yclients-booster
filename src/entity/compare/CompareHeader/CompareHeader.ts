@@ -22,6 +22,7 @@ export type CompareHeaderProps =
         forceState?: CompareState;
         variants?: Array<{ id: string, title: string }>;
         onVariantChange?: (id: string) => void;
+        modalLabel?: string;
     };
 
 export class CompareHeader extends Component<HTMLDivElement> {
@@ -33,6 +34,7 @@ export class CompareHeader extends Component<HTMLDivElement> {
                   idTo,
                   forceState = CompareState.VALID,
                   onVariantChange,
+                  modalLabel,
                   ...other
               } = props;
         super('div', other);
@@ -63,7 +65,7 @@ export class CompareHeader extends Component<HTMLDivElement> {
                 withSearch  : true,
                 styleType   : ButtonStyleType.DEFAULT,
                 isModal     : true,
-                modalLabel  : 'Выбор варианта',
+                modalLabel  : modalLabel ?? 'Выберите вариант',
                 onChange    : (option: SelectOption) => onVariantChange?.(option.value),
             });
             select.insert(this.element, 'beforeend');
