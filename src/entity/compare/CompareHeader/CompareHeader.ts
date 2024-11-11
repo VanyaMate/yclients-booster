@@ -3,9 +3,8 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import css from '@/entity/compare/CompareRow/CompareRow.module.css';
-import { Select } from '@/shared/input/Select/Select.ts';
-import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
-import { Modal } from '@/shared/modal/Modal/Modal.ts';
+import { Select, SelectOption } from '@/shared/input/Select/Select.ts';
+import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 
 
 export enum CompareState {
@@ -18,15 +17,24 @@ export type CompareHeaderProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
         titleFrom: string;
+        idTo?: string | null;
         titleTo?: string | null;
-        variants?: Array<string>;
+        forceState?: CompareState;
+        variants?: Array<{ id: string, title: string }>;
+        onVariantChange?: (id: string) => void;
     };
 
 export class CompareHeader extends Component<HTMLDivElement> {
-    private _modal: Modal | null = null;
-
     constructor (props: CompareHeaderProps) {
-        const { titleFrom, titleTo, variants = [], ...other } = props;
+        const {
+                  titleFrom,
+                  titleTo,
+                  variants   = [],
+                  idTo,
+                  forceState = CompareState.VALID,
+                  onVariantChange,
+                  ...other
+              } = props;
         super('div', other);
         this.element.classList.add(css.container);
         this.element.innerHTML = `
@@ -34,44 +42,33 @@ export class CompareHeader extends Component<HTMLDivElement> {
             <span class="${ css.label }"></span>
         `;
 
-        if (typeof titleTo !== 'string') {
+        if (typeof titleTo !== 'string' || forceState === CompareState.CRITICAL) {
             this.element.classList.add(css.critical);
-            this.element.innerHTML += `<span>-</span>`;
+        } else if (titleFrom !== titleTo || forceState === CompareState.WARNING) {
+            this.element.classList.add(css.warning);
+            this.element.title = titleTo;
         } else {
-            if (titleFrom !== titleTo) {
-                this.element.classList.add(css.warning);
-                this.element.title = titleTo;
-            } else {
-                this.element.classList.add(css.valid);
-            }
+            this.element.classList.add(css.valid);
+        }
 
-            if (variants.length) {
-                new Button({
-                    innerHTML: titleTo,
-                    onclick  : () => {
-                        if (this._modal) {
-                            this._modal.show();
-                        } else {
-                            const select = new Select({
-                                defaultLabel: titleTo,
-                                defaultValue: titleTo,
-                                list        : variants.map((variant) => ({
-                                    label   : variant,
-                                    value   : variant,
-                                    selected: false,
-                                })),
-                                withSearch  : true,
-                                styleType   : ButtonStyleType.PRIMARY,
-                            });
-                            select.show();
-                            this._modal = new Modal({
-                                content: select,
-                            });
-                            this._modal.show();
-                        }
-                    },
-                }).insert(this.element, 'beforeend');
-            }
+        if (variants.length) {
+            const select = new Select({
+                defaultLabel: 'Создать новый',
+                defaultValue: '-1',
+                list        : variants.map((variant) => ({
+                    label   : variant.title,
+                    value   : variant.id,
+                    selected: variant.id === idTo,
+                })),
+                withSearch  : true,
+                styleType   : ButtonStyleType.DEFAULT,
+                isModal     : true,
+                modalLabel  : 'Выбор варианта',
+                onChange    : (option: SelectOption) => onVariantChange?.(option.value),
+            });
+            select.insert(this.element, 'beforeend');
+        } else {
+            this.element.innerHTML += `<span>${ titleTo ?? '-' }</span>`;
         }
     }
 }

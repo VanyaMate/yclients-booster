@@ -6,6 +6,7 @@ import { TextInput } from '@/shared/input/TextInput/TextInput.ts';
 import css from './Select.module.css';
 import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
+import { Modal } from '@/shared/modal/Modal/Modal.ts';
 
 
 export type SelectOption = {
@@ -14,6 +15,8 @@ export type SelectOption = {
     label: string;
 }
 
+export type SelectOnChange = (data: SelectOption) => void;
+
 export type SelectProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
@@ -21,20 +24,27 @@ export type SelectProps =
         defaultLabel: string;
         list: Array<SelectOption>;
         withSearch?: boolean;
+        isModal?: boolean;
+        modalLabel?: string;
         styleType?: ButtonStyleType;
+        onChange?: SelectOnChange;
     }
 
 export class Select extends Component<HTMLDivElement> {
     private readonly _defaultLabel: string              = '';
     private readonly _defaultValue: string              = '';
     private readonly _defaultStyleType: ButtonStyleType = ButtonStyleType.DEFAULT;
+    private readonly _onChangeHandler?: SelectOnChange;
+    private readonly _isModal: boolean                  = false;
     private readonly _list: Array<SelectOption>         = [];
     private readonly _selectButton: Button;
     private readonly _dropdown: Col;
     private readonly _optionsBox: Col;
+    private readonly _modal: Modal | null               = null;
     private _search: string                             = '';
     private _currentLabel: string                       = '';
     private _currentValue: string                       = '';
+    private _inited: boolean                            = false;
 
     constructor (props: SelectProps) {
         const {
@@ -43,6 +53,9 @@ export class Select extends Component<HTMLDivElement> {
                   defaultLabel,
                   defaultValue,
                   styleType,
+                  isModal,
+                  modalLabel,
+                  onChange,
                   ...other
               } = props;
 
@@ -51,15 +64,11 @@ export class Select extends Component<HTMLDivElement> {
         this._defaultValue     = this._currentValue = defaultValue;
         this._defaultLabel     = this._currentLabel = defaultLabel;
         this._defaultStyleType = styleType ?? ButtonStyleType.DEFAULT;
+        this._onChangeHandler  = onChange;
+        this._isModal          = isModal ?? false;
         this._list             = list;
 
         this.element.classList.add(css.container);
-        this._list.forEach((item) => {
-            if (item.selected) {
-                this._select(item);
-                return;
-            }
-        });
 
         this._selectButton = new Button({
             textContent: this._currentLabel,
@@ -70,9 +79,16 @@ export class Select extends Component<HTMLDivElement> {
         });
         this._selectButton.insert(this.element, 'afterbegin');
 
+        this._list.forEach((item) => {
+            if (item.selected) {
+                this._select(item);
+                return;
+            }
+        });
+
         this._dropdown = new Col({
             rows     : [],
-            className: css.dropdown,
+            className: ([ css.dropdown, isModal ? css.isModal : '' ]).join(' '),
         });
 
         if (withSearch) {
@@ -86,13 +102,32 @@ export class Select extends Component<HTMLDivElement> {
                     this._renderOptions();
                 },
             });
+
             this._dropdown.add(textInput);
         }
 
         this._optionsBox = new Col({ rows: [] });
         this._dropdown.add(this._optionsBox);
-        this._dropdown.insert(this.element, 'beforeend');
+
+        if (!this._isModal) {
+            this._dropdown.insert(this.element, 'beforeend');
+        } else {
+            this._modal = new Modal({
+                label  : modalLabel ?? 'Выбор',
+                content: this._dropdown,
+            });
+
+            this._modal.onChange((state: boolean) => {
+                if (state) {
+                    this.show();
+                } else {
+                    this.hide();
+                }
+            });
+        }
+
         this._renderOptions();
+        this._inited = true;
     }
 
     getValue () {
@@ -147,8 +182,18 @@ export class Select extends Component<HTMLDivElement> {
     }
 
     private _select (item: SelectOption) {
+        if (this._inited) {
+            this._onChangeHandler?.(item);
+        }
+
+
         this._currentValue = item.value;
         this._currentLabel = item.label;
+
+        if (this._isModal) {
+            this._modal?.hide();
+        }
+
         this.hide();
         this._selectButton.element.textContent = this._currentLabel;
         if (this._currentValue === this._defaultValue) {
@@ -160,9 +205,17 @@ export class Select extends Component<HTMLDivElement> {
 
     private _toggle () {
         if (this.isOpened) {
+            if (this._isModal) {
+                this._modal?.hide();
+            }
+
             this.hide();
         } else {
             this._renderOptions();
+            if (this._isModal) {
+                this._modal?.show();
+            }
+
             this.show();
         }
     }

@@ -3,6 +3,9 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import css from './CompareRow.module.css';
+import {
+    ICompareItem,
+} from '@/entity/compare/CompareRow/CompareRow.interface.ts';
 
 
 export type CompareRowProps =
@@ -13,7 +16,9 @@ export type CompareRowProps =
         valueTo?: string | null;
     };
 
-export class CompareRow extends Component<HTMLDivElement> {
+export class CompareRow extends Component<HTMLDivElement> implements ICompareItem {
+    private readonly _valid: boolean = true;
+
     constructor (props: CompareRowProps) {
         const { valueFrom, valueTo, label, ...other } = props;
         super('div', other);
@@ -26,11 +31,17 @@ export class CompareRow extends Component<HTMLDivElement> {
 
         if (typeof valueTo !== 'string') {
             this.element.classList.add(css.critical);
+            this._valid = false;
         } else if (valueFrom !== valueTo) {
             this.element.classList.add(css.warning);
             this.element.title = valueTo;
+            this._valid        = false;
         } else {
             this.element.classList.add(css.valid);
         }
+    }
+
+    getValid (): boolean {
+        return this._valid;
     }
 }

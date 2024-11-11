@@ -72,22 +72,22 @@ export class CopySalaryCriteriaForm extends Component<HTMLDivElement> {
         control.add(copyToInput);
         control.add(checkButton);
         control.insert(this.element, 'beforeend');
-
-        // input copyTo
-        // get copyFrom criteria
-        // get copyTo criteria
-        // compare criteria
-        // предоставить действия
     }
 
-    private _renderSalaryCriteriaCompare (dataFrom: SalaryCriteriaListDataForCopy, dataTo: SalaryCriteriaListDataForCopy | null) {
+    private _renderSalaryCriteriaCompare (dataFrom: SalaryCriteriaListDataForCopy, dataTo: SalaryCriteriaListDataForCopy) {
         new Col({
-            rows: dataFrom.criteriaList.map((criteria) => (
-                new CompareSalaryCriteria({
-                    dataFrom: criteria,
-                    dataTo  : dataTo?.criteriaList.find((_criteria) => _criteria.title === criteria.title),
-                })
-            )),
+            rows: dataFrom.criteriaList.map((criteria) => {
+                const compareCriteria = new CompareSalaryCriteria({
+                    dataFrom  : criteria,
+                    dataTo    : dataTo.criteriaList.find((_criteria) => _criteria.title === criteria.title),
+                    dataToList: dataTo.criteriaList,
+                    onChange  : (changeId: string) => {
+                        compareCriteria.renderWithNewDataTo(dataTo.criteriaList.find(({ id }) => id === changeId));
+                    },
+                });
+
+                return compareCriteria;
+            }),
         })
             .insert(this.element, 'beforeend');
     }

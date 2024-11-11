@@ -31,6 +31,10 @@
         padding       : var(--offset-small);
         border-radius : var(--offset-small);
 
+        &.isModal {
+            position : relative;
+        }
+
         .search {
             position : sticky;
             z-index  : 1;
