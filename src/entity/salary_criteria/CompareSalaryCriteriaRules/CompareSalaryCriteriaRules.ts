@@ -15,6 +15,18 @@ import {
 } from '@/entity/compare/CompareHeader/CompareHeader.ts';
 import { CompareRow } from '@/entity/compare/CompareRow/CompareRow.ts';
 import { Details } from '@/shared/box/Details/Details.ts';
+import {
+    salaryCriteriaRuleUseDiscountTransform,
+} from '@/methods/salary_criteria/transform/salaryCriteriaRuleUseDiscountTransform.ts';
+import {
+    salaryCriteriaRuleUseNetCostTransform,
+} from '@/methods/salary_criteria/transform/salaryCriteriaRuleUseNetCostTransform.ts';
+import {
+    salaryCriteriaRuleIndividualTypeTransform,
+} from '@/methods/salary_criteria/transform/salaryCriteriaRuleIndividualTypeTransform.ts';
+import {
+    salaryCriteriaRuleTargetTypeTransform,
+} from '@/methods/salary_criteria/transform/salaryCriteriaRuleTargetTypeTransform.ts';
 
 
 export type CompareSalaryCriteriaRulesProps =
@@ -50,37 +62,37 @@ export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implem
         }
 
         const useDiscount    = new CompareRow({
-            valueFrom: this._ruleFrom.useDiscount,
-            valueTo  : rule?.useDiscount,
-            label    : 'useDiscount',
+            valueFrom: salaryCriteriaRuleUseDiscountTransform(this._ruleFrom.useDiscount)!,
+            valueTo  : salaryCriteriaRuleUseDiscountTransform(rule?.useDiscount),
+            label    : 'С учетом скидки',
         });
         const useNetCost     = new CompareRow({
-            valueFrom: this._ruleFrom.useNetCost,
-            valueTo  : rule?.useNetCost,
-            label    : 'useNetCost',
+            valueFrom: salaryCriteriaRuleUseNetCostTransform(this._ruleFrom.useNetCost)!,
+            valueTo  : salaryCriteriaRuleUseNetCostTransform(rule?.useNetCost),
+            label    : 'Тип',
         });
         const individualType = new CompareRow({
-            valueFrom: this._ruleFrom.individualType,
-            valueTo  : rule?.individualType,
-            label    : 'individualType',
+            valueFrom: salaryCriteriaRuleIndividualTypeTransform(this._ruleFrom.individualType)!,
+            valueTo  : salaryCriteriaRuleIndividualTypeTransform(rule?.individualType)!,
+            label    : 'Для кого',
         });
         const targetType     = new CompareRow({
-            valueFrom: this._ruleFrom.targetType,
-            valueTo  : rule?.targetType,
-            label    : 'targetType',
+            valueFrom: salaryCriteriaRuleTargetTypeTransform(this._ruleFrom.targetType)!,
+            valueTo  : salaryCriteriaRuleTargetTypeTransform(rule?.targetType),
+            label    : 'За что',
         });
         const amount         = new CompareRow({
             valueFrom: this._ruleFrom.amount,
             valueTo  : rule?.amount,
-            label    : 'amount',
+            label    : 'Превышает',
         });
 
         this._rows = [];
-        this._rows.push(useDiscount);
         this._rows.push(useNetCost);
         this._rows.push(individualType);
         this._rows.push(targetType);
         this._rows.push(amount);
+        this._rows.push(useDiscount);
 
         const header = new CompareHeader({
             titleFrom : `Правило #${ this._index + 1 }`,
@@ -93,11 +105,11 @@ export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implem
             header : header,
             details: new Col({
                 rows: [
-                    useDiscount,
                     useNetCost,
                     individualType,
                     targetType,
                     amount,
+                    useDiscount,
                 ],
             }),
         });

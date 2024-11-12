@@ -41,7 +41,7 @@ export class CompareHeader extends Component<HTMLDivElement> {
         this.element.classList.add(css.container);
         this.element.innerHTML = `
             <span>${ titleFrom }</span>
-            <span class="${ css.label }"></span>
+            <span></span>
         `;
 
         if (typeof titleTo !== 'string' || forceState === CompareState.CRITICAL) {
@@ -65,10 +65,11 @@ export class CompareHeader extends Component<HTMLDivElement> {
                 withSearch  : true,
                 styleType   : ButtonStyleType.DEFAULT,
                 isModal     : true,
+                className   : css.select,
                 modalLabel  : modalLabel ?? 'Выберите вариант',
                 onChange    : (option: SelectOption) => onVariantChange?.(option.value),
             });
-            select.insert(this.element, 'beforeend');
+            new Component('span', {}, [ select ]).insert(this.element, 'beforeend');
         } else {
             this.element.innerHTML += `<span>${ titleTo ?? '-' }</span>`;
         }

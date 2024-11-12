@@ -16,6 +16,9 @@ import {
     CompareSalaryCriteriaRules,
 } from '@/entity/salary_criteria/CompareSalaryCriteriaRules/CompareSalaryCriteriaRules.ts';
 import { Details } from '@/shared/box/Details/Details.ts';
+import {
+    salaryCriteriaPeriodTypeTransform,
+} from '@/methods/salary_criteria/transform/salaryCriteriaPeriodTypeTransform.ts';
 
 
 export type onChangeHandler = (id: string) => void;
@@ -51,8 +54,8 @@ export class CompareSalaryCriteria extends Component<HTMLDivElement> {
         }
 
         const row = new CompareRow({
-            valueFrom: this._dataFrom.period,
-            valueTo  : data?.period,
+            valueFrom: salaryCriteriaPeriodTypeTransform(this._dataFrom.period)!,
+            valueTo  : salaryCriteriaPeriodTypeTransform(data?.period),
             label    : 'Период',
         });
 
