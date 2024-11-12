@@ -40,7 +40,7 @@ export type CompareSalaryCriteriaRulesProps =
 export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implements ICompareItem {
     private readonly _ruleFrom: SalaryCriteriaRuleData;
     private readonly _index: number;
-    private _col: Details | null       = null;
+    private _details: Details | null       = null;
     private _rows: Array<ICompareItem> = [];
 
     constructor (props: CompareSalaryCriteriaRulesProps) {
@@ -57,8 +57,8 @@ export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implem
     }
 
     renderWithNewRule (rule?: SalaryCriteriaRuleData) {
-        if (this._col) {
-            this._col.remove();
+        if (this._details) {
+            this._details.remove();
         }
 
         const useDiscount    = new CompareRow({
@@ -101,7 +101,7 @@ export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implem
                                         : CompareState.WARNING,
         });
 
-        this._col = new Details({
+        this._details = new Details({
             header : header,
             details: new Col({
                 rows: [
@@ -114,7 +114,7 @@ export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implem
             }),
         });
 
-        this._col.insert(this.element, 'beforeend');
+        this._details.insert(this.element, 'beforeend');
     }
 
     getValid (): boolean {

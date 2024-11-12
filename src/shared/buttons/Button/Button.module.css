@@ -20,6 +20,7 @@
     transition    : var(--transition-fast);
     height        : 30px;
     min-height    : fit-content;
+    font-weight   : normal;
 
     &:hover {
         background : var(--bg-main);

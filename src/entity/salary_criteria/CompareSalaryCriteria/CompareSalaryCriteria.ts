@@ -21,7 +21,7 @@ import {
 } from '@/methods/salary_criteria/transform/salaryCriteriaPeriodTypeTransform.ts';
 
 
-export type onChangeHandler = (id: string) => void;
+export type compareSalaryCriteriaOnChangeHandler = (id: string) => void;
 
 export type CompareSalaryCriteriaProps =
     ComponentPropsOptional<HTMLDivElement>
@@ -29,14 +29,14 @@ export type CompareSalaryCriteriaProps =
         dataFrom: SalaryCriteriaFullData;
         dataToList: Array<SalaryCriteriaFullData>;
         dataTo?: SalaryCriteriaFullData;
-        onChange?: onChangeHandler;
+        onChange?: compareSalaryCriteriaOnChangeHandler;
     };
 
 export class CompareSalaryCriteria extends Component<HTMLDivElement> {
     private readonly _dataFrom: SalaryCriteriaFullData;
     private readonly _dataToList: Array<SalaryCriteriaFullData>;
-    private readonly _onChange?: onChangeHandler;
-    private _col: Details | null = null;
+    private readonly _onChange?: compareSalaryCriteriaOnChangeHandler;
+    private _details: Details | null = null;
 
     constructor (props: CompareSalaryCriteriaProps) {
         const { dataTo, dataFrom, dataToList, onChange, ...other } = props;
@@ -49,8 +49,8 @@ export class CompareSalaryCriteria extends Component<HTMLDivElement> {
     }
 
     renderWithNewDataTo (data?: SalaryCriteriaFullData | null) {
-        if (this._col) {
-            this._col.remove();
+        if (this._details) {
+            this._details.remove();
         }
 
         const row = new CompareRow({
@@ -83,9 +83,10 @@ export class CompareSalaryCriteria extends Component<HTMLDivElement> {
             forceState     : [ row, ...rules ].every((item) => item.getValid())
                              ? CompareState.VALID
                              : CompareState.WARNING,
+            modalLabel     : 'Выберите критерий',
         });
 
-        this._col = new Details({
+        this._details = new Details({
             header : header,
             details: new Col({
                 rows: [
@@ -94,6 +95,6 @@ export class CompareSalaryCriteria extends Component<HTMLDivElement> {
                 ],
             }),
         });
-        this._col.insert(this.element, 'beforeend');
+        this._details.insert(this.element, 'beforeend');
     }
 }

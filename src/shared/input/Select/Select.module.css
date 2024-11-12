@@ -1,6 +1,7 @@
 .container {
-    position : relative;
-    width    : auto;
+    position    : relative;
+    width       : auto;
+    font-weight : normal;
 
     .label {
         position      : relative;
