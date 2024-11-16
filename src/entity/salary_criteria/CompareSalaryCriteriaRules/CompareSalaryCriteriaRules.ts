@@ -32,16 +32,16 @@ import {
 export type CompareSalaryCriteriaRulesProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        index: number,
-        ruleFrom: SalaryCriteriaRuleData;
-        ruleTo?: SalaryCriteriaRuleData;
-    };
+    index: number,
+    ruleFrom: SalaryCriteriaRuleData;
+    ruleTo?: SalaryCriteriaRuleData;
+};
 
-export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implements ICompareItem {
+export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implements ICompareItem<HTMLDivElement> {
     private readonly _ruleFrom: SalaryCriteriaRuleData;
     private readonly _index: number;
-    private _details: Details | null       = null;
-    private _rows: Array<ICompareItem> = [];
+    private _details: Details | null                        = null;
+    private _compareItems: Array<ICompareItem<HTMLElement>> = [];
 
     constructor (props: CompareSalaryCriteriaRulesProps) {
         const {
@@ -87,12 +87,12 @@ export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implem
             label    : 'Превышает',
         });
 
-        this._rows = [];
-        this._rows.push(useNetCost);
-        this._rows.push(individualType);
-        this._rows.push(targetType);
-        this._rows.push(amount);
-        this._rows.push(useDiscount);
+        this._compareItems = [];
+        this._compareItems.push(useNetCost);
+        this._compareItems.push(individualType);
+        this._compareItems.push(targetType);
+        this._compareItems.push(amount);
+        this._compareItems.push(useDiscount);
 
         const header = new CompareHeader({
             titleFrom : `Правило #${ this._index + 1 }`,
@@ -118,6 +118,6 @@ export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implem
     }
 
     getValid (): boolean {
-        return this._rows.every((row) => row.getValid());
+        return this._compareItems.every((row) => row.getValid());
     }
 }

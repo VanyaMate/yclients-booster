@@ -26,11 +26,11 @@ export type compareSalaryCriteriaOnChangeHandler = (id: string) => void;
 export type CompareSalaryCriteriaProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        dataFrom: SalaryCriteriaFullData;
-        dataToList: Array<SalaryCriteriaFullData>;
-        dataTo?: SalaryCriteriaFullData;
-        onChange?: compareSalaryCriteriaOnChangeHandler;
-    };
+    dataFrom: SalaryCriteriaFullData;
+    dataToList: Array<SalaryCriteriaFullData>;
+    dataTo?: SalaryCriteriaFullData;
+    onChange?: compareSalaryCriteriaOnChangeHandler;
+};
 
 export class CompareSalaryCriteria extends Component<HTMLDivElement> {
     private readonly _dataFrom: SalaryCriteriaFullData;

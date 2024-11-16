@@ -3,12 +3,13 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import css from './Col.module.css';
+import { IComponent } from '@/shared/component/Component.interface.ts';
 
 
 export type ColProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        rows: Array<Component<HTMLElement>>;
+        rows: Array<IComponent<HTMLElement>>;
     }
 
 export class Col extends Component<HTMLDivElement> {

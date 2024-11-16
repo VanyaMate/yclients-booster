@@ -1,10 +1,10 @@
 import {
-    SettingsServiceCategoriesItemApiResponse,
+    SettingsServiceItemApiResponse,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 
-export const getSettingsServicesByCategoryRequestAction = function (bearer: string, clientId: string, categoryId: string, logger?: ILogger): Promise<SettingsServiceCategoriesItemApiResponse> {
+export const getSettingsServicesByCategoryRequestAction = function (bearer: string, clientId: string, categoryId: string, logger?: ILogger): Promise<SettingsServiceItemApiResponse> {
     logger?.log(`получение услуг категории "${ categoryId }" для клиента "${ clientId }"`);
     return fetch(`https://yclients.com/api/v1/company/${ clientId }/services?category_id=${ categoryId }&include=composite_details`, {
         method : 'GET',

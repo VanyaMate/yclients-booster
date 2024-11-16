@@ -11,7 +11,7 @@ export type ComponentPropsOptional<T extends HTMLElement> = Partial<ComponentPro
 export class Component<T extends HTMLElement> implements IComponent<T> {
     private readonly _element: T;
 
-    constructor (tag: string, props: ComponentPropsOptional<T>, children: Array<Component<HTMLElement>> = []) {
+    constructor (tag: string, props: ComponentPropsOptional<T>, children: Array<IComponent<HTMLElement>> = []) {
         this._element = Object.assign(document.createElement(tag), props as ComponentProps<T>);
         children.forEach((child) => child.insert(this.element, 'beforeend'));
     }

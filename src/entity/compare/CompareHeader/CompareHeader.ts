@@ -5,6 +5,9 @@ import {
 import css from '@/entity/compare/CompareRow/CompareRow.module.css';
 import { Select, SelectOption } from '@/shared/input/Select/Select.ts';
 import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
+import {
+    ICompareItem,
+} from '@/entity/compare/CompareRow/CompareRow.interface.ts';
 
 
 export enum CompareState {
@@ -16,16 +19,16 @@ export enum CompareState {
 export type CompareHeaderProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        titleFrom: string;
-        idTo?: string | null;
-        titleTo?: string | null;
-        forceState?: CompareState;
-        variants?: Array<{ id: string, title: string }>;
-        onVariantChange?: (id: string) => void;
-        modalLabel?: string;
-    };
+    titleFrom: string;
+    idTo?: string | null;
+    titleTo?: string | null;
+    forceState?: CompareState;
+    variants?: Array<{ id: string, title: string }>;
+    onVariantChange?: (id: string) => void;
+    modalLabel?: string;
+};
 
-export class CompareHeader extends Component<HTMLDivElement> {
+export class CompareHeader extends Component<HTMLDivElement> implements ICompareItem<HTMLDivElement> {
     constructor (props: CompareHeaderProps) {
         const {
                   titleFrom,
@@ -73,5 +76,9 @@ export class CompareHeader extends Component<HTMLDivElement> {
         } else {
             this.element.innerHTML += `<span>${ titleTo ?? '-' }</span>`;
         }
+    }
+
+    getValid (): boolean {
+        return this.element.classList.contains(css.valid);
     }
 }

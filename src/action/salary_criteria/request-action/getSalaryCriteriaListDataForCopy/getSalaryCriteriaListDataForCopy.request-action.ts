@@ -16,7 +16,7 @@ import {
     getSettingsServicesByCategoryRequestAction,
 } from '@/action/settings/service_categories/request-action/getSettingsServicesByCategory/getSettingsServicesByCategory.request-action.ts';
 import {
-    SettingsServiceCategoriesItemApiResponse,
+    SettingsServiceItemApiResponse,
     SettingsServiceCategoryDataWithChildren,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 
@@ -60,7 +60,7 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
                 return {
                     chain: [
                         async () => getSettingsServicesByCategoryRequestAction(bearer, clientId, category.id.toString(), logger),
-                        async (response: SettingsServiceCategoriesItemApiResponse) => {
+                        async (response: SettingsServiceItemApiResponse) => {
                             data.children = response.data;
                             response.data.forEach((service) => {
                                 dataForCopy.servicesMapper[service.id.toString()] = service;

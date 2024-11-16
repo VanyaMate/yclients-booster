@@ -1,7 +1,7 @@
 import {
-    SettingsServiceCategoryData,
-    SettingsServiceCategoryDataWithChildren,
-    SettingsServiceCategoryServiceData,
+    SettingsServicesCategoriesMapper,
+    SettingsServicesMapper,
+    SettingsServicesTree,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 
 
@@ -43,9 +43,11 @@ export type SalaryCriteriaFullData = {
     rules: Array<SalaryCriteriaRuleData>;
 }
 
+export type SalaryCriteriaList = Array<SalaryCriteriaFullData>;
+
 export type SalaryCriteriaListDataForCopy = {
-    criteriaList: Array<SalaryCriteriaFullData>;
-    serviceTree: Array<SettingsServiceCategoryDataWithChildren>;
-    serviceCategoriesMapper: Record<string, SettingsServiceCategoryData>;
-    servicesMapper: Record<string, SettingsServiceCategoryServiceData>;
+    criteriaList: SalaryCriteriaList;
+    serviceTree: SettingsServicesTree;
+    serviceCategoriesMapper: SettingsServicesCategoriesMapper;
+    servicesMapper: SettingsServicesMapper;
 }

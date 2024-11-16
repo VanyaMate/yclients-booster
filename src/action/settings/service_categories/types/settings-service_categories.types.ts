@@ -1,5 +1,5 @@
 export type SettingsServiceCategoryIdMapper = Record<string, SettingsServiceCategoryData>;
-export type SettingsServiceCategoryItemIdMapper = Record<string, SettingsServiceCategoryServiceData>;
+export type SettingsServiceCategoryItemIdMapper = Record<string, SettingsServiceData>;
 
 export type SettingsServiceCategoryResponse = {
     list: Array<SettingsServiceCategoryDataWithChildren>;
@@ -32,20 +32,20 @@ export type SettingsServiceCategoryData = {
 export type SettingsServiceCategoryDataWithChildren =
     SettingsServiceCategoryData
     & {
-        children: Array<SettingsServiceCategoryServiceData>;
-    }
+    children: Array<SettingsServiceData>;
+}
 
 export type SettingsServiceCategoryApiResponseMeta = {
     total_count: number
 }
 
-export type SettingsServiceCategoriesItemApiResponse = {
+export type SettingsServiceItemApiResponse = {
     success: boolean;
-    data: Array<SettingsServiceCategoryServiceData>;
+    data: Array<SettingsServiceData>;
     meta: SettingsServiceCategoryApiResponseMeta;
 }
 
-export type SettingsServiceCategoryServiceData = {
+export type SettingsServiceData = {
     booking_title: string;
     tax_variant: any;                                       // TODO: Проверить что там должно быть
     vat_id: any;                                            // TODO: Проверить что там должно быть
@@ -102,3 +102,7 @@ export interface SettingsServiceCategoryServiceStuff {
     price: any;
     name: string;
 }
+
+export type SettingsServicesTree = Array<SettingsServiceCategoryDataWithChildren>;
+export type SettingsServicesCategoriesMapper = Record<string, SettingsServiceCategoryData>;
+export type SettingsServicesMapper = Record<string, SettingsServiceData>;

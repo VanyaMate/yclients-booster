@@ -11,12 +11,12 @@ import {
 export type CompareRowProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        label: string;
-        valueFrom: string;
-        valueTo?: string | null;
-    };
+    label: string;
+    valueFrom: string;
+    valueTo?: string | null;
+};
 
-export class CompareRow extends Component<HTMLDivElement> implements ICompareItem {
+export class CompareRow extends Component<HTMLDivElement> implements ICompareItem<HTMLDivElement> {
     private readonly _valid: boolean = true;
 
     constructor (props: CompareRowProps) {
