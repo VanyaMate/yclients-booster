@@ -106,3 +106,9 @@ export interface SettingsServiceCategoryServiceStuff {
 export type SettingsServicesTree = Array<SettingsServiceCategoryDataWithChildren>;
 export type SettingsServicesCategoriesMapper = Record<string, SettingsServiceCategoryData>;
 export type SettingsServicesMapper = Record<string, SettingsServiceData>;
+
+export type SettingsServiceCopyData = {
+    tree: SettingsServicesTree;
+    categoriesMapper: SettingsServicesCategoriesMapper;
+    servicesMapper: SettingsServicesMapper;
+}

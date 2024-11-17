@@ -26,10 +26,12 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
     const list                                       = await getSalaryCriteriaListRequestAction(clientId, logger);
     const splitter                                   = new PromiseSplitter(maxSplit, maxRetry);
     const dataForCopy: SalaryCriteriaListDataForCopy = {
-        criteriaList           : [],
-        serviceTree            : [],
-        serviceCategoriesMapper: {},
-        servicesMapper         : {},
+        criteriaList    : [],
+        settingsCopyData: {
+            tree            : [],
+            categoriesMapper: {},
+            servicesMapper  : {},
+        },
     };
 
     await splitter.exec(
@@ -50,12 +52,12 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
         const serviceCategories = await getSettingsServiceCategoriesRequestAction(bearer, clientId, logger);
         await splitter.exec(
             serviceCategories.data.map((category) => {
-                dataForCopy.serviceCategoriesMapper[category.id.toString()] = category;
-                const data: SettingsServiceCategoryDataWithChildren         = {
+                dataForCopy.settingsCopyData.categoriesMapper[category.id.toString()] = category;
+                const data: SettingsServiceCategoryDataWithChildren                   = {
                     ...category,
                     children: [],
                 };
-                dataForCopy.serviceTree.push(data);
+                dataForCopy.settingsCopyData.tree.push(data);
 
                 return {
                     chain: [
@@ -63,7 +65,7 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
                         async (response: SettingsServiceItemApiResponse) => {
                             data.children = response.data;
                             response.data.forEach((service) => {
-                                dataForCopy.servicesMapper[service.id.toString()] = service;
+                                dataForCopy.settingsCopyData.servicesMapper[service.id.toString()] = service;
                             });
                         },
                     ],

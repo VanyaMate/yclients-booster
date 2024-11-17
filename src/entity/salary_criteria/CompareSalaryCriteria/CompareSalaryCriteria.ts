@@ -19,6 +19,9 @@ import { Details } from '@/shared/box/Details/Details.ts';
 import {
     salaryCriteriaPeriodTypeTransform,
 } from '@/methods/salary_criteria/transform/salaryCriteriaPeriodTypeTransform.ts';
+import {
+    SettingsServiceCopyData,
+} from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 
 
 export type compareSalaryCriteriaOnChangeHandler = (id: string) => void;
@@ -26,24 +29,38 @@ export type compareSalaryCriteriaOnChangeHandler = (id: string) => void;
 export type CompareSalaryCriteriaProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
-    dataFrom: SalaryCriteriaFullData;
-    dataToList: Array<SalaryCriteriaFullData>;
-    dataTo?: SalaryCriteriaFullData;
-    onChange?: compareSalaryCriteriaOnChangeHandler;
-};
+        dataFrom: SalaryCriteriaFullData;
+        dataToList: Array<SalaryCriteriaFullData>;
+        copyData: SettingsServiceCopyData;
+        existedData: SettingsServiceCopyData;
+        dataTo?: SalaryCriteriaFullData;
+        onChange?: compareSalaryCriteriaOnChangeHandler;
+    };
 
 export class CompareSalaryCriteria extends Component<HTMLDivElement> {
     private readonly _dataFrom: SalaryCriteriaFullData;
     private readonly _dataToList: Array<SalaryCriteriaFullData>;
     private readonly _onChange?: compareSalaryCriteriaOnChangeHandler;
+    private readonly _copyData: SettingsServiceCopyData;
+    private readonly _existedData: SettingsServiceCopyData;
     private _details: Details | null = null;
 
     constructor (props: CompareSalaryCriteriaProps) {
-        const { dataTo, dataFrom, dataToList, onChange, ...other } = props;
+        const {
+                  dataTo,
+                  dataFrom,
+                  dataToList,
+                  onChange,
+                  copyData,
+                  existedData,
+                  ...other
+              } = props;
         super('div', other);
-        this._dataFrom   = dataFrom;
-        this._dataToList = dataToList;
-        this._onChange   = onChange;
+        this._dataFrom    = dataFrom;
+        this._dataToList  = dataToList;
+        this._onChange    = onChange;
+        this._copyData    = copyData;
+        this._existedData = existedData;
         this.renderWithNewDataTo(dataTo);
         this.element.classList.add(css.container);
     }
@@ -61,9 +78,11 @@ export class CompareSalaryCriteria extends Component<HTMLDivElement> {
 
         const rules = this._dataFrom.rules.map((rule, index) => (
             new CompareSalaryCriteriaRules({
-                ruleFrom: rule,
-                ruleTo  : data?.rules[index],
-                index   : index,
+                ruleFrom   : rule,
+                ruleTo     : data?.rules[index],
+                index      : index,
+                copyData   : this._copyData,
+                existedData: this._existedData,
             })
         ));
 

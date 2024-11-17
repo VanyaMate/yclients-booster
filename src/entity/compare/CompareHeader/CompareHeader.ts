@@ -2,12 +2,16 @@ import {
     Component,
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
-import css from '@/entity/compare/CompareRow/CompareRow.module.css';
+import css from './CompareHeader.module.css';
 import { Select, SelectOption } from '@/shared/input/Select/Select.ts';
 import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import {
-    ICompareItem,
+    ICompareComponent,
 } from '@/entity/compare/CompareRow/CompareRow.interface.ts';
+import {
+    CompareStateIcon,
+    CompareStateIconType, ICompareStateIcon,
+} from '@/entity/compare/CompareStateIcon/CompareStateIcon.ts';
 
 
 export enum CompareState {
@@ -28,7 +32,9 @@ export type CompareHeaderProps =
     modalLabel?: string;
 };
 
-export class CompareHeader extends Component<HTMLDivElement> implements ICompareItem<HTMLDivElement> {
+export class CompareHeader extends Component<HTMLDivElement> implements ICompareComponent<HTMLDivElement>, ICompareStateIcon {
+    private _icon: CompareStateIcon;
+
     constructor (props: CompareHeaderProps) {
         const {
                   titleFrom,
@@ -42,18 +48,28 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
               } = props;
         super('div', other);
         this.element.classList.add(css.container);
-        this.element.innerHTML = `
-            <span>${ titleFrom }</span>
-            <span></span>
-        `;
+
+        const info = new Component<HTMLDivElement>('div', {
+            innerHTML: `
+                <span>${ titleFrom }</span>
+                <span></span>
+            `,
+            className: css.info,
+        });
+
+        this._icon = new CompareStateIcon({
+            init: CompareStateIconType.IDLE,
+        });
+
+        info.insert(this.element, 'beforeend');
+        this._icon.insert(this.element, 'afterbegin');
 
         if (typeof titleTo !== 'string' || forceState === CompareState.CRITICAL) {
-            this.element.classList.add(css.critical);
+            info.element.classList.add(css.critical);
         } else if (titleFrom !== titleTo || forceState === CompareState.WARNING) {
-            this.element.classList.add(css.warning);
-            this.element.title = titleTo;
+            info.element.classList.add(css.warning);
         } else {
-            this.element.classList.add(css.valid);
+            info.element.classList.add(css.valid);
         }
 
         if (variants.length) {
@@ -72,13 +88,17 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
                 modalLabel  : modalLabel ?? 'Выберите вариант',
                 onChange    : (option: SelectOption) => onVariantChange?.(option.value),
             });
-            new Component('span', {}, [ select ]).insert(this.element, 'beforeend');
+            new Component('span', {}, [ select ]).insert(info.element, 'beforeend');
         } else {
-            this.element.innerHTML += `<span>${ titleTo ?? '-' }</span>`;
+            info.element.innerHTML += `<span>${ titleTo ?? '-' }</span>`;
         }
     }
 
     getValid (): boolean {
         return this.element.classList.contains(css.valid);
+    }
+
+    setState (state: CompareStateIconType): void {
+        this._icon.setState(state);
     }
 }

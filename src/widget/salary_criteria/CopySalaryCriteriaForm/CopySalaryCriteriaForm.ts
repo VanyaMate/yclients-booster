@@ -60,7 +60,7 @@ export class CopySalaryCriteriaForm extends Component<HTMLDivElement> {
                 if (copyToId) {
                     control.remove();
                     const copyFromData = await this._getCriteriaListData(this._clientId);
-                    const copyToData   = await this._getCriteriaListData(copyToId, !!copyFromData.serviceTree.length);
+                    const copyToData   = await this._getCriteriaListData(copyToId, !!copyFromData.settingsCopyData.tree.length);
 
                     this._renderSalaryCriteriaCompare(copyFromData, copyToData);
 
@@ -78,10 +78,12 @@ export class CopySalaryCriteriaForm extends Component<HTMLDivElement> {
         new Col({
             rows: dataFrom.criteriaList.map((criteria) => {
                 const compareCriteria = new CompareSalaryCriteria({
-                    dataFrom  : criteria,
-                    dataTo    : dataTo.criteriaList.find((_criteria) => _criteria.title === criteria.title),
-                    dataToList: dataTo.criteriaList,
-                    onChange  : (changeId: string) => {
+                    dataFrom   : criteria,
+                    dataTo     : dataTo.criteriaList.find((_criteria) => _criteria.title === criteria.title),
+                    dataToList : dataTo.criteriaList,
+                    copyData   : dataFrom.settingsCopyData,
+                    existedData: dataTo.settingsCopyData,
+                    onChange   : (changeId: string) => {
                         compareCriteria.renderWithNewDataTo(dataTo.criteriaList.find(({ id }) => id === changeId));
                     },
                 });

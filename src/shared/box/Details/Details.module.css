@@ -14,7 +14,7 @@
             height        : 0;
             top           : calc(100% + var(--offset-extra-small));
             left          : var(--offset-medium);
-            border-bottom : 1px solid var(--border-color);
+            border-bottom : 1px dotted var(--border-color);
             transition    : var(--transition-fast);
             text-align    : center;
             color         : var(--border-color);
