@@ -1,0 +1,13 @@
+.container {
+    display : flex;
+    gap     : var(--offset-small);
+
+    & > *:nth-child(1) {
+        width     : 40px;
+        min-width : 40px;
+    }
+
+    & > *:nth-child(2) {
+        flex : 1;
+    }
+}

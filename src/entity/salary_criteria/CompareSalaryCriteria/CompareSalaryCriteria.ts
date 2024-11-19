@@ -15,13 +15,22 @@ import { Col } from '@/shared/box/Col/Col.ts';
 import {
     CompareSalaryCriteriaRules,
 } from '@/entity/salary_criteria/CompareSalaryCriteriaRules/CompareSalaryCriteriaRules.ts';
-import { Details } from '@/shared/box/Details/Details.ts';
+import { Details, DetailsType } from '@/shared/box/Details/Details.ts';
 import {
     salaryCriteriaPeriodTypeTransform,
 } from '@/methods/salary_criteria/transform/salaryCriteriaPeriodTypeTransform.ts';
 import {
     SettingsServiceCopyData,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
+import {
+    CompareProcess,
+} from '@/entity/compare/CompareProcess/CompareProcess.ts';
+import {
+    CompareStateIconType,
+} from '@/entity/compare/CompareStateIcon/CompareStateIcon.ts';
+import {
+    ICompareComponent,
+} from '@/entity/compare/CompareRow/CompareRow.interface.ts';
 
 
 export type compareSalaryCriteriaOnChangeHandler = (id: string) => void;
@@ -37,13 +46,14 @@ export type CompareSalaryCriteriaProps =
         onChange?: compareSalaryCriteriaOnChangeHandler;
     };
 
-export class CompareSalaryCriteria extends Component<HTMLDivElement> {
+export class CompareSalaryCriteria extends Component<HTMLDivElement> implements ICompareComponent<HTMLDivElement> {
     private readonly _dataFrom: SalaryCriteriaFullData;
     private readonly _dataToList: Array<SalaryCriteriaFullData>;
     private readonly _onChange?: compareSalaryCriteriaOnChangeHandler;
     private readonly _copyData: SettingsServiceCopyData;
     private readonly _existedData: SettingsServiceCopyData;
-    private _details: Details | null = null;
+    private _compareProcess: CompareProcess | null        = null;
+    private _rules: Array<ICompareComponent<HTMLElement>> = [];
 
     constructor (props: CompareSalaryCriteriaProps) {
         const {
@@ -66,8 +76,8 @@ export class CompareSalaryCriteria extends Component<HTMLDivElement> {
     }
 
     renderWithNewDataTo (data?: SalaryCriteriaFullData | null) {
-        if (this._details) {
-            this._details.remove();
+        if (this._compareProcess) {
+            this._compareProcess.remove();
         }
 
         const row = new CompareRow({
@@ -76,7 +86,7 @@ export class CompareSalaryCriteria extends Component<HTMLDivElement> {
             label    : 'Период',
         });
 
-        const rules = this._dataFrom.rules.map((rule, index) => (
+        this._rules = this._dataFrom.rules.map((rule, index) => (
             new CompareSalaryCriteriaRules({
                 ruleFrom   : rule,
                 ruleTo     : data?.rules[index],
@@ -86,8 +96,10 @@ export class CompareSalaryCriteria extends Component<HTMLDivElement> {
             })
         ));
 
+        this._rules.unshift(row);
+
         const rulesCol = new Col({
-            rows: rules,
+            rows: this._rules,
         });
 
         const header = new CompareHeader({
@@ -99,21 +111,32 @@ export class CompareSalaryCriteria extends Component<HTMLDivElement> {
                 title: item.title,
             })),
             onVariantChange: this._onChange,
-            forceState     : [ row, ...rules ].every((item) => item.getValid())
+            forceState     : this.getValid()
                              ? CompareState.VALID
                              : CompareState.WARNING,
             modalLabel     : 'Выберите критерий',
+            label          : 'Критерий',
         });
 
-        this._details = new Details({
-            header : header,
-            details: new Col({
-                rows: [
-                    row,
-                    rulesCol,
-                ],
+
+        this._compareProcess = new CompareProcess({
+            init   : this.getValid() ? CompareStateIconType.SUCCESS
+                                     : CompareStateIconType.IDLE,
+            content: new Details({
+                header : header,
+                details: new Col({
+                    rows: [
+                        row,
+                        rulesCol,
+                    ],
+                }),
+                type   : DetailsType.SECOND,
             }),
         });
-        this._details.insert(this.element, 'beforeend');
+        this._compareProcess.insert(this.element, 'beforeend');
+    }
+
+    getValid (): boolean {
+        return this._rules.every((item) => item.getValid());
     }
 }

@@ -8,10 +8,6 @@ import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import {
     ICompareComponent,
 } from '@/entity/compare/CompareRow/CompareRow.interface.ts';
-import {
-    CompareStateIcon,
-    CompareStateIconType, ICompareStateIcon,
-} from '@/entity/compare/CompareStateIcon/CompareStateIcon.ts';
 
 
 export enum CompareState {
@@ -23,20 +19,20 @@ export enum CompareState {
 export type CompareHeaderProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
-    titleFrom: string;
-    idTo?: string | null;
-    titleTo?: string | null;
-    forceState?: CompareState;
-    variants?: Array<{ id: string, title: string }>;
-    onVariantChange?: (id: string) => void;
-    modalLabel?: string;
-};
+        titleFrom: string;
+        label?: string;
+        idTo?: string | null;
+        titleTo?: string | null;
+        forceState?: CompareState;
+        variants?: Array<{ id: string, title: string }>;
+        onVariantChange?: (id: string) => void;
+        modalLabel?: string;
+    };
 
-export class CompareHeader extends Component<HTMLDivElement> implements ICompareComponent<HTMLDivElement>, ICompareStateIcon {
-    private _icon: CompareStateIcon;
-
+export class CompareHeader extends Component<HTMLDivElement> implements ICompareComponent<HTMLDivElement> {
     constructor (props: CompareHeaderProps) {
         const {
+                  label      = '',
                   titleFrom,
                   titleTo,
                   variants   = [],
@@ -48,28 +44,17 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
               } = props;
         super('div', other);
         this.element.classList.add(css.container);
-
-        const info = new Component<HTMLDivElement>('div', {
-            innerHTML: `
+        this.element.innerHTML = `
                 <span>${ titleFrom }</span>
-                <span></span>
-            `,
-            className: css.info,
-        });
-
-        this._icon = new CompareStateIcon({
-            init: CompareStateIconType.IDLE,
-        });
-
-        info.insert(this.element, 'beforeend');
-        this._icon.insert(this.element, 'afterbegin');
+                <span>${ label }</span>
+            `;
 
         if (typeof titleTo !== 'string' || forceState === CompareState.CRITICAL) {
-            info.element.classList.add(css.critical);
+            this.element.classList.add(css.critical);
         } else if (titleFrom !== titleTo || forceState === CompareState.WARNING) {
-            info.element.classList.add(css.warning);
+            this.element.classList.add(css.warning);
         } else {
-            info.element.classList.add(css.valid);
+            this.element.classList.add(css.valid);
         }
 
         if (variants.length) {
@@ -88,17 +73,13 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
                 modalLabel  : modalLabel ?? 'Выберите вариант',
                 onChange    : (option: SelectOption) => onVariantChange?.(option.value),
             });
-            new Component('span', {}, [ select ]).insert(info.element, 'beforeend');
+            new Component('span', {}, [ select ]).insert(this.element, 'beforeend');
         } else {
-            info.element.innerHTML += `<span>${ titleTo ?? '-' }</span>`;
+            this.element.innerHTML += `<span>${ titleTo ?? '-' }</span>`;
         }
     }
 
     getValid (): boolean {
         return this.element.classList.contains(css.valid);
-    }
-
-    setState (state: CompareStateIconType): void {
-        this._icon.setState(state);
     }
 }

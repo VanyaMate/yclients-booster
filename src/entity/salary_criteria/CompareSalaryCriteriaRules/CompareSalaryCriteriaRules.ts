@@ -14,7 +14,6 @@ import {
     CompareState,
 } from '@/entity/compare/CompareHeader/CompareHeader.ts';
 import { CompareRow } from '@/entity/compare/CompareRow/CompareRow.ts';
-import { Details } from '@/shared/box/Details/Details.ts';
 import {
     salaryCriteriaRuleUseDiscountTransform,
 } from '@/methods/salary_criteria/transform/salaryCriteriaRuleUseDiscountTransform.ts';
@@ -33,6 +32,13 @@ import {
 import {
     SettingsServiceCategoriesCompare,
 } from '@/widget/settings/service/SettingsServiceCategoriesCompare/SettingsServiceCategoriesCompare.ts';
+import {
+    CompareProcess,
+} from '@/entity/compare/CompareProcess/CompareProcess.ts';
+import {
+    CompareStateIconType,
+} from '@/entity/compare/CompareStateIcon/CompareStateIcon.ts';
+import { Details } from '@/shared/box/Details/Details.ts';
 
 
 export type CompareSalaryCriteriaRulesProps =
@@ -50,7 +56,7 @@ export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implem
     private readonly _index: number;
     private readonly _copyData: SettingsServiceCopyData;
     private readonly _existedData: SettingsServiceCopyData;
-    private _details: Details | null                             = null;
+    private _compareProcess: CompareProcess | null               = null;
     private _compareItems: Array<ICompareComponent<HTMLElement>> = [];
 
     constructor (props: CompareSalaryCriteriaRulesProps) {
@@ -71,8 +77,8 @@ export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implem
     }
 
     renderWithNewRule (rule?: SalaryCriteriaRuleData) {
-        if (this._details) {
-            this._details.remove();
+        if (this._compareProcess) {
+            this._compareProcess.remove();
         }
 
         const useDiscount    = new CompareRow({
@@ -113,6 +119,7 @@ export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implem
             titleTo   : rule ? `Правило #${ this._index + 1 }` : null,
             forceState: this.getValid() ? CompareState.VALID
                                         : CompareState.WARNING,
+            label     : 'Правило',
         });
 
         // copy categories
@@ -128,23 +135,28 @@ export class CompareSalaryCriteriaRules extends Component<HTMLDivElement> implem
 
         // copy items
 
-        this._details = new Details({
-            header : header,
-            details: new Col({
-                rows: [
-                    useNetCost,
-                    individualType,
-                    targetType,
-                    amount,
-                    useDiscount,
-                    new Col({
-                        rows: categories ?? [],
-                    }),
-                ],
+
+        this._compareProcess = new CompareProcess({
+            init   : this.getValid() ? CompareStateIconType.SUCCESS
+                                     : CompareStateIconType.IDLE,
+            content: new Details({
+                header : header,
+                details: new Col({
+                    rows: [
+                        useNetCost,
+                        individualType,
+                        targetType,
+                        amount,
+                        useDiscount,
+                        new Col({
+                            rows: categories ?? [],
+                        }),
+                    ],
+                }),
             }),
         });
 
-        this._details.insert(this.element, 'beforeend');
+        this._compareProcess.insert(this.element, 'beforeend');
     }
 
     getValid (): boolean {

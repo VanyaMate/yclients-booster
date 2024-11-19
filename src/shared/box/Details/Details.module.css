@@ -1,5 +1,12 @@
 .container {
-    margin-bottom : var(--offset-small);
+    padding-bottom : var(--offset-small);
+    background     : var(--bg-main);
+    border-radius  : var(--offset-small);
+    overflow       : hidden;
+
+    &.second {
+        background : var(--bg-second);
+    }
 
     & > summary {
         position      : relative;
@@ -8,26 +15,25 @@
         margin-bottom : 0;
 
         &:after {
-            content       : '▼';
-            position      : absolute;
-            width         : calc(100% - var(--offset-big));
-            height        : 0;
-            top           : calc(100% + var(--offset-extra-small));
-            left          : var(--offset-medium);
-            border-bottom : 1px dotted var(--border-color);
-            transition    : var(--transition-fast);
-            text-align    : center;
-            color         : var(--border-color);
-            line-height   : 6px;
-            font-size     : 10px;
+            content     : '▼';
+            position    : absolute;
+            width       : calc(100% - var(--offset-big));
+            height      : var(--offset-extra-small);
+            top         : 100%;
+            left        : var(--offset-medium);
+            transition  : var(--transition-fast);
+            text-align  : center;
+            color       : var(--color-dark-gray);
+            line-height : 6px;
+            font-size   : 7px;
+            transform   : translateY(0);
         }
     }
 
     &:hover {
         & > summary {
             &:after {
-                border-bottom : 1px solid var(--bg-second);
-                color         : var(--color-dark-black-opacity);
+                color : var(--color-dark-black-opacity);
             }
         }
     }
@@ -37,17 +43,14 @@
             margin-bottom : var(--offset-medium);
 
             &:after {
-                content       : '▲';
-                border-bottom : 1px solid transparent;
-                color         : var(--color-black);
+                content   : '▲';
+                color     : var(--color-black);
+                transform : translateY(5px);
             }
         }
     }
 
     & > *:nth-child(2) {
-        padding       : var(--offset-small);
-        border-radius : var(--offset-medium);
-        border        : 1px solid var(--border-color);
-        margin        : 0 var(--offset-small);
+        padding : var(--offset-small);
     }
 }

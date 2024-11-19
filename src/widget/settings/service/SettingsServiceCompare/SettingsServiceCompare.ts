@@ -20,6 +20,9 @@ import {
     CompareStateIconType,
 } from '@/entity/compare/CompareStateIcon/CompareStateIcon.ts';
 import { delay } from '@/helper/lib/delay/delay.ts';
+import {
+    CompareProcess,
+} from '@/entity/compare/CompareProcess/CompareProcess.ts';
 
 
 export type SettingsServiceCompareProps =
@@ -44,9 +47,6 @@ export class SettingsServiceCompare extends Component<HTMLDivElement> implements
         const { dataFrom, dataTo, services, toCategoryId, ...other } = props;
         super('div', other);
 
-        console.log('DataFrom', dataFrom);
-        console.log('DataTo', dataTo);
-
         this._dataFrom      = dataFrom;
         this._services      = services;
         this._currentDataTo = dataTo ?? null;
@@ -66,7 +66,8 @@ export class SettingsServiceCompare extends Component<HTMLDivElement> implements
                 title: service.title,
             })),
             idTo      : this._currentDataTo?.id.toString(),
-            modalLabel: 'Выбрать сервис',
+            modalLabel: 'Выбрать услугу',
+            label     : 'Услуга',
         });
 
         this._compareItems.push(
@@ -428,10 +429,14 @@ export class SettingsServiceCompare extends Component<HTMLDivElement> implements
             }),
         );
 
-        new Details({
-            header : this._header,
-            details: new Col({
-                rows: this._compareItems,
+        new CompareProcess({
+            init   : this.getValid() ? CompareStateIconType.SUCCESS
+                                     : CompareStateIconType.IDLE,
+            content: new Details({
+                header : this._header,
+                details: new Col({
+                    rows: this._compareItems,
+                }),
             }),
         }).insert(this.element, 'beforeend');
         this._compareItems.push(this._header);
@@ -445,16 +450,13 @@ export class SettingsServiceCompare extends Component<HTMLDivElement> implements
         return [
             async () => {
                 // set loading...
-                this._header?.setState(CompareStateIconType.PROCESS);
                 if (this._toCategoryId) {
                     // set success
                     await delay(500);
-                    this._header?.setState(CompareStateIconType.SUCCESS);
                     console.log(`Создать услгулу для категории ${ this._toCategoryId }`);
                 } else {
                     // set error
                     await delay(250);
-                    this._header?.setState(CompareStateIconType.ERROR);
                 }
             },
         ];

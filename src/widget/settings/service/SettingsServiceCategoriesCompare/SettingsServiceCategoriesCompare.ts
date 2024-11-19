@@ -3,7 +3,8 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import {
-    IPromisableComponent, PromiseCallback,
+    IPromisableComponent,
+    PromiseCallback,
 } from '@/shared/component/IPromisableComponent.interface.ts';
 import {
     ICompareComponent,
@@ -13,12 +14,18 @@ import {
     SettingsServiceCategoryDataWithChildren,
     SettingsServiceCopyData,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
-import { Details } from '@/shared/box/Details/Details.ts';
+import { Details, DetailsType } from '@/shared/box/Details/Details.ts';
 import { CompareHeader } from '@/entity/compare/CompareHeader/CompareHeader.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
 import {
     SettingsServiceCompare,
 } from '@/widget/settings/service/SettingsServiceCompare/SettingsServiceCompare.ts';
+import {
+    CompareProcess,
+} from '@/entity/compare/CompareProcess/CompareProcess.ts';
+import {
+    CompareStateIconType,
+} from '@/entity/compare/CompareStateIcon/CompareStateIcon.ts';
 
 
 export type SettingsServiceCategoriesCompareProps =
@@ -66,6 +73,7 @@ export class SettingsServiceCategoriesCompare extends Component<HTMLDivElement> 
                 this._dataTo = this._copyData.tree.find((item) => item.id.toString() === id) ?? null;
                 this._render();
             },
+            label          : 'Категория услуг',
         });
 
         // render rows
@@ -79,10 +87,15 @@ export class SettingsServiceCategoriesCompare extends Component<HTMLDivElement> 
             });
         });
 
-        new Details({
-            header : this._header,
-            details: new Col({
-                rows: this._services,
+        new CompareProcess({
+            init   : this.getValid() ? CompareStateIconType.SUCCESS
+                                     : CompareStateIconType.IDLE,
+            content: new Details({
+                header : this._header,
+                details: new Col({
+                    rows: this._services,
+                }),
+                type   : DetailsType.SECOND,
             }),
         })
             .insert(this.element, 'afterbegin');
