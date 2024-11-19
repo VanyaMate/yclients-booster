@@ -32,8 +32,8 @@ export type SettingsServiceCategoryData = {
 export type SettingsServiceCategoryDataWithChildren =
     SettingsServiceCategoryData
     & {
-    children: Array<SettingsServiceData>;
-}
+        children: Array<SettingsServiceData>;
+    }
 
 export type SettingsServiceCategoryApiResponseMeta = {
     total_count: number
@@ -89,7 +89,7 @@ export type SettingsServiceData = {
     staff: Array<SettingsServiceCategoryServiceStuff>;
     dates: any[];                                           // TODO: Проверить что там должно быть
     duration: number;
-    resources: any[];                                       // TODO: Проверить что там должно быть
+    resources: number[];
     is_online: boolean;
     composite_details: any;
 }
