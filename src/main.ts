@@ -17,6 +17,10 @@ import {
     salaryCriteriaPageHandler,
 } from '@/pages/salary_criteria';
 import { commonPageHandler } from '@/pages/_common';
+import {
+    isLabelsClientPage,
+    labelsClientPageHandler,
+} from '@/pages/labels/client';
 
 
 const pathParts = location.pathname.split('/');
@@ -29,6 +33,8 @@ if (isGoodsPage(pathParts)) {
     salaryParamsListHandler();
 } else if (isSalaryCriteriaPage(pathParts)) {
     salaryCriteriaPageHandler();
+} else if (isLabelsClientPage(pathParts)) {
+    labelsClientPageHandler();
 }
 
 commonPageHandler();
