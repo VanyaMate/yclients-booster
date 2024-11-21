@@ -12,7 +12,7 @@ export const createLabelClientRequestAction = function (clientId: string, create
     formData.append('color', createData.color);
     formData.append('icon', createData.icon ?? '');
 
-    logger?.log(`Попытка создать лейбл "${ createData.title }" для "${ clientId }"`);
+    logger?.log(`Попытка создать категорию клиента "${ createData.title }" для "${ clientId }"`);
 
     return fetch(`https://yclients.com/labels/save/${ clientId }/0/`, {
         method: 'POST',
@@ -20,10 +20,10 @@ export const createLabelClientRequestAction = function (clientId: string, create
     })
         .then((response) => {
             if (response.ok) {
-                logger?.success(`Лейбл "${ createData.title }" для "${ clientId }" создан`);
+                logger?.success(`Категория клиента "${ createData.title }" для "${ clientId }" создана`);
                 return true;
             } else {
-                logger?.error(`Лейбл "${ createData.title }" для "${ clientId }" не создан`);
+                logger?.error(`Категория клиента "${ createData.title }" для "${ clientId }" не создана`);
                 throw response.json();
             }
         });

@@ -28,6 +28,7 @@ import {
 import {
     updateLabelClientRequestAction,
 } from '@/action/labels/client/request-action/updateLabelClient/updateLabelClient.request-action.ts';
+import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 
 export type CompareLabelClientProps =
@@ -37,6 +38,7 @@ export type CompareLabelClientProps =
         compareList: Array<LabelClientType>;
         targetClientId: string;
         targetLabel?: LabelClientType;
+        logger?: ILogger,
     };
 
 export class CompareLabelClient extends Component<HTMLDivElement> implements IPromisableComponent<HTMLDivElement>,
@@ -47,6 +49,7 @@ export class CompareLabelClient extends Component<HTMLDivElement> implements IPr
     private _targetLabel?: LabelClientType;
     private _compareProcess: CompareProcess | null                      = null;
     private _currentCompareItems: Array<ICompareComponent<HTMLElement>> = [];
+    private _logger?: ILogger;
 
     constructor (props: CompareLabelClientProps) {
         const {
@@ -54,6 +57,7 @@ export class CompareLabelClient extends Component<HTMLDivElement> implements IPr
                   compareList,
                   targetLabel,
                   targetClientId,
+                  logger,
                   ...other
               } = props;
         super('div', other);
@@ -62,6 +66,7 @@ export class CompareLabelClient extends Component<HTMLDivElement> implements IPr
         this._compareList    = compareList;
         this._targetClientId = targetClientId;
         this._targetLabel    = targetLabel;
+        this._logger         = logger;
 
         this._render(this._targetLabel);
     }
@@ -126,7 +131,7 @@ export class CompareLabelClient extends Component<HTMLDivElement> implements IPr
             return [
                 async () => {
                     this._compareProcess?.setState(CompareStateIconType.PROCESS);
-                    updateLabelClientRequestAction(this._targetClientId, targetId, this._copyLabel)
+                    updateLabelClientRequestAction(this._targetClientId, targetId, this._copyLabel, this._logger)
                         .then(() => this._compareProcess?.setState(CompareStateIconType.SUCCESS))
                         .catch(() => this._compareProcess?.setState(CompareStateIconType.ERROR));
                 },
@@ -135,7 +140,7 @@ export class CompareLabelClient extends Component<HTMLDivElement> implements IPr
             return [
                 async () => {
                     this._compareProcess?.setState(CompareStateIconType.PROCESS);
-                    createLabelClientRequestAction(this._targetClientId, this._copyLabel)
+                    createLabelClientRequestAction(this._targetClientId, this._copyLabel, this._logger)
                         .then(() => this._compareProcess?.setState(CompareStateIconType.SUCCESS))
                         .catch(() => this._compareProcess?.setState(CompareStateIconType.ERROR));
                 },
@@ -143,5 +148,3 @@ export class CompareLabelClient extends Component<HTMLDivElement> implements IPr
         }
     }
 }
-
-// vip #fbca4

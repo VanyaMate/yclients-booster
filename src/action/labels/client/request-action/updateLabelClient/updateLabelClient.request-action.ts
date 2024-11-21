@@ -12,7 +12,7 @@ export const updateLabelClientRequestAction = function (clientId: string, labelI
     formData.append('color', updateData.color);
     formData.append('icon', updateData.icon ?? '');
 
-    logger?.log(`Попытка изменить лейбл "${ labelId }: ${ updateData.title }" для "${ clientId }"`);
+    logger?.log(`Попытка изменить категорию клиента "${ labelId }: ${ updateData.title }" для "${ clientId }"`);
 
     return fetch(`https://yclients.com/labels/save/${ clientId }/${ labelId }/`, {
         method: 'POST',
@@ -20,10 +20,10 @@ export const updateLabelClientRequestAction = function (clientId: string, labelI
     })
         .then((response) => {
             if (response.ok) {
-                logger?.success(`Лейбл "${ labelId }: ${ updateData.title }" для "${ clientId }" изменен`);
+                logger?.success(`Категория клиента "${ labelId }: ${ updateData.title }" для "${ clientId }" изменена`);
                 return true;
             } else {
-                logger?.error(`Лейбл "${ labelId }: ${ updateData.title }" для "${ clientId }" не изменен`);
+                logger?.error(`Категория клиента "${ labelId }: ${ updateData.title }" для "${ clientId }" не изменена`);
                 throw response.json();
             }
         });

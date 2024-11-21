@@ -61,15 +61,16 @@ export class CopyLabelsClientForm extends Component<HTMLDivElement> {
             onclick  : this._onConfirmHandler.bind(this),
         });
 
+        this._logger.insert(this.element, 'afterbegin');
+
         this._col = new Col({
             rows: [
-                this._logger,
                 this._input,
                 this._compareButton,
             ],
         });
 
-        this._col.insert(this.element, 'afterbegin');
+        this._col.insert(this.element, 'beforeend');
     }
 
     private async _onConfirmHandler () {
@@ -84,6 +85,8 @@ export class CopyLabelsClientForm extends Component<HTMLDivElement> {
     }
 
     private _render (list: Array<LabelClientType>, selfList: Array<LabelClientType>) {
+        this._col.element.innerHTML = '';
+
         const compareLabels: Array<CompareLabelClient> = [];
         let compareLabel: CompareLabelClient;
         list.forEach((label) => {
@@ -92,6 +95,7 @@ export class CopyLabelsClientForm extends Component<HTMLDivElement> {
                 targetLabel   : selfList.find((selfLabel) => selfLabel.title === label.title),
                 compareList   : selfList,
                 targetClientId: this._clientId,
+                logger        : this._logger,
             });
             compareLabels.push(compareLabel);
             this._col.add(compareLabel);
@@ -107,7 +111,7 @@ export class CopyLabelsClientForm extends Component<HTMLDivElement> {
                         (label) => ({ chain: label.getPromises() }),
                     ),
                 )
-                    .finally(() => button.setLoading(false));
+                    .finally(this._onConfirmHandler.bind(this));
             },
         });
 
