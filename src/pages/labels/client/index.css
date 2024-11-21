@@ -1,0 +1,11 @@
+form#labels-form {
+    .form-group.hidden {
+        display : block !important;
+    }
+}
+
+#page-wrapper .wrapper-content {
+    display        : flex;
+    flex-direction : column;
+    gap            : var(--offset-small);
+}

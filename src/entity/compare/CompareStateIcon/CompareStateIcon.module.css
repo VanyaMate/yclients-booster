@@ -15,7 +15,7 @@
         border     : 1px solid var(--bg-second);
 
         &:before {
-            content : 'idl';
+            content : '…';
         }
     }
 
@@ -25,7 +25,7 @@
         border     : 1px solid var(--bg-second);
 
         &:before {
-            content : 'wai';
+            content : '✎';
         }
     }
 
@@ -34,7 +34,7 @@
         border     : 1px solid var(--bg-second);
 
         &:before {
-            content : 'pro';
+            content : '⏳';
         }
     }
 
@@ -44,7 +44,7 @@
         border     : 1px solid var(--success-color);
 
         &:before {
-            content : 'suc';
+            content : '✓';
         }
     }
 
@@ -54,7 +54,7 @@
         border     : 1px solid var(--danger-color);
 
         &:before {
-            content : 'err';
+            content : '✗';
         }
     }
 }

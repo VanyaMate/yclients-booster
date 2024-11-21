@@ -1,10 +1,10 @@
 import {
-    LabelClientType,
+    ChangeLabelClientType,
 } from '@/action/labels/client/types/labelClientType.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 
-export const createLabelClientRequestAction = function (clientId: string, createData: LabelClientType, logger?: ILogger): Promise<boolean> {
+export const createLabelClientRequestAction = function (clientId: string, createData: ChangeLabelClientType, logger?: ILogger): Promise<boolean> {
     const formData = new FormData();
 
     formData.append('entity', createData.entity.toString());

@@ -21,6 +21,10 @@ import {
     isLabelsClientPage,
     labelsClientPageHandler,
 } from '@/pages/labels/client';
+import {
+    isOnlineBookingForm,
+    onlineBookingFormPageHandler,
+} from '@/pages/online_booking/_clientId/forms';
 
 
 const pathParts = location.pathname.split('/');
@@ -35,6 +39,8 @@ if (isGoodsPage(pathParts)) {
     salaryCriteriaPageHandler();
 } else if (isLabelsClientPage(pathParts)) {
     labelsClientPageHandler();
+} else if (isOnlineBookingForm(pathParts)) {
+    onlineBookingFormPageHandler();
 }
 
 commonPageHandler();

@@ -3,6 +3,7 @@ import {
     CopyLabelsClientButton,
 } from '@/widget/labels/client/CopyLabelsClientButton/CopyLabelsClientButton.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
+import './index.css';
 
 
 export const isLabelsClientPage = function (pathname: Array<string>) {

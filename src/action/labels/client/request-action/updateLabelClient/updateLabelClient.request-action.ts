@@ -1,10 +1,10 @@
 import {
-    LabelClientType,
+    ChangeLabelClientType,
 } from '@/action/labels/client/types/labelClientType.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 
-export const updateLabelClientRequestAction = function (clientId: string, labelId: string, updateData: LabelClientType, logger?: ILogger): Promise<boolean> {
+export const updateLabelClientRequestAction = function (clientId: string, labelId: string, updateData: ChangeLabelClientType, logger?: ILogger): Promise<boolean> {
     const formData = new FormData();
 
     formData.append('entity', updateData.entity.toString());
@@ -14,7 +14,7 @@ export const updateLabelClientRequestAction = function (clientId: string, labelI
 
     logger?.log(`Попытка изменить лейбл "${ labelId }: ${ updateData.title }" для "${ clientId }"`);
 
-    return fetch(`https://yclients.com/labels/save/${ clientId }/0/`, {
+    return fetch(`https://yclients.com/labels/save/${ clientId }/${ labelId }/`, {
         method: 'POST',
         body  : formData,
     })
