@@ -13,6 +13,7 @@ export type SelectOption = {
     selected?: boolean;
     value: string;
     label: string;
+    showLabel?: string;
 }
 
 export type SelectOnChange = (data: SelectOption) => void;
@@ -22,16 +23,19 @@ export type SelectProps =
     & {
         defaultValue: string;
         defaultLabel: string;
+        defaultShowLabel?: string;
         list: Array<SelectOption>;
         withSearch?: boolean;
         isModal?: boolean;
         modalLabel?: string;
+        showValue?: boolean;
         styleType?: ButtonStyleType;
         onChange?: SelectOnChange;
     }
 
 export class Select extends Component<HTMLDivElement> {
     private readonly _defaultLabel: string              = '';
+    private readonly _defaultShowLabel?: string;
     private readonly _defaultValue: string              = '';
     private readonly _defaultStyleType: ButtonStyleType = ButtonStyleType.DEFAULT;
     private readonly _onChangeHandler?: SelectOnChange;
@@ -43,8 +47,10 @@ export class Select extends Component<HTMLDivElement> {
     private readonly _modal: Modal | null               = null;
     private _search: string                             = '';
     private _currentLabel: string                       = '';
+    private _currentShowLabel?: string;
     private _currentValue: string                       = '';
     private _inited: boolean                            = false;
+    private _showValue: boolean                         = true;
 
     constructor (props: SelectProps) {
         const {
@@ -52,29 +58,34 @@ export class Select extends Component<HTMLDivElement> {
                   withSearch,
                   defaultLabel,
                   defaultValue,
+                  defaultShowLabel,
                   styleType,
                   isModal,
                   modalLabel,
+                  showValue = true,
                   onChange,
+                  className,
                   ...other
               } = props;
 
         super('div', other);
 
         this._defaultValue     = this._currentValue = defaultValue;
+        this._defaultShowLabel = this._currentShowLabel = defaultShowLabel;
         this._defaultLabel     = this._currentLabel = defaultLabel;
         this._defaultStyleType = this._defaultStyleType ?? ButtonStyleType.DEFAULT;
         this._onChangeHandler  = onChange;
         this._isModal          = isModal ?? false;
         this._list             = list;
+        this._showValue        = showValue;
 
         this.element.classList.add(css.container);
 
         this._selectButton = new Button({
-            textContent: this._currentLabel,
+            textContent: this._currentShowLabel ?? this._currentLabel,
             styleType  : this._defaultStyleType,
             fullWidth  : true,
-            className  : css.label,
+            className  : `${ css.label } ${ className }`,
             onclick    : this._toggle.bind(this),
         });
         this._selectButton.insert(this.element, 'afterbegin');
@@ -134,6 +145,10 @@ export class Select extends Component<HTMLDivElement> {
         return this._currentValue;
     }
 
+    public setStyleType (styleType: ButtonStyleType) {
+        this._selectButton.setStyleType(styleType);
+    }
+
     public get isOpened () {
         return this.element.classList.contains(css.show);
     }
@@ -158,8 +173,9 @@ export class Select extends Component<HTMLDivElement> {
                     disabled   : selected,
                     fullWidth  : true,
                     onclick    : () => this._select({
-                        label: this._defaultLabel,
-                        value: this._defaultValue,
+                        label    : this._defaultLabel,
+                        showLabel: this._defaultShowLabel,
+                        value    : this._defaultValue,
                     }),
                 }),
             );
@@ -170,7 +186,9 @@ export class Select extends Component<HTMLDivElement> {
                 selected = item.value === this._currentValue;
                 this._optionsBox.add(
                     new Button({
-                        textContent: `${ item.label } (${ item.value })`,
+                        textContent: this._showValue
+                                     ? `${ item.label } (${ item.value })`
+                                     : item.label,
                         styleType  : selected ? ButtonStyleType.PRIMARY
                                               : undefined,
                         disabled   : selected,
@@ -188,7 +206,7 @@ export class Select extends Component<HTMLDivElement> {
 
 
         this._currentValue = item.value;
-        this._currentLabel = item.label;
+        this._currentLabel = item.showLabel ?? item.label;
 
         if (this._isModal) {
             this._modal?.hide();

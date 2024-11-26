@@ -24,6 +24,7 @@
 
     &:hover {
         background : var(--bg-main);
+        cursor     : pointer;
     }
 
     &.primary {
@@ -40,6 +41,16 @@
         border     : 1px solid var(--danger-color);
         background : var(--danger-color);
         color      : var(--on-primary-color);
+
+        &:hover {
+            background : var(--color-black);
+        }
+    }
+
+    &.warning {
+        border     : 1px solid var(--warning-color);
+        background : var(--warning-color);
+        color      : var(--on-warning-color);
 
         &:hover {
             background : var(--color-black);

@@ -9,6 +9,7 @@ export enum ButtonStyleType {
     DEFAULT,
     PRIMARY,
     DANGER,
+    WARNING
 }
 
 export enum ButtonSizeType {
@@ -64,11 +65,14 @@ export class Button extends Component<HTMLButtonElement> {
     setStyleType (styleType: ButtonStyleType) {
         this.element.classList.remove(css.primary);
         this.element.classList.remove(css.danger);
+        this.element.classList.remove(css.warning);
 
         if (styleType === ButtonStyleType.PRIMARY) {
             this.element.classList.add(css.primary);
         } else if (styleType === ButtonStyleType.DANGER) {
             this.element.classList.add(css.danger);
+        } else if (styleType === ButtonStyleType.WARNING) {
+            this.element.classList.add(css.warning);
         }
     }
 }

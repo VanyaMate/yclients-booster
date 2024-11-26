@@ -9,6 +9,9 @@ import {
 import {
     getBearerTokenDomAction,
 } from '@/action/bearer/dom-action/getBearerToken/getBearerToken.dom-action.ts';
+import {
+    CompareHeaderV3,
+} from '@/entity/compare/v3/CompareHeaderV3/CompareHeaderV3.ts';
 
 
 export const isSalaryCriteriaPage = function (pathnameParts: Array<string>): boolean {
@@ -26,6 +29,11 @@ export const salaryCriteriaPageHandler = function () {
                 rows: [
                     new CopySalaryCriteriaFromThisToOtherButton(clientId, bearer),
                     new SalaryCriteriaListInfo(),
+                    new CompareHeaderV3({
+                        headerOriginal: 'Original',
+                        label         : 'Original',
+                        headerCompare : 'Original',
+                    }),
                 ],
             })
                 .insert(container, 'afterbegin');

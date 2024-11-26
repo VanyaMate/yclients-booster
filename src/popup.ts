@@ -1,6 +1,8 @@
 import { Component } from '@/shared/component/Component.ts';
 
 
+const END_OF_DAY = new Date().getHours() > 19;
+
 new Component<HTMLDivElement>('div', { id: 'app' }, [
     new Component<HTMLStyleElement>('style', {
         innerHTML: `
@@ -38,7 +40,9 @@ new Component<HTMLDivElement>('div', { id: 'app' }, [
             }
         `,
     }),
-    new Component<HTMLHeadingElement>('h1', { innerHTML: 'Балдежного вам котика' }),
+    new Component<HTMLHeadingElement>('h1', {
+        innerHTML: END_OF_DAY ? `Топ топ домой` : `Балдежный котик`,
+    }),
     new Component<HTMLVideoElement>(
         'video',
         {
@@ -47,7 +51,8 @@ new Component<HTMLDivElement>('div', { id: 'app' }, [
         },
         [
             new Component<HTMLSourceElement>('source', {
-                src : '/sticker.webm',
+                src : new Date().getHours() > 19 ? '/domoy.webm'
+                                                 : '/sticker.webm',
                 type: 'video/webm',
             }),
         ],

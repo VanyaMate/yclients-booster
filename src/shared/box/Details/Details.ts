@@ -3,6 +3,7 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import css from './Details.module.css';
+import { IComponent } from '@/shared/component/Component.interface.ts';
 
 
 export enum DetailsType {
@@ -13,8 +14,8 @@ export enum DetailsType {
 export type DetailsProps =
     ComponentPropsOptional<HTMLDetailsElement>
     & {
-        header: Component<HTMLElement>,
-        details: Component<HTMLElement>,
+        header: IComponent<HTMLElement>,
+        details: IComponent<HTMLElement>,
         type?: DetailsType,
     };
 
