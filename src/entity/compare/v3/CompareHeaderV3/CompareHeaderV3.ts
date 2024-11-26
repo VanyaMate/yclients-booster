@@ -93,7 +93,6 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
     }
 
     private _updateValidation (headerCompare?: string) {
-        this.element.className = css.container;
         if (typeof headerCompare !== 'string') {
             this._selectButton.setStyleType(ButtonStyleType.DANGER);
         } else if (headerCompare !== this._headerOriginal) {
