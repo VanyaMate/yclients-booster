@@ -12,6 +12,7 @@ import {
 import {
     CompareHeaderV3,
 } from '@/entity/compare/v3/CompareHeaderV3/CompareHeaderV3.ts';
+import { CompareRowV3 } from '@/entity/compare/v3/CompareRowV3/CompareRowV3.ts';
 
 
 export const isSalaryCriteriaPage = function (pathnameParts: Array<string>): boolean {
@@ -30,9 +31,33 @@ export const salaryCriteriaPageHandler = function () {
                     new CopySalaryCriteriaFromThisToOtherButton(clientId, bearer),
                     new SalaryCriteriaListInfo(),
                     new CompareHeaderV3({
-                        headerOriginal: 'Original',
-                        label         : 'Original',
-                        headerCompare : 'Original',
+                        headerOriginal : 'Original',
+                        label          : 'Original',
+                        headerCompare  : 'Original',
+                        rows           : [
+                            new CompareRowV3({
+                                dataOriginal: 'Original',
+                                label       : 'Original',
+                                dataCompare : 'Original',
+                            }),
+                            new CompareRowV3({
+                                dataOriginal: 'Original',
+                                label       : 'Original',
+                                dataCompare : 'Original2',
+                            }),
+                        ],
+                        variants       : [],
+                        onVariantChange: () => {
+                        },
+                    }),
+                    new CompareHeaderV3({
+                        headerOriginal : 'Original',
+                        label          : 'Original',
+                        headerCompare  : 'Original2',
+                        rows           : [],
+                        variants       : [],
+                        onVariantChange: () => {
+                        },
                     }),
                 ],
             })

@@ -2,38 +2,56 @@
     display        : flex;
     flex-direction : row;
     gap            : var(--offset-small);
-    align-items    : center;
+    align-items    : start;
 
     .select {
-        width : 60px !important;
+        width : 50px !important;
     }
 
-    .data {
-        display         : flex;
-        flex-direction  : row;
-        justify-content : space-between;
-        flex            : 1;
-        align-items     : center;
+    .headerSelect {
+        width   : fit-content;
+        padding : 0 25px 0 var(--offset-small);
+        border  : none;
+        height  : calc(30px - var(--offset-extra-small) * 2);
+    }
 
-        & > * {
-            &:nth-child(1) {
-                text-align : left;
-                flex       : 2;
-            }
+    .content {
+        flex : 1;
 
-            &:nth-child(2) {
-                text-align    : center;
-                flex          : 1;
-                padding       : var(--offset-extra-small);
-                border        : 1px solid var(--border-color);
-                border-radius : var(--offset-small);
-                color         : var(--color-dark-gray);
-            }
+        .data {
+            display         : flex;
+            flex-direction  : row;
+            justify-content : space-between;
+            flex            : 1;
+            align-items     : center;
+            min-height      : 30px;
+            padding         : var(--offset-extra-small) var(--offset-small);
 
-            &:nth-child(3) {
-                text-align : right;
-                flex       : 2;
+            & > * {
+                &:nth-child(1) {
+                    text-align : left;
+                    flex       : 2;
+                }
+
+                &:nth-child(2) {
+                    text-align    : center;
+                    flex          : 1;
+                    padding       : var(--offset-extra-small);
+                    border        : 1px solid var(--border-color);
+                    border-radius : var(--offset-small);
+                    color         : var(--color-dark-gray);
+                }
+
+                &:nth-child(3) {
+                    text-align : right;
+                    flex       : 2;
+                }
             }
+        }
+
+        .rows {
+            padding-top : var(--offset-small);
+            border-top  : 1px dotted var(--border-color);
         }
     }
 }

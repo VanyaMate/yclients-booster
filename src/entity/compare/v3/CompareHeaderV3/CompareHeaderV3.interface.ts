@@ -1,3 +1,6 @@
-export interface ICompareHeaderV3<Data> {
-    update (data: Data): void;
+import { CompareType } from '@/entity/compare/v3/Compare.types.ts';
+
+
+export interface ICompareHeaderV3 {
+    setValidationType (type: CompareType): void;
 }

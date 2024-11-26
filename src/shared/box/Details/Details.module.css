@@ -1,8 +1,7 @@
 .container {
-    padding-bottom : var(--offset-small);
-    background     : var(--bg-main);
-    border-radius  : var(--offset-small);
-    overflow       : hidden;
+    background    : var(--bg-main);
+    border-radius : var(--offset-small);
+    overflow      : visible;
 
     &.second {
         background : var(--bg-second);

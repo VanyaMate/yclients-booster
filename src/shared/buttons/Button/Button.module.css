@@ -54,6 +54,7 @@
 
         &:hover {
             background : var(--color-black);
+            color      : var(--color-white);
         }
     }
 

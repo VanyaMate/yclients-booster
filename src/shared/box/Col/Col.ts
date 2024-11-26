@@ -19,7 +19,7 @@ export class Col extends Component<HTMLDivElement> {
         this.element.classList.add(css.container);
     }
 
-    add (row: Component<HTMLElement>) {
+    add (row: IComponent<HTMLElement>) {
         row.insert(this.element, 'beforeend');
     }
 }
