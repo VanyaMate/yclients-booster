@@ -19,6 +19,86 @@ export const isSalaryCriteriaPage = function (pathnameParts: Array<string>): boo
     return pathnameParts[1] === 'salary_criteria' && !!pathnameParts[3].match(/\d+/);
 };
 
+type MockRow = {
+    title: string;
+    description: string;
+    amount: number;
+}
+
+type MockItem = {
+    title: string;
+    description: string;
+    rows: Array<string>;
+}
+
+type MockRows = Record<string, MockRow>;
+type MockItems = Record<string, MockItem>;
+
+
+const mockOriginalData: { rows: MockRows, items: MockItems } = {
+    rows : {
+        '1': {
+            title      : 'Row title 1',
+            description: 'Description row #1',
+            amount     : 1,
+        },
+        '2': {
+            title      : 'Row title 2',
+            description: 'Description row #2',
+            amount     : 2,
+        },
+        '3': {
+            title      : 'Row title 3',
+            description: 'Description row #3',
+            amount     : 3,
+        },
+    },
+    items: {
+        '1': {
+            title      : 'Item title 1',
+            description: 'Description [item] @1',
+            rows       : [ '1', '2' ],
+        },
+        '2': {
+            title      : 'Item title 2',
+            description: 'Description [item] @2',
+            rows       : [ '3' ],
+        },
+    },
+};
+
+const mockCompareData: { rows: MockRows, items: MockItems } = {
+    rows : {
+        '1': {
+            title      : 'Row title 1',
+            description: 'Description row #1',
+            amount     : 1,
+        },
+        '2': {
+            title      : 'Row title 4',
+            description: 'Description row #4',
+            amount     : 4,
+        },
+        '3': {
+            title      : 'Row title 3',
+            description: 'Description row #3',
+            amount     : 3,
+        },
+    },
+    items: {
+        '1': {
+            title      : 'Item title 1',
+            description: 'Description [item] @1',
+            rows       : [ '1', '2' ],
+        },
+        '2': {
+            title      : 'Item title 2',
+            description: 'Description [item] @2',
+            rows       : [ '3' ],
+        },
+    },
+};
+
 export const salaryCriteriaPageHandler = function () {
     startHandler(() => {
         const container = document.querySelector('.wrapper-content');
@@ -46,8 +126,22 @@ export const salaryCriteriaPageHandler = function () {
                                 dataCompare : 'Original2',
                             }),
                         ],
-                        variants       : [],
-                        onVariantChange: () => {
+                        variants       : [
+                            {
+                                value: '1',
+                                label: 'Orignal1',
+                            },
+                            {
+                                value: '2',
+                                label: 'Orignal2',
+                            },
+                            {
+                                value: '3',
+                                label: 'Orignal3',
+                            },
+                        ],
+                        onVariantChange: (variant) => {
+                            console.log('rerender children with', variant);
                         },
                     }),
                     new CompareHeaderV3({
@@ -59,6 +153,27 @@ export const salaryCriteriaPageHandler = function () {
                         onVariantChange: () => {
                         },
                     }),
+                    ...Object.keys(mockOriginalData.items).map((key) => (
+                        new CompareHeaderV3({
+                            headerOriginal : mockOriginalData.items[key].title,
+                            headerCompare  : mockCompareData.items[key]?.title,
+                            label          : 'item',
+                            variants       : Object.keys(mockCompareData.items).map((key) => ({
+                                label: mockCompareData.items[key].title,
+                                value: key,
+                            })),
+                            rows           : [
+                                new CompareRowV3({
+                                    dataOriginal: mockOriginalData.items[key].description,
+                                    dataCompare : mockCompareData.items[key]?.description,
+                                    label       : 'описание',
+                                }),
+
+                            ],
+                            onVariantChange: () => {
+                            },
+                        })
+                    )),
                 ],
             })
                 .insert(container, 'afterbegin');

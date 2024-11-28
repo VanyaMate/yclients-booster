@@ -25,6 +25,10 @@ import {
     isOnlineBookingForm,
     onlineBookingFormPageHandler,
 } from '@/pages/online_booking/_clientId/forms';
+import {
+    isSettingsServicePage,
+    settingsServicePageHandler,
+} from '@/pages/settings/service';
 
 
 const pathParts = location.pathname.split('/');
@@ -41,6 +45,8 @@ if (isGoodsPage(pathParts)) {
     labelsClientPageHandler();
 } else if (isOnlineBookingForm(pathParts)) {
     onlineBookingFormPageHandler();
+} else if (isSettingsServicePage(pathParts)) {
+    settingsServicePageHandler(pathParts);
 }
 
 commonPageHandler();

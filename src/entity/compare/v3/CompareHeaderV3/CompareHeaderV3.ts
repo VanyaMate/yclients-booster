@@ -8,10 +8,10 @@ import {
 import css from './CompareHeaderV3.module.css';
 import { Select, SelectOption } from '@/shared/input/Select/Select.ts';
 import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
-import { CompareType } from '@/entity/compare/v3/Compare.types.ts';
 import {
-    ICompareRowV3,
-} from '@/entity/compare/v3/CompareRowV3/CompareRowV3.interface.ts';
+    CompareType,
+    ICompareComponent,
+} from '@/entity/compare/v3/Compare.types.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
 import { Details } from '@/shared/box/Details/Details.ts';
 
@@ -21,19 +21,21 @@ export type CompareHeaderV3Props =
     & {
         headerOriginal: string;
         label: string;
+        rows: Array<ICompareComponent>;
+        variants: Array<SelectOption>;
+        onVariantChange: (option: SelectOption) => void;
         headerCompare?: string;
         onActivateAll?: () => void;
         onActivateOnlyChildren?: () => void;
         onActivateOnlyItem?: () => void;
         onDeactivate?: () => void;
-        rows: Array<ICompareRowV3>;
-        variants: Array<SelectOption>;
-        onVariantChange: (option: SelectOption) => void;
     };
 
-export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompareHeaderV3 {
+export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompareHeaderV3,
+                                                                          ICompareComponent {
     private readonly _headerOriginal: string;
     private readonly _selectButton: Select;
+    private _isValid: boolean;
 
     constructor (props: CompareHeaderV3Props) {
         const {
@@ -52,6 +54,7 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
         super('div', other);
         this.element.classList.add(css.container);
         this._headerOriginal = headerOriginal;
+        this._isValid        = this._headerOriginal === headerCompare;
 
         this._selectButton = new Select({
             defaultValue    : '0',
@@ -91,7 +94,7 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
             isModal         : true,
             modalLabel      : `Варианты действия`,
             className       : css.select,
-            showValue       : false,
+            showValue       : true,
         });
 
         this._selectButton.insert(this.element, 'beforeend');
@@ -104,13 +107,14 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
                 new Component<HTMLDivElement>('div', {}, [
                     new Select({
                         defaultValue: '0',
-                        defaultLabel: headerCompare ?? '-',
+                        defaultLabel: 'Создать новый',
                         list        : variants,
                         isModal     : true,
                         modalLabel  : `Выберите ${ label }`,
                         showValue   : false,
                         className   : css.headerSelect,
                         onChange    : onVariantChange,
+                        withSearch  : true,
                     }),
                 ]),
             ]),
@@ -126,16 +130,23 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
         this._updateValidation(headerCompare);
     }
 
+    get isValid (): boolean {
+        return this._isValid;
+    }
+
     setValidationType (type: CompareType): void {
         switch (type) {
             case CompareType.VALID:
                 this._selectButton.setStyleType(ButtonStyleType.DEFAULT);
+                this._isValid = true;
                 break;
             case CompareType.NO_VALID:
                 this._selectButton.setStyleType(ButtonStyleType.WARNING);
+                this._isValid = false;
                 break;
             case CompareType.NO_EXIST:
                 this._selectButton.setStyleType(ButtonStyleType.DANGER);
+                this._isValid = false;
                 break;
             default:
                 break;
