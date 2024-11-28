@@ -19,8 +19,12 @@ export class CompareRowV3 extends Component<HTMLDivElement> implements ICompareC
 
     constructor (props: CompareRowV3Props) {
         const { dataCompare, dataOriginal, label, ...other } = props;
+        const isEmpty                                        = dataOriginal.length === 0;
         super('div', other, [
-            new Component<HTMLDivElement>('div', { textContent: dataOriginal }),
+            new Component<HTMLDivElement>('div', {
+                textContent: isEmpty ? 'Пусто' : dataOriginal,
+                className  : isEmpty ? css.empty : '',
+            }),
             new Component<HTMLDivElement>('div', { textContent: label }),
             new Component<HTMLDivElement>('div', { textContent: dataCompare ?? '-' }),
         ]);
