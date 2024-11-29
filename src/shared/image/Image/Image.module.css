@@ -1,0 +1,7 @@
+.container {
+    img {
+        border-radius : var(--offset-small);
+        max-width     : 100%;
+        background    : var(--bg-second);
+    }
+}

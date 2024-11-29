@@ -1,7 +1,7 @@
 import { Component } from '@/shared/component/Component.ts';
 
 
-const END_OF_DAY = new Date().getHours() > 19;
+const END_OF_DAY = new Date().getHours() >= 19;
 
 new Component<HTMLDivElement>('div', { id: 'app' }, [
     new Component<HTMLStyleElement>('style', {
@@ -13,7 +13,7 @@ new Component<HTMLDivElement>('div', { id: 'app' }, [
             }
         
             body {
-                background: #fee;
+                background: #f4f4ff;
                 width: fit-content;
                 height: fit-content;
             }
@@ -51,8 +51,8 @@ new Component<HTMLDivElement>('div', { id: 'app' }, [
         },
         [
             new Component<HTMLSourceElement>('source', {
-                src : new Date().getHours() > 19 ? '/domoy.webm'
-                                                 : '/sticker.webm',
+                src : END_OF_DAY ? '/domoy.webm'
+                                 : '/sticker-2.webm',
                 type: 'video/webm',
             }),
         ],

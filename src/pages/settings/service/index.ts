@@ -8,6 +8,7 @@ import {
 import {
     getSalaryCriteriaListDataForCopyRequestAction,
 } from '@/action/salary_criteria/request-action/getSalaryCriteriaListDataForCopy/getSalaryCriteriaListDataForCopy.request-action.ts';
+import { MemoFetch } from '@/service/Fetcher/implementations/MemoFetch.ts';
 
 
 export const isSettingsServicePage = function (pathname: Array<string>) {
@@ -19,15 +20,18 @@ export const settingsServicePageHandler = function (pathname: Array<string>) {
         const clientId: string = pathname[3];
         const bearer           = getBearerTokenDomAction();
         const container        = document.querySelector('#page-wrapper > .wrapper-content');
-        const data             = await getSalaryCriteriaListDataForCopyRequestAction(bearer, clientId, true, 5, 1);
+        const data1            = await getSalaryCriteriaListDataForCopyRequestAction(bearer, clientId, true, 5, 1);
+        const data2            = await getSalaryCriteriaListDataForCopyRequestAction(bearer, clientId, true, 5, 1);
 
         console.log('container', container);
 
         if (container) {
             new SettingsServiceCategoriesCompareComponent({
                 clientId,
-                clientData : data.settingsCopyData,
-                compareData: data.settingsCopyData,
+                clientData: data1.settingsCopyData,
+                targetData: data2.settingsCopyData,
+                bearer    : bearer,
+                fetcher   : new MemoFetch(),
             }).insert(container, 'afterbegin');
         }
     });

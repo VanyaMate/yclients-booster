@@ -111,19 +111,19 @@ export const salaryCriteriaPageHandler = function () {
                     new CopySalaryCriteriaFromThisToOtherButton(clientId, bearer),
                     new SalaryCriteriaListInfo(),
                     new CompareHeaderV3({
-                        headerOriginal : 'Original',
-                        label          : 'Original',
-                        headerCompare  : 'Original',
-                        rows           : [
+                        targetHeaderData: 'Original',
+                        label           : 'Original',
+                        clientHeaderData: 'Original',
+                        rows            : [
                             new CompareRowV3({
-                                dataOriginal: 'Original',
-                                label       : 'Original',
-                                dataCompare : 'Original',
+                                targetData: 'Original',
+                                label     : 'Original',
+                                clientData: 'Original',
                             }),
                             new CompareRowV3({
-                                dataOriginal: 'Original',
-                                label       : 'Original',
-                                dataCompare : 'Original2',
+                                targetData: 'Original',
+                                label     : 'Original',
+                                clientData: 'Original2',
                             }),
                         ],
                         variants       : [
@@ -145,28 +145,28 @@ export const salaryCriteriaPageHandler = function () {
                         },
                     }),
                     new CompareHeaderV3({
-                        headerOriginal : 'Original',
-                        label          : 'Original',
-                        headerCompare  : 'Original2',
-                        rows           : [],
-                        variants       : [],
-                        onVariantChange: () => {
+                        targetHeaderData: 'Original',
+                        label           : 'Original',
+                        clientHeaderData: 'Original2',
+                        rows            : [],
+                        variants        : [],
+                        onVariantChange : () => {
                         },
                     }),
                     ...Object.keys(mockOriginalData.items).map((key) => (
                         new CompareHeaderV3({
-                            headerOriginal : mockOriginalData.items[key].title,
-                            headerCompare  : mockCompareData.items[key]?.title,
-                            label          : 'item',
-                            variants       : Object.keys(mockCompareData.items).map((key) => ({
+                            targetHeaderData: mockOriginalData.items[key].title,
+                            clientHeaderData: mockCompareData.items[key]?.title,
+                            label           : 'item',
+                            variants        : Object.keys(mockCompareData.items).map((key) => ({
                                 label: mockCompareData.items[key].title,
                                 value: key,
                             })),
-                            rows           : [
+                            rows            : [
                                 new CompareRowV3({
-                                    dataOriginal: mockOriginalData.items[key].description,
-                                    dataCompare : mockCompareData.items[key]?.description,
-                                    label       : 'описание',
+                                    targetData: mockOriginalData.items[key].description,
+                                    clientData: mockCompareData.items[key]?.description,
+                                    label     : 'описание',
                                 }),
 
                             ],

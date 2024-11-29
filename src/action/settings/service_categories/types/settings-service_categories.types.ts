@@ -26,7 +26,101 @@ export type SettingsServiceCategoryData = {
     price_max: number
     sex: number
     is_chain: boolean
-    services_count: number
+    translations: Array<SettingsServiceTranslation>;
+}
+
+export type SettingsServiceTranslation = {
+    language_id: number;
+    translation: string;
+}
+
+export type SettingsServiceCategoryCreateData = {
+    api_id: string,
+    booking_title: string,
+    services: Array<number>,
+    service_count: number;
+    staff: Array<number>,
+    title: string,
+    translations: Array<SettingsServiceTranslation>;
+}
+
+export type SettingsServiceImageGroup = {
+    id: number;
+    entity: string;
+    entity_id: string,
+    images: {
+        basic: {
+            id: number;
+            path: string;
+            width: string;
+            height: string;
+            type: string;
+            image_group_id: number;
+            version: string;
+        }
+    }
+}
+
+export type SettingsServiceItemCreateData = {
+    active: number;
+    api_id: string;
+    api_service_id: number;
+    autopayment_before_visit_time: number;
+    booking_title: string;
+    capacity: number;
+    category_id: number;
+    chain_details: { // TODO                                // NOT_EXIST
+        is_comment_managed_only_in_chain: boolean;
+        is_price_managed_only_in_chain: boolean;
+        price_max: number;
+        price_min: number;
+        comment: string;
+    };
+    comment: string;
+    date_from: string; // format '1970-01-01'
+    date_to: string; // format '1970-01-01'
+    dates: Array<string>;
+    delete_image: false; //  default: false // Если изменяется картинка -> true
+    discount: number;
+    duration: number;
+    id: number;
+    image?: string;
+    image_group: null | SettingsServiceImageGroup;
+    is_abonement_autopayment_enabled: number;
+    is_category: false; // default: false
+    is_chain: boolean;
+    is_comment_managed_only_in_chain: boolean;
+    is_composite: boolean;
+    is_linked_to_composite: boolean;
+    is_multi: boolean;
+    is_need_limit_date: boolean;
+    is_online: boolean;
+    is_price_managed_only_in_chain: boolean;
+    is_range_price_enabled: boolean; // price max !== price min
+    kkm_settings_id: number;
+    online_invoicing_status: number;
+    price_max: number;
+    price_min: number;
+    price_prepaid_amount: number;
+    price_prepaid_percent: number;
+    print_title: string;
+    repeat_visit_days_step: number | null;
+    resources: Array<number>; // TODO
+    salon_group_service_link: null | string;
+    salon_group_title: null | string;
+    salon_service_id: number;
+    schedule_template_type: number;
+    seance_search_finish: number;
+    seance_search_start: number;
+    seance_search_step: number;
+    service_type: number;
+    staff: Array<number>;
+    step: number;
+    tax_variant: null | number;
+    title: string;
+    translations: Array<SettingsServiceTranslation>
+    vat_id: null | number;
+    weight: number;
 }
 
 export type SettingsServiceCategoryDataWithChildren =
@@ -46,51 +140,56 @@ export type SettingsServiceItemApiResponse = {
 }
 
 export type SettingsServiceData = {
-    booking_title: string;
-    tax_variant: any;                                       // TODO: Проверить что там должно быть
-    vat_id: any;                                            // TODO: Проверить что там должно быть
-    print_title: string;
-    service_type: number;
-    api_service_id: number;
-    repeat_visit_days_step: any;                            // TODO: Проверить что там должно быть
-    seance_search_start: number;
-    seance_search_finish: number;
-    seance_search_step: number;
-    step: number;
-    is_need_limit_date: boolean;
-    date_from: string;
-    date_to: string;
-    schedule_template_type: number;
-    online_invoicing_status: number;
-    is_abonement_autopayment_enabled: number;
-    autopayment_before_visit_time: number;
     abonement_restriction_value: number;
-    is_chain: boolean;
-    is_price_managed_only_in_chain: boolean;
-    is_comment_managed_only_in_chain: boolean;
-    price_prepaid_amount: number;
-    price_prepaid_percent: number;
-    is_composite: boolean;
-    id: number;
-    salon_service_id: number;
-    title: string;
-    category_id: number;
-    price_min: number;
-    price_max: number;
-    discount: number;
-    comment: string;
-    weight: number;
     active: number;
     api_id: string;
-    prepaid: string;
-    is_multi: boolean;
+    api_service_id: number;
+    autopayment_before_visit_time: number;
+    booking_title: string;
     capacity: number;
-    image_group: any[];                                     // TODO: Проверить что там должно быть
-    staff: Array<SettingsServiceCategoryServiceStuff>;
-    dates: any[];                                           // TODO: Проверить что там должно быть
+    category_id: number;
+    comment: string;
+    date_from: string;
+    date_to: string;
+    dates: string[];
+    discount: number;
     duration: number;
-    resources: number[];
+    id: number;
+    image_group: null | SettingsServiceImageGroup;
+    is_abonement_autopayment_enabled: number;
+    is_chain: boolean;
+    is_comment_managed_only_in_chain: boolean;
+    is_composite: boolean;
+    is_linked_to_composite: boolean;
+    is_multi: boolean;
+    is_need_limit_date: boolean;
     is_online: boolean;
+    is_price_managed_only_in_chain: boolean;
+    kkm_settings_id: null | number;
+    online_invoicing_status: number;
+    prepaid: string;
+    price_max: number;
+    price_min: number;
+    price_prepaid_amount: number;
+    price_prepaid_percent: number;
+    print_title: string;
+    repeat_visit_days_step: number;
+    resources: Array<number>;
+    salon_group_service_link: null | string;
+    salon_group_title: null | string;
+    salon_service_id: number;
+    schedule_template_type: number;
+    seance_search_finish: number;
+    seance_search_start: number;
+    seance_search_step: number;
+    service_type: number;
+    staff: Array<SettingsServiceCategoryServiceStuff>;
+    step: number;
+    tax_variant: number | null;
+    title: string;
+    translations: Array<SettingsServiceTranslation>;
+    vat_id: number | null;
+    weight: number;
     composite_details: any;
 }
 

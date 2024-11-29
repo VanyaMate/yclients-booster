@@ -52,7 +52,13 @@
 
         .rows {
             padding-top : var(--offset-small);
-            border-top  : 1px dotted var(--border-color);
+        }
+    }
+
+    &.invalid {
+        & > .content > summary > .data > *:nth-child(2) {
+            border : 1px solid var(--danger-color);
+            color  : var(--danger-color);
         }
     }
 }

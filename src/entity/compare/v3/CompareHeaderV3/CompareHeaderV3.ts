@@ -14,47 +14,52 @@ import {
 } from '@/entity/compare/v3/Compare.types.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
 import { Details } from '@/shared/box/Details/Details.ts';
+import { TextInput } from '@/shared/input/TextInput/TextInput.ts';
+import { CompareEvent } from '@/entity/compare/v3/CompareEvent.ts';
 
 
 export type CompareHeaderV3Props =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        headerOriginal: string;
+        targetHeaderData: string;
+        clientHeaderData?: string;
         label: string;
         rows: Array<ICompareComponent>;
         variants: Array<SelectOption>;
         onVariantChange: (option: SelectOption) => void;
-        headerCompare?: string;
         onActivateAll?: () => void;
         onActivateOnlyChildren?: () => void;
         onActivateOnlyItem?: () => void;
         onDeactivate?: () => void;
+        onRename?: (name: string) => void;
     };
 
 export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompareHeaderV3,
                                                                           ICompareComponent {
-    private readonly _headerOriginal: string;
+    private readonly _initialTargetHeader: string;
     private readonly _selectButton: Select;
+    private _currentTargetHeader: string;
     private _isValid: boolean;
 
     constructor (props: CompareHeaderV3Props) {
         const {
-                  headerOriginal,
+                  targetHeaderData,
                   label,
-                  headerCompare,
+                  clientHeaderData,
                   onActivateOnlyChildren,
                   onActivateOnlyItem,
                   onActivateAll,
                   onDeactivate,
                   variants,
                   onVariantChange,
+                  onRename,
                   rows,
                   ...other
               } = props;
         super('div', other);
         this.element.classList.add(css.container);
-        this._headerOriginal = headerOriginal;
-        this._isValid        = this._headerOriginal === headerCompare;
+        this._initialTargetHeader = this._currentTargetHeader = targetHeaderData;
+        this._isValid             = this._initialTargetHeader === clientHeaderData;
 
         this._selectButton = new Select({
             defaultValue    : '0',
@@ -98,11 +103,22 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
         });
 
         this._selectButton.insert(this.element, 'beforeend');
+        let input: TextInput;
 
         const content = new Details({
             className: css.content,
             header   : new Component<HTMLDivElement>('div', { className: css.data }, [
-                new Component<HTMLDivElement>('div', { textContent: headerOriginal }),
+                input = new TextInput({
+                    type       : 'text',
+                    value      : targetHeaderData,
+                    placeholder: label,
+                    required   : true,
+                    oninput    : () => {
+                        this._currentTargetHeader = input.getValue();
+                        onRename?.(this._currentTargetHeader);
+                        this._updateValidation(clientHeaderData);
+                    },
+                }),
                 new Component<HTMLDivElement>('div', { textContent: label }),
                 new Component<HTMLDivElement>('div', {}, [
                     new Select({
@@ -127,7 +143,7 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
         });
 
         content.insert(this.element, 'beforeend');
-        this._updateValidation(headerCompare);
+        this._updateValidation(clientHeaderData);
     }
 
     get isValid (): boolean {
@@ -138,15 +154,12 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
         switch (type) {
             case CompareType.VALID:
                 this._selectButton.setStyleType(ButtonStyleType.DEFAULT);
-                this._isValid = true;
                 break;
             case CompareType.NO_VALID:
                 this._selectButton.setStyleType(ButtonStyleType.WARNING);
-                this._isValid = false;
                 break;
             case CompareType.NO_EXIST:
                 this._selectButton.setStyleType(ButtonStyleType.DANGER);
-                this._isValid = false;
                 break;
             default:
                 break;
@@ -156,10 +169,17 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
     private _updateValidation (headerCompare?: string) {
         if (typeof headerCompare !== 'string') {
             this._selectButton.setStyleType(ButtonStyleType.DANGER);
-        } else if (headerCompare !== this._headerOriginal) {
+            this.element.classList.add(css.invalid);
+            this._isValid = false;
+        } else if (headerCompare !== this._currentTargetHeader) {
             this._selectButton.setStyleType(ButtonStyleType.WARNING);
+            this.element.classList.add(css.invalid);
+            this._isValid = false;
         } else {
             this._selectButton.setStyleType(ButtonStyleType.DEFAULT);
+            this.element.classList.remove(css.invalid);
+            this._isValid = true;
         }
+        this.element.dispatchEvent(CompareEvent);
     }
 }

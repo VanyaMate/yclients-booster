@@ -9,27 +9,33 @@ import { ICompareComponent } from '@/entity/compare/v3/Compare.types.ts';
 export type CompareRowV3Props =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        dataOriginal: string;
+        targetData: string;
         label: string;
-        dataCompare?: string;
+        clientData?: string;
     };
 
 export class CompareRowV3 extends Component<HTMLDivElement> implements ICompareComponent {
     private readonly _isValid: boolean;
 
     constructor (props: CompareRowV3Props) {
-        const { dataCompare, dataOriginal, label, ...other } = props;
-        const isEmpty                                        = dataOriginal.length === 0;
+        const { clientData, targetData, label, ...other } = props;
+        const isEmpty                                     = targetData.length === 0;
+        const isClientEmpty                               = clientData
+                                                            ? (clientData?.length === 0)
+                                                            : true;
         super('div', other, [
             new Component<HTMLDivElement>('div', {
-                textContent: isEmpty ? 'Пусто' : dataOriginal,
+                textContent: isEmpty ? 'Пусто' : targetData,
                 className  : isEmpty ? css.empty : '',
             }),
             new Component<HTMLDivElement>('div', { textContent: label }),
-            new Component<HTMLDivElement>('div', { textContent: dataCompare ?? '-' }),
+            new Component<HTMLDivElement>('div', {
+                textContent: isClientEmpty ? 'Пусто' : clientData,
+                className  : isClientEmpty ? css.empty : '',
+            }),
         ]);
         this.element.classList.add(css.container);
-        this._isValid = dataCompare === dataOriginal;
+        this._isValid = clientData === targetData;
 
         if (!this._isValid) {
             this.element.classList.add(css.invalid);

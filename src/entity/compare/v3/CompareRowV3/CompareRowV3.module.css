@@ -12,16 +12,16 @@
         }
     }
 
+    .empty {
+        color       : var(--color-gray);
+        font-style  : italic;
+        user-select : none;
+    }
+
     & > * {
         &:nth-child(1) {
             text-align : left;
             flex       : 2;
-
-            &.empty {
-                color       : var(--color-gray);
-                font-style  : italic;
-                user-select : none;
-            }
         }
 
         &:nth-child(2) {
