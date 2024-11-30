@@ -11,11 +11,11 @@ export class MemoFetch implements IFetcher {
         const cacheName: string = `${ method }:${ url }`;
 
         if (this._cache[cacheName] !== undefined) {
-            return this._cache[cacheName];
+            return this._cache[cacheName].then((response) => response.clone());
         }
 
         const request          = fetch(requestInfo, requestInit);
         this._cache[cacheName] = request;
-        return request;
+        return request.then((response) => response.clone());
     }
 }

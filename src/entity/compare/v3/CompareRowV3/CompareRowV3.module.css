@@ -4,6 +4,10 @@
     gap            : var(--offset-small);
     align-items    : center;
 
+    &.disable {
+        opacity : .6;
+    }
+
     &.invalid {
         & > *:nth-child(2) {
             background : var(--danger-color);

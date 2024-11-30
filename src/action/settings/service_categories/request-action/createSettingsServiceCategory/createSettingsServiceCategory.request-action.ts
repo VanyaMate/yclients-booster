@@ -6,9 +6,14 @@ import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import { Fetch } from '@/service/Fetcher/implementations/Fetch.ts';
 
 
-export const createSettingsServiceCategoryRequestAction = function (bearer: string, clientId: string, createData: SettingsServiceCategoryCreateData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<SettingsServiceCategoryData> {
+/**
+ * Если у двух разных категорий будет одинаковый title и booking_title
+ * то при MemoFetch будет лишь один запрос
+ */
+
+export const createSettingsServiceCategoryRequestAction = async function (bearer: string, clientId: string, createData: SettingsServiceCategoryCreateData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<SettingsServiceCategoryData> {
     logger?.log(`создание новой категории услуг "${ createData.title }" для "${ clientId }"`);
-    return fetcher.fetch(`https://yclients.com/api/v1/company/${ clientId }/service_categories`, {
+    return fetcher.fetch(`https://yclients.com/api/v1/company/${ clientId }/service_categories?title=${ createData.title }&booking_title=${ createData.booking_title }`, {
         method : 'POST',
         body   : JSON.stringify(createData),
         headers: {

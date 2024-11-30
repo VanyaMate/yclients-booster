@@ -3,7 +3,9 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import css from './CompareRowV3.module.css';
-import { ICompareComponent } from '@/entity/compare/v3/Compare.types.ts';
+import {
+    ICompareComponent,
+} from '@/entity/compare/v3/Compare.types.ts';
 
 
 export type CompareRowV3Props =
@@ -16,6 +18,7 @@ export type CompareRowV3Props =
 
 export class CompareRowV3 extends Component<HTMLDivElement> implements ICompareComponent {
     private readonly _isValid: boolean;
+    private _validating: boolean = true;
 
     constructor (props: CompareRowV3Props) {
         const { clientData, targetData, label, ...other } = props;
@@ -43,6 +46,18 @@ export class CompareRowV3 extends Component<HTMLDivElement> implements ICompareC
     }
 
     get isValid () {
-        return this._isValid;
+        if (this._validating) {
+            return this._isValid;
+        }
+        return true;
+    }
+
+    enable (status: boolean): void {
+        this._validating = status;
+        if (status) {
+            this.element.classList.add(css.disable);
+        } else {
+            this.element.classList.remove(css.disable);
+        }
     }
 }

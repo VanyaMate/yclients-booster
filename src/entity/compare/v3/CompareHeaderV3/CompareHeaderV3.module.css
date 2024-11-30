@@ -4,6 +4,10 @@
     gap            : var(--offset-small);
     align-items    : start;
 
+    &.disable > .content > .data {
+        opacity : .6;
+    }
+
     .select {
         width : 50px !important;
     }

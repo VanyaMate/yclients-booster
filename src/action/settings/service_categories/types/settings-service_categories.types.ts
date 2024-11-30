@@ -69,7 +69,7 @@ export type SettingsServiceItemCreateData = {
     booking_title: string;
     capacity: number;
     category_id: number;
-    chain_details: { // TODO                                // NOT_EXIST
+    chain_details: {
         is_comment_managed_only_in_chain: boolean;
         is_price_managed_only_in_chain: boolean;
         price_max: number;
@@ -105,7 +105,7 @@ export type SettingsServiceItemCreateData = {
     price_prepaid_percent: number;
     print_title: string;
     repeat_visit_days_step: number | null;
-    resources: Array<number>; // TODO
+    resources: Array<number>;
     salon_group_service_link: null | string;
     salon_group_title: null | string;
     salon_service_id: number;

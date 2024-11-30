@@ -9,6 +9,7 @@ import css from './CompareHeaderV3.module.css';
 import { Select, SelectOption } from '@/shared/input/Select/Select.ts';
 import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import {
+    CompareResult,
     CompareType,
     ICompareComponent,
 } from '@/entity/compare/v3/Compare.types.ts';
@@ -40,6 +41,7 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
     private readonly _selectButton: Select;
     private _currentTargetHeader: string;
     private _isValid: boolean;
+    private _validating: boolean = true;
 
     constructor (props: CompareHeaderV3Props) {
         const {
@@ -62,35 +64,35 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
         this._isValid             = this._initialTargetHeader === clientHeaderData;
 
         this._selectButton = new Select({
-            defaultValue    : '0',
+            defaultValue    : CompareType.ALL,
             defaultLabel    : 'Все',
-            defaultShowLabel: '+',
+            defaultShowLabel: '✓',
             list            : [
                 {
                     label    : 'Только это',
-                    showLabel: '->',
-                    value    : '1',
+                    showLabel: '→',
+                    value    : CompareType.ITEM,
                 },
                 {
                     label    : 'Только дочерние',
-                    showLabel: 'V',
-                    value    : '2',
+                    showLabel: '↓',
+                    value    : CompareType.CHILDREN,
                 },
                 {
                     label    : 'Ничего не делать',
-                    showLabel: '=',
-                    value    : '3',
+                    showLabel: '🗙',
+                    value    : CompareType.NONE,
                 },
             ],
             onChange        : (data) => {
-                switch (data.value) {
-                    case '0':
+                switch (data.value as CompareType) {
+                    case CompareType.ALL:
                         return onActivateAll?.();
-                    case '1':
+                    case CompareType.ITEM:
                         return onActivateOnlyItem?.();
-                    case '2':
+                    case CompareType.CHILDREN:
                         return onActivateOnlyChildren?.();
-                    case '3':
+                    case CompareType.NONE:
                         return onDeactivate?.();
                     default:
                         break;
@@ -147,18 +149,32 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
     }
 
     get isValid (): boolean {
-        return this._isValid;
+        if (this._validating) {
+            return this._isValid;
+        }
+
+        return true;
     }
 
-    setValidationType (type: CompareType): void {
+    enable (status: boolean): void {
+        this._validating = status;
+
+        if (status) {
+            this.element.classList.add(css.disable);
+        } else {
+            this.element.classList.remove(css.disable);
+        }
+    }
+
+    setValidationType (type: CompareResult): void {
         switch (type) {
-            case CompareType.VALID:
+            case CompareResult.VALID:
                 this._selectButton.setStyleType(ButtonStyleType.DEFAULT);
                 break;
-            case CompareType.NO_VALID:
+            case CompareResult.NO_VALID:
                 this._selectButton.setStyleType(ButtonStyleType.WARNING);
                 break;
-            case CompareType.NO_EXIST:
+            case CompareResult.NO_EXIST:
                 this._selectButton.setStyleType(ButtonStyleType.DANGER);
                 break;
             default:

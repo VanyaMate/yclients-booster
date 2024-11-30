@@ -3,7 +3,7 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import {
-    CompareType,
+    CompareResult,
     ICompareComponent,
 } from '@/entity/compare/v3/Compare.types.ts';
 import {
@@ -23,6 +23,7 @@ import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import {
     createSettingsServiceCategoryRequestAction,
 } from '@/action/settings/service_categories/request-action/createSettingsServiceCategory/createSettingsServiceCategory.request-action.ts';
+import { SelectOption } from '@/shared/input/Select/Select.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -53,6 +54,7 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
     private _bearer: string;
     private _fetcher?: IFetcher;
     private _logger?: ILogger;
+    private _enabled: boolean                                              = true;
 
     constructor (props: SettingsServiceCategoryCompareComponentProps) {
         const {
@@ -79,10 +81,17 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
     }
 
     get isValid () {
-        return (
-            this._currentCategoryIsValid() &&
-            this._childrenIsValid()
-        );
+        if (this._enabled) {
+            return (
+                this._currentCategoryIsValid() &&
+                this._childrenIsValid()
+            );
+        }
+        return true;
+    }
+
+    enable (status: boolean): void {
+        this._enabled = status;
     }
 
     getAction (): () => Promise<void> {
@@ -99,9 +108,8 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
                     Promise.all(this._serviceComponents.map((component) => component.getAction(this._clientCategory!.id.toString())()));
                 }
             } else {
-                const id = Math.random().toString(16);
-                console.log('CREATE NEW CATEGORY FOR', id, this._clientId);
-                createSettingsServiceCategoryRequestAction(this._bearer, this._clientId, {
+                console.log('CREATE NEW CATEGORY FOR', this._clientId);
+                return createSettingsServiceCategoryRequestAction(this._bearer, this._clientId, {
                     title        : this._targetCategory.title,
                     service_count: 0,
                     services     : [],
@@ -110,8 +118,13 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
                     api_id       : this._targetCategory.api_id,
                     booking_title: this._targetCategory.booking_title ?? this._targetCategory.title,
                 }, this._fetcher, this._logger)
-                    .then((response) => Promise.all(this._serviceComponents.map((component) => component.getAction(response.id.toString())())));
+                    .then((response) => {
+                        console.log(`CATEGORY CREATED ${ response.id }`);
+                        this._serviceComponents.map((component) => component.getAction(response.id.toString())());
+                    });
             }
+
+            return;
         };
     }
 
@@ -174,7 +187,7 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
                 ...this._compareComponents,
                 ...this._serviceComponents,
             ],
-            onVariantChange : (e) => {
+            onVariantChange : (e: SelectOption) => {
                 this._clientCategory = this._clientData.tree.find((category) => category.id.toString() === e.value);
                 this._render();
             },
@@ -189,11 +202,11 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
 
     private _revalidate () {
         if (this._clientCategory === undefined) {
-            this._header?.setValidationType(CompareType.NO_EXIST);
+            this._header?.setValidationType(CompareResult.NO_EXIST);
         } else if (!this.isValid) {
-            this._header?.setValidationType(CompareType.NO_VALID);
+            this._header?.setValidationType(CompareResult.NO_VALID);
         } else {
-            this._header?.setValidationType(CompareType.VALID);
+            this._header?.setValidationType(CompareResult.VALID);
         }
     }
 }

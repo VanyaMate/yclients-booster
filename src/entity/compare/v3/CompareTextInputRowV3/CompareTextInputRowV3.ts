@@ -1,4 +1,6 @@
-import { ICompareComponent } from '@/entity/compare/v3/Compare.types.ts';
+import {
+    ICompareComponent,
+} from '@/entity/compare/v3/Compare.types.ts';
 import {
     Component,
     ComponentPropsOptional,
@@ -27,6 +29,7 @@ export class CompareTextInputRowV3 extends Component<HTMLDivElement> implements 
     private _clientValue?: string;
     private _initialTargetValue: string;
     private _currentTargetValue?: string;
+    private _validating: boolean = true;
 
     constructor (props: CompareTextInputRowV3Props) {
         const { clientData, targetData, label, type, ...other } = props;
@@ -62,7 +65,20 @@ export class CompareTextInputRowV3 extends Component<HTMLDivElement> implements 
     }
 
     get isValid () {
-        return this._isValid;
+        if (this._validating) {
+            return this._isValid;
+        }
+        return true;
+    }
+
+    enable (status: boolean): void {
+        this._validating = status;
+
+        if (status) {
+            this.element.classList.add(css.disable);
+        } else {
+            this.element.classList.remove(css.disable);
+        }
     }
 
     private _revalidate () {

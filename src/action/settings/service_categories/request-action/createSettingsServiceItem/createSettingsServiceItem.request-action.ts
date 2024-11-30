@@ -6,9 +6,14 @@ import {
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 
 
-export const createSettingsServiceItemRequestAction = function (bearer: string, clientId: string, createData: SettingsServiceItemCreateData, fetcher: IFetcher = new Fetch(), logger?: ILogger) {
-    logger?.log(`создание новой услуги ${ fetcher }`);
-    return fetcher.fetch(`https://yclients.com/api/v1/company/${ clientId }/services`, {
+/**
+ * Если у двух разных услуг будет одинаковый categoryId, title и booking_title
+ * то при MemoFetch будет лишь один запрос
+ */
+
+export const createSettingsServiceItemRequestAction = async function (bearer: string, clientId: string, createData: SettingsServiceItemCreateData, fetcher: IFetcher = new Fetch(), logger?: ILogger) {
+    logger?.log(`создание новой услуги "${ createData.title }" для "${ clientId }"`);
+    return fetcher.fetch(`https://yclients.com/api/v1/company/${ clientId }/services?categoryId=${ createData.category_id }&title=${ createData.title }&booking_title=${ createData.booking_title }`, {
         method : 'POST',
         body   : JSON.stringify(createData),
         headers: {

@@ -41,6 +41,7 @@ export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDiv
     private _bearer: string;
     private _fetcher?: IFetcher;
     private _logger?: ILogger;
+    private _enabled: boolean = true;
 
     constructor (props: SettingsServiceCategoriesCompareComponentProps) {
         const {
@@ -64,7 +65,14 @@ export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDiv
     }
 
     get isValid () {
+        if (this._enabled) {
+            return true;
+        }
         return true;
+    }
+
+    enable (status: boolean): void {
+        this._enabled = status;
     }
 
     private _render () {
