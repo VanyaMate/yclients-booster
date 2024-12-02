@@ -54,10 +54,11 @@ export class CompareRowV3 extends Component<HTMLDivElement> implements ICompareC
 
     enable (status: boolean): void {
         this._validating = status;
+
         if (status) {
-            this.element.classList.add(css.disable);
-        } else {
             this.element.classList.remove(css.disable);
+        } else {
+            this.element.classList.add(css.disable);
         }
     }
 }

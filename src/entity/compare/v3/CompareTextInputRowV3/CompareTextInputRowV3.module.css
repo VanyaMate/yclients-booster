@@ -1,4 +1,14 @@
-.input {
-    width     : 300px;
-    max-width : 100%;
+.container {
+    .input {
+        width     : 300px;
+        max-width : 100%;
+    }
+
+    &.disable {
+        opacity : .6;
+
+        > .input {
+            pointer-events : none;
+        }
+    }
 }

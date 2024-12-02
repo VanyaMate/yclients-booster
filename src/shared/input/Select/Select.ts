@@ -214,11 +214,6 @@ export class Select extends Component<HTMLDivElement> {
 
         this.hide();
         this._selectButton.element.textContent = this._currentLabel;
-        if (this._currentValue === this._defaultValue) {
-            this._selectButton.setStyleType(ButtonStyleType.DEFAULT);
-        } else {
-            this._selectButton.setStyleType(this._defaultStyleType);
-        }
     }
 
     private _toggle () {

@@ -101,7 +101,7 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
             isModal         : true,
             modalLabel      : `Варианты действия`,
             className       : css.select,
-            showValue       : true,
+            showValue       : false,
         });
 
         this._selectButton.insert(this.element, 'beforeend');
@@ -160,9 +160,9 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
         this._validating = status;
 
         if (status) {
-            this.element.classList.add(css.disable);
-        } else {
             this.element.classList.remove(css.disable);
+        } else {
+            this.element.classList.add(css.disable);
         }
     }
 

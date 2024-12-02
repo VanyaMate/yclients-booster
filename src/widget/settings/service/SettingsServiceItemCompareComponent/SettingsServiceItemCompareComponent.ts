@@ -29,6 +29,8 @@ import {
 import {
     CompareTextInputRowV3,
 } from '@/entity/compare/v3/CompareTextInputRowV3/CompareTextInputRowV3.ts';
+import css from './SettingsServiceItemCompareComponent.module.css';
+import { CompareBoxV3 } from '@/entity/compare/v3/CompareBoxV3/CompareBoxV3.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -60,6 +62,7 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
     private _fetcher?: IFetcher;
     private _logger?: ILogger;
     private _enabled: boolean                                 = true;
+    private _compareType: CompareType                         = CompareType.ALL;
 
     constructor (props: SettingsServiceItemCompareComponentProps) {
         const {
@@ -81,6 +84,7 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
         this._logger         = logger;
         this._clientService  = this._clientServices.find((service) => service.title === this._targetService.title);
 
+        this.element.classList.add(css.container);
         this.element.addEventListener(CompareEvent.type, this._revalidate.bind(this));
         this._render();
     }
@@ -104,9 +108,43 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
 
     enable (status: boolean): void {
         this._enabled = status;
+
+        if (status) {
+            this.element.classList.remove(css.disable);
+        } else {
+            this.element.classList.add(css.disable);
+        }
     }
 
-    setCompareType (value: CompareType): void {
+    getAction (categoryId: string): () => Promise<void> {
+        return async () => {
+            if (this._enabled && this._compareType !== CompareType.NONE) {
+                switch (this._compareType) {
+                    case CompareType.ITEM:
+                        // only create/update item
+                        await this._itemAction(categoryId);
+                        return;
+                    case CompareType.CHILDREN:
+                        // if exist - create/update children
+                        this._childrenAction();
+                        return;
+                    case CompareType.ALL:
+                        // all
+                        await this._itemAction(categoryId);
+                        this._childrenAction();
+                        return;
+                    default:
+                        return;
+                }
+            }
+
+            return;
+        };
+    }
+
+    private _setCompareType (value: CompareType): void {
+        this._compareType = value;
+
         switch (value) {
             case CompareType.ALL:
                 this._header?.enable(true);
@@ -130,88 +168,43 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
                 break;
         }
 
-        this._revalidate();
-    }
-
-    getAction (categoryId: string): () => Promise<void> {
-        return async () => {
-            if (this._clientService !== undefined) {
-                if (this.isValid) {
-                    console.log('NOTHING');
-                } else {
-                    console.log(`UPDATE SERVICE "${ this._clientService.title }" [${ this._clientService.id }] FOR [${ categoryId }] :${ this._clientId }`);
-                }
-            } else {
-                console.log(`CREATE NEW SERVICE "${ this._targetService.title }" FOR [${ categoryId }] :${ this._clientId }`);
-                return createSettingsServiceItemRequestAction(
-                    this._bearer,
-                    this._clientId,
-                    {
-                        ...this._targetService,
-                        chain_details           : {
-                            comment                         : '',
-                            is_comment_managed_only_in_chain: false,
-                            is_price_managed_only_in_chain  : false,
-                            price_max                       : 0,
-                            price_min                       : 0,
-                        },
-                        delete_image            : false,
-                        is_category             : false,
-                        category_id             : Number(categoryId),
-                        is_linked_to_composite  : this._targetService.is_linked_to_composite,
-                        is_range_price_enabled  : this._targetService.price_min !== this._targetService.price_max,
-                        kkm_settings_id         : 0,
-                        salon_group_service_link: '',
-                        salon_group_title       : '',
-                        salon_service_id        : 0,
-                        translations            : this._targetService.translations.filter((translation) => translation.translation),
-                        resources               : [], // CREATE TOO
-                        staff                   : [],
-                        image_group             : this._targetService.image_group,
-                        image                   : this._targetService.image_group?.images?.basic?.path
-                                                  ? await base64ImageLoad(this._targetService.image_group.images.basic.path)
-                                                  : undefined,
-                        id                      : 0,
-                        vat_id                  : -1,
-                        tax_variant             : -1,
-                    },
-                    this._fetcher,
-                    this._logger,
-                );
-            }
-
-            return;
-        };
+        this.element.dispatchEvent(CompareEvent);
     }
 
     private _render () {
         this.element.innerHTML   = ``;
         this._serviceCompareRows = [
-            new CompareImageRowV3({
-                targetImage: this._targetService.image_group?.images?.basic.path,
-                clientImage: this._clientService?.image_group?.images?.basic.path,
-                label      : 'Картинка',
-            }),
-            new CompareTextInputRowV3({
-                targetData: this._targetService.booking_title,
-                clientData: this._clientService?.booking_title,
-                label     : 'Букинг заголовок',
-            }),
-            new CompareTextInputRowV3({
-                targetData: this._targetService.comment,
-                clientData: this._clientService?.comment,
-                label     : 'Комментарий',
-            }),
-            new CompareTextInputRowV3({
-                targetData: this._targetService.discount.toString(),
-                clientData: this._clientService?.discount.toString(),
-                label     : 'Скидка',
-                type      : 'number',
-            }),
-            new CompareRowV3({
-                targetData: this._targetService.translations.filter((translation) => translation.translation).length.toString(),
-                clientData: this._clientService?.translations.filter((translation) => translation.translation).length.toString(),
-                label     : 'Переводы',
+            new CompareBoxV3({
+                level     : 3,
+                title     : 'Поля сервиса',
+                components: [
+                    new CompareImageRowV3({
+                        targetImage: this._targetService.image_group?.images?.basic.path,
+                        clientImage: this._clientService?.image_group?.images?.basic.path,
+                        label      : 'Картинка',
+                    }),
+                    new CompareTextInputRowV3({
+                        targetData: this._targetService.booking_title,
+                        clientData: this._clientService?.booking_title,
+                        label     : 'Букинг заголовок',
+                    }),
+                    new CompareTextInputRowV3({
+                        targetData: this._targetService.comment,
+                        clientData: this._clientService?.comment,
+                        label     : 'Комментарий',
+                    }),
+                    new CompareTextInputRowV3({
+                        targetData: this._targetService.discount.toString(),
+                        clientData: this._clientService?.discount.toString(),
+                        label     : 'Скидка',
+                        type      : 'number',
+                    }),
+                    new CompareRowV3({
+                        targetData: this._targetService.translations.filter((translation) => translation.translation).length.toString(),
+                        clientData: this._clientService?.translations.filter((translation) => translation.translation).length.toString(),
+                        label     : 'Переводы',
+                    }),
+                ],
             }),
         ];
 
@@ -234,10 +227,10 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
             onRename              : (title: string) => {
                 this._targetService.title = title;
             },
-            onActivateAll         : () => this.setCompareType(CompareType.ALL),
-            onActivateOnlyItem    : () => this.setCompareType(CompareType.ITEM),
-            onActivateOnlyChildren: () => this.setCompareType(CompareType.CHILDREN),
-            onDeactivate          : () => this.setCompareType(CompareType.NONE),
+            onActivateAll         : () => this._setCompareType(CompareType.ALL),
+            onActivateOnlyItem    : () => this._setCompareType(CompareType.ITEM),
+            onActivateOnlyChildren: () => this._setCompareType(CompareType.CHILDREN),
+            onDeactivate          : () => this._setCompareType(CompareType.NONE),
         });
 
         this._revalidate();
@@ -245,12 +238,57 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
     }
 
     private _revalidate () {
-        if (this._clientService === undefined) {
+        if (this._compareType === CompareType.NONE) {
+            this._header?.setValidationType(CompareResult.VALID);
+        } else if (this._clientService === undefined) {
             this._header?.setValidationType(CompareResult.NO_EXIST);
         } else if (!this.isValid) {
             this._header?.setValidationType(CompareResult.NO_VALID);
         } else {
             this._header?.setValidationType(CompareResult.VALID);
         }
+    }
+
+    private async _itemAction (categoryId: string) {
+        console.log(`CREATE NEW SERVICE "${ this._targetService.title }" FOR [${ categoryId }] :${ this._clientId }`);
+        return createSettingsServiceItemRequestAction(
+            this._bearer,
+            this._clientId,
+            {
+                ...this._targetService,
+                chain_details           : {
+                    comment                         : '',
+                    is_comment_managed_only_in_chain: false,
+                    is_price_managed_only_in_chain  : false,
+                    price_max                       : 0,
+                    price_min                       : 0,
+                },
+                delete_image            : false,
+                is_category             : false,
+                category_id             : Number(categoryId),
+                is_linked_to_composite  : this._targetService.is_linked_to_composite,
+                is_range_price_enabled  : this._targetService.price_min !== this._targetService.price_max,
+                kkm_settings_id         : 0,
+                salon_group_service_link: '',
+                salon_group_title       : '',
+                salon_service_id        : 0,
+                translations            : this._targetService.translations.filter((translation) => translation.translation),
+                resources               : [], // CREATE TOO
+                staff                   : [],
+                image_group             : this._targetService.image_group,
+                image                   : this._targetService.image_group?.images?.basic?.path
+                                          ? await base64ImageLoad(this._targetService.image_group.images.basic.path)
+                                          : undefined,
+                id                      : 0,
+                vat_id                  : -1,
+                tax_variant             : -1,
+            },
+            this._fetcher,
+            this._logger,
+        );
+    }
+
+    private _childrenAction () {
+        // ресурсы?
     }
 }

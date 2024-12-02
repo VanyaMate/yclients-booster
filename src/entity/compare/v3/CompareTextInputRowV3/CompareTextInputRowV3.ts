@@ -25,9 +25,9 @@ export type CompareTextInputRowV3Props =
     }
 
 export class CompareTextInputRowV3 extends Component<HTMLDivElement> implements ICompareComponent {
+    private readonly _clientValue?: string;
+    private readonly _initialTargetValue: string;
     private _isValid: boolean;
-    private _clientValue?: string;
-    private _initialTargetValue: string;
     private _currentTargetValue?: string;
     private _validating: boolean = true;
 
@@ -60,6 +60,7 @@ export class CompareTextInputRowV3 extends Component<HTMLDivElement> implements 
         this._clientValue        = clientData;
         this._isValid            = this._initialTargetValue === this._clientValue;
 
+        this.element.classList.add(css.container);
         this.element.classList.add(commonCss.container);
         this._revalidate();
     }
@@ -68,6 +69,7 @@ export class CompareTextInputRowV3 extends Component<HTMLDivElement> implements 
         if (this._validating) {
             return this._isValid;
         }
+
         return true;
     }
 
@@ -75,9 +77,9 @@ export class CompareTextInputRowV3 extends Component<HTMLDivElement> implements 
         this._validating = status;
 
         if (status) {
-            this.element.classList.add(css.disable);
-        } else {
             this.element.classList.remove(css.disable);
+        } else {
+            this.element.classList.add(css.disable);
         }
     }
 

@@ -24,6 +24,7 @@ import {
     createSettingsServiceCategoryRequestAction,
 } from '@/action/settings/service_categories/request-action/createSettingsServiceCategory/createSettingsServiceCategory.request-action.ts';
 import { SelectOption } from '@/shared/input/Select/Select.ts';
+import { CompareBoxV3 } from '@/entity/compare/v3/CompareBoxV3/CompareBoxV3.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -47,7 +48,8 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
     private readonly _clientId: string;
     private readonly _clientData: SettingsServiceCopyData;
     private readonly _targetCategory: SettingsServiceCategoryDataWithChildren;
-    private _compareComponents: Array<ICompareComponent>                   = [];
+    private _categoryCompareRows: Array<ICompareComponent>                 = [];
+    private _categoryCompareChildren: Array<ICompareComponent>             = [];
     private _serviceComponents: Array<SettingsServiceItemCompareComponent> = [];
     private _clientCategory?: SettingsServiceCategoryDataWithChildren;
     private _header?: CompareHeaderV3;
@@ -132,7 +134,7 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
         return (
             this._clientCategory !== undefined &&
             (this._header?.isValid ?? false) &&
-            this._compareComponents.every((component) => component.isValid)
+            this._categoryCompareRows.every((component) => component.isValid)
         );
     }
 
@@ -141,35 +143,48 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
     }
 
     private _render () {
-        this.element.innerHTML  = ``;
-        this._serviceComponents = this._targetCategory.children.map((service) => (
-            new SettingsServiceItemCompareComponent({
-                clientId      : this._clientId,
-                targetService : service,
-                clientServices: this._clientCategory?.children,
-                bearer        : this._bearer,
-                fetcher       : this._fetcher,
-                logger        : this._logger,
-            })
-        ));
+        this.element.innerHTML        = ``;
+        this._categoryCompareChildren = [
+            new CompareBoxV3({
+                title     : 'Сервисы',
+                level     : 3,
+                components: this._serviceComponents = this._targetCategory.children.map((service) => (
+                    new SettingsServiceItemCompareComponent({
+                        clientId      : this._clientId,
+                        targetService : service,
+                        clientServices: this._clientCategory?.children,
+                        bearer        : this._bearer,
+                        fetcher       : this._fetcher,
+                        logger        : this._logger,
+                    })
+                )),
+            }),
+        ];
 
-        this._compareComponents = [
-            new CompareRowV3({
-                targetData: this._targetCategory.booking_title,
-                clientData: this._clientCategory?.booking_title,
-                label     : 'Букинг заголовок',
-            }),
-            new CompareRowV3({
-                targetData: this._targetCategory.sex ? 'Муж' : 'Жен',
-                clientData: this._clientCategory?.sex === undefined
-                            ? undefined : this._clientCategory.sex ? 'Муж'
-                                                                   : 'Жен',
-                label     : 'Пол',
-            }),
-            new CompareRowV3({
-                targetData: this._targetCategory.translations.length.toString(),
-                clientData: this._clientCategory?.translations.length.toString(),
-                label     : 'Переводы',
+        this._categoryCompareRows = [
+            new CompareBoxV3({
+                title     : 'Поля категории',
+                level     : 2,
+                components: [
+                    new CompareRowV3({
+                        targetData: this._targetCategory.booking_title,
+                        clientData: this._clientCategory?.booking_title,
+                        label     : 'Букинг заголовок',
+                    }),
+                    new CompareRowV3({
+                        targetData: this._targetCategory.sex ? 'Муж' : 'Жен',
+                        clientData: this._clientCategory?.sex === undefined
+                                    ? undefined : this._clientCategory.sex
+                                                  ? 'Муж'
+                                                  : 'Жен',
+                        label     : 'Пол',
+                    }),
+                    new CompareRowV3({
+                        targetData: this._targetCategory.translations.length.toString(),
+                        clientData: this._clientCategory?.translations.length.toString(),
+                        label     : 'Переводы',
+                    }),
+                ],
             }),
         ];
 
@@ -184,8 +199,8 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
                     selected: category.id === this._clientCategory?.id,
                 })),
             rows            : [
-                ...this._compareComponents,
-                ...this._serviceComponents,
+                ...this._categoryCompareRows,
+                ...this._categoryCompareChildren,
             ],
             onVariantChange : (e: SelectOption) => {
                 this._clientCategory = this._clientData.tree.find((category) => category.id.toString() === e.value);

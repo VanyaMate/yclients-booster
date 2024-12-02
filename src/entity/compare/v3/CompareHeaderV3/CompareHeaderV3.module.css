@@ -4,7 +4,7 @@
     gap            : var(--offset-small);
     align-items    : start;
 
-    &.disable > .content > .data {
+    &.disable > .content > summary > .data {
         opacity : .6;
     }
 

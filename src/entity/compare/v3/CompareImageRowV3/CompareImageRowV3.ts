@@ -49,10 +49,11 @@ export class CompareImageRowV3 extends Component<HTMLDivElement> implements ICom
 
     enable (status: boolean): void {
         this._validating = status;
+
         if (status) {
-            this.element.classList.add(commonCss.disable);
-        } else {
             this.element.classList.remove(commonCss.disable);
+        } else {
+            this.element.classList.add(commonCss.disable);
         }
     }
 }
