@@ -3,7 +3,7 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import {
-    ICompareComponent,
+    ICompareComponentV3,
 } from '@/entity/compare/v3/Compare.types.ts';
 import {
     SettingsServiceCopyData,
@@ -34,7 +34,7 @@ export type SettingsServiceCategoriesCompareComponentProps =
         logger?: ILogger;
     };
 
-export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDivElement> implements ICompareComponent {
+export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDivElement> implements ICompareComponentV3 {
     private _clientId: string;
     private _clientData: SettingsServiceCopyData;
     private _targetData: SettingsServiceCopyData;

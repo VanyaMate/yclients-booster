@@ -2,7 +2,7 @@ import {
     Component,
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
-import { ICompareComponent } from '@/entity/compare/v3/Compare.types.ts';
+import { ICompareComponentV3 } from '@/entity/compare/v3/Compare.types.ts';
 import css from './CompareBoxV3.module.css';
 
 
@@ -11,12 +11,12 @@ export type CompareBoxV3Props =
     & {
         title: string;
         level: number;
-        components: Array<ICompareComponent>;
+        components: Array<ICompareComponentV3>;
     };
 
-export class CompareBoxV3 extends Component<HTMLDivElement> implements ICompareComponent {
-    private _enabled: boolean                            = true;
-    private _compareComponents: Array<ICompareComponent> = [];
+export class CompareBoxV3 extends Component<HTMLDivElement> implements ICompareComponentV3 {
+    private _enabled: boolean                              = true;
+    private _compareComponents: Array<ICompareComponentV3> = [];
 
     constructor (props: CompareBoxV3Props) {
         const { title, components, level, ...other } = props;

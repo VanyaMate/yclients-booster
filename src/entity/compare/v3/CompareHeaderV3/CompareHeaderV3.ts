@@ -11,7 +11,7 @@ import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import {
     CompareResult,
     CompareType,
-    ICompareComponent,
+    ICompareComponentV3,
 } from '@/entity/compare/v3/Compare.types.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
 import { Details } from '@/shared/box/Details/Details.ts';
@@ -25,7 +25,7 @@ export type CompareHeaderV3Props =
         targetHeaderData: string;
         clientHeaderData?: string;
         label: string;
-        rows: Array<ICompareComponent>;
+        rows: Array<ICompareComponentV3>;
         variants: Array<SelectOption>;
         onVariantChange: (option: SelectOption) => void;
         onActivateAll?: () => void;
@@ -36,7 +36,7 @@ export type CompareHeaderV3Props =
     };
 
 export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompareHeaderV3,
-                                                                          ICompareComponent {
+                                                                          ICompareComponentV3 {
     private readonly _initialTargetHeader: string;
     private readonly _selectButton: Select;
     private _currentTargetHeader: string;

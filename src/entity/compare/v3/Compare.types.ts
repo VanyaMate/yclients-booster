@@ -14,7 +14,7 @@ export enum CompareType {
     NONE     = 'none'
 }
 
-export interface ICompareComponent extends IComponent<HTMLElement> {
+export interface ICompareComponentV3 extends IComponent<HTMLElement> {
     isValid: boolean;
 
     enable (status: boolean): void;

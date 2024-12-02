@@ -4,7 +4,7 @@ import {
 } from '@/shared/component/Component.ts';
 import css from './CompareRowV3.module.css';
 import {
-    ICompareComponent,
+    ICompareComponentV3,
 } from '@/entity/compare/v3/Compare.types.ts';
 
 
@@ -16,7 +16,7 @@ export type CompareRowV3Props =
         clientData?: string;
     };
 
-export class CompareRowV3 extends Component<HTMLDivElement> implements ICompareComponent {
+export class CompareRowV3 extends Component<HTMLDivElement> implements ICompareComponentV3 {
     private readonly _isValid: boolean;
     private _validating: boolean = true;
 

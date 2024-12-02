@@ -1,11 +1,9 @@
 import {
-    Component,
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import {
-    CompareResult,
     CompareType,
-    ICompareComponent,
+    ICompareComponentV3,
 } from '@/entity/compare/v3/Compare.types.ts';
 import {
     SettingsServiceData,
@@ -29,8 +27,10 @@ import {
 import {
     CompareTextInputRowV3,
 } from '@/entity/compare/v3/CompareTextInputRowV3/CompareTextInputRowV3.ts';
-import css from './SettingsServiceItemCompareComponent.module.css';
 import { CompareBoxV3 } from '@/entity/compare/v3/CompareBoxV3/CompareBoxV3.ts';
+import {
+    CompareComponentV3,
+} from '@/entity/compare/v3/CompareComponent/CompareComponentV3.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -50,19 +50,14 @@ export type SettingsServiceItemCompareComponentProps =
         logger?: ILogger;
     };
 
-export class SettingsServiceItemCompareComponent extends Component<HTMLDivElement> implements ICompareComponent {
+export class SettingsServiceItemCompareComponent extends CompareComponentV3 implements ICompareComponentV3 {
     private _clientId: string;
     private _clientServices: Array<SettingsServiceData>;
     private _targetService: SettingsServiceData;
-    private _serviceCompareRows: Array<ICompareComponent>     = [];
-    private _serviceCompareChildren: Array<ICompareComponent> = [];
     private _clientService?: SettingsServiceData;
-    private _header?: CompareHeaderV3;
     private _bearer: string;
     private _fetcher?: IFetcher;
     private _logger?: ILogger;
-    private _enabled: boolean                                 = true;
-    private _compareType: CompareType                         = CompareType.ALL;
 
     constructor (props: SettingsServiceItemCompareComponentProps) {
         const {
@@ -74,7 +69,7 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
                   logger,
                   ...other
               } = props;
-        super('div', other);
+        super(other);
 
         this._clientId       = clientId;
         this._clientServices = clientServices;
@@ -84,8 +79,7 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
         this._logger         = logger;
         this._clientService  = this._clientServices.find((service) => service.title === this._targetService.title);
 
-        this.element.classList.add(css.container);
-        this.element.addEventListener(CompareEvent.type, this._revalidate.bind(this));
+        this.element.addEventListener(CompareEvent.type, this._revalidate.bind(this, this._clientService));
         this._render();
     }
 
@@ -98,27 +92,17 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
                     ? this._header.isValid
                     : (this._clientService.title === this._targetService.title)
                 ) &&
-                this._serviceCompareRows.every((row) => row.isValid) &&
-                this._serviceCompareChildren.every((child) => child.isValid)
+                this._compareRows.every((row) => row.isValid) &&
+                this._compareChildren.every((child) => child.isValid)
             );
         }
 
         return true;
     }
 
-    enable (status: boolean): void {
-        this._enabled = status;
-
-        if (status) {
-            this.element.classList.remove(css.disable);
-        } else {
-            this.element.classList.add(css.disable);
-        }
-    }
-
     getAction (categoryId: string): () => Promise<void> {
         return async () => {
-            if (this._enabled && this._compareType !== CompareType.NONE) {
+            if (this._enabled) {
                 switch (this._compareType) {
                     case CompareType.ITEM:
                         // only create/update item
@@ -142,38 +126,9 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
         };
     }
 
-    private _setCompareType (value: CompareType): void {
-        this._compareType = value;
-
-        switch (value) {
-            case CompareType.ALL:
-                this._header?.enable(true);
-                this._serviceCompareRows.forEach((row) => row.enable(true));
-                this._serviceCompareChildren.forEach((row) => row.enable(true));
-                break;
-            case CompareType.ITEM:
-                this._header?.enable(true);
-                this._serviceCompareRows.forEach((row) => row.enable(true));
-                this._serviceCompareChildren.forEach((row) => row.enable(false));
-                break;
-            case CompareType.CHILDREN:
-                this._header?.enable(false);
-                this._serviceCompareRows.forEach((row) => row.enable(false));
-                this._serviceCompareChildren.forEach((row) => row.enable(true));
-                break;
-            default:
-                this._header?.enable(false);
-                this._serviceCompareRows.forEach((row) => row.enable(false));
-                this._serviceCompareChildren.forEach((row) => row.enable(false));
-                break;
-        }
-
-        this.element.dispatchEvent(CompareEvent);
-    }
-
     private _render () {
-        this.element.innerHTML   = ``;
-        this._serviceCompareRows = [
+        this.element.innerHTML = ``;
+        this._compareRows      = [
             new CompareBoxV3({
                 level     : 3,
                 title     : 'Поля сервиса',
@@ -218,7 +173,7 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
                     value   : service.id.toString(),
                     selected: service.id === this._clientService?.id,
                 })),
-            rows                  : this._serviceCompareRows,
+            rows                  : this._compareRows,
             onVariantChange       : (e) => {
                 this._clientService = this._clientServices.find((service) => service.id.toString() === e.value);
                 this._render();
@@ -233,20 +188,8 @@ export class SettingsServiceItemCompareComponent extends Component<HTMLDivElemen
             onDeactivate          : () => this._setCompareType(CompareType.NONE),
         });
 
-        this._revalidate();
+        this._revalidate(this._clientService);
         this._header.insert(this.element, 'beforeend');
-    }
-
-    private _revalidate () {
-        if (this._compareType === CompareType.NONE) {
-            this._header?.setValidationType(CompareResult.VALID);
-        } else if (this._clientService === undefined) {
-            this._header?.setValidationType(CompareResult.NO_EXIST);
-        } else if (!this.isValid) {
-            this._header?.setValidationType(CompareResult.NO_VALID);
-        } else {
-            this._header?.setValidationType(CompareResult.VALID);
-        }
     }
 
     private async _itemAction (categoryId: string) {

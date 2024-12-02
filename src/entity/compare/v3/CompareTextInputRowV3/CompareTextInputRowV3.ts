@@ -1,5 +1,5 @@
 import {
-    ICompareComponent,
+    ICompareComponentV3,
 } from '@/entity/compare/v3/Compare.types.ts';
 import {
     Component,
@@ -24,7 +24,7 @@ export type CompareTextInputRowV3Props =
         type?: TextInputType;
     }
 
-export class CompareTextInputRowV3 extends Component<HTMLDivElement> implements ICompareComponent {
+export class CompareTextInputRowV3 extends Component<HTMLDivElement> implements ICompareComponentV3 {
     private readonly _clientValue?: string;
     private readonly _initialTargetValue: string;
     private _isValid: boolean;

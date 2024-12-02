@@ -1,5 +1,5 @@
 import {
-    ICompareComponent,
+    ICompareComponentV3,
 } from '@/entity/compare/v3/Compare.types.ts';
 import {
     Component,
@@ -18,7 +18,7 @@ export type CompareImageRowV3Props =
         label: string;
     };
 
-export class CompareImageRowV3 extends Component<HTMLDivElement> implements ICompareComponent {
+export class CompareImageRowV3 extends Component<HTMLDivElement> implements ICompareComponentV3 {
     private _validating: boolean = true;
 
     constructor (props: CompareImageRowV3Props) {

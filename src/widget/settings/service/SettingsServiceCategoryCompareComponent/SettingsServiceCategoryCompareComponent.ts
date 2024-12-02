@@ -1,10 +1,7 @@
+import { ComponentPropsOptional } from '@/shared/component/Component.ts';
 import {
-    Component,
-    ComponentPropsOptional,
-} from '@/shared/component/Component.ts';
-import {
-    CompareResult,
-    ICompareComponent,
+    CompareType,
+    ICompareComponentV3,
 } from '@/entity/compare/v3/Compare.types.ts';
 import {
     SettingsServiceCategoryDataWithChildren,
@@ -25,6 +22,9 @@ import {
 } from '@/action/settings/service_categories/request-action/createSettingsServiceCategory/createSettingsServiceCategory.request-action.ts';
 import { SelectOption } from '@/shared/input/Select/Select.ts';
 import { CompareBoxV3 } from '@/entity/compare/v3/CompareBoxV3/CompareBoxV3.ts';
+import {
+    CompareComponentV3,
+} from '@/entity/compare/v3/CompareComponent/CompareComponentV3.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -44,19 +44,15 @@ export type SettingsServiceCategoryCompareComponentProps =
         logger?: ILogger;
     };
 
-export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivElement> implements ICompareComponent {
+export class SettingsServiceCategoryCompareComponent extends CompareComponentV3 implements ICompareComponentV3 {
     private readonly _clientId: string;
     private readonly _clientData: SettingsServiceCopyData;
     private readonly _targetCategory: SettingsServiceCategoryDataWithChildren;
-    private _categoryCompareRows: Array<ICompareComponent>                 = [];
-    private _categoryCompareChildren: Array<ICompareComponent>             = [];
+    private readonly _bearer: string;
+    private readonly _fetcher?: IFetcher;
+    private readonly _logger?: ILogger;
     private _serviceComponents: Array<SettingsServiceItemCompareComponent> = [];
     private _clientCategory?: SettingsServiceCategoryDataWithChildren;
-    private _header?: CompareHeaderV3;
-    private _bearer: string;
-    private _fetcher?: IFetcher;
-    private _logger?: ILogger;
-    private _enabled: boolean                                              = true;
 
     constructor (props: SettingsServiceCategoryCompareComponentProps) {
         const {
@@ -68,7 +64,7 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
                   logger,
                   ...other
               } = props;
-        super('div', other);
+        super(other);
 
         this._clientId       = clientId;
         this._clientData     = clientData;
@@ -78,7 +74,7 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
         this._logger         = logger;
         this._clientCategory = this._clientData.tree.find((category) => category.title === this._targetCategory.title);
 
-        this.element.addEventListener(CompareEvent.type, this._revalidate.bind(this));
+        this.element.addEventListener(CompareEvent.type, this._revalidate.bind(this, this._clientCategory));
         this._render();
     }
 
@@ -90,10 +86,6 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
             );
         }
         return true;
-    }
-
-    enable (status: boolean): void {
-        this._enabled = status;
     }
 
     getAction (): () => Promise<void> {
@@ -134,7 +126,7 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
         return (
             this._clientCategory !== undefined &&
             (this._header?.isValid ?? false) &&
-            this._categoryCompareRows.every((component) => component.isValid)
+            this._compareRows.every((component) => component.isValid)
         );
     }
 
@@ -143,8 +135,8 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
     }
 
     private _render () {
-        this.element.innerHTML        = ``;
-        this._categoryCompareChildren = [
+        this.element.innerHTML = ``;
+        this._compareChildren  = [
             new CompareBoxV3({
                 title     : 'Сервисы',
                 level     : 3,
@@ -161,7 +153,7 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
             }),
         ];
 
-        this._categoryCompareRows = [
+        this._compareRows = [
             new CompareBoxV3({
                 title     : 'Поля категории',
                 level     : 2,
@@ -189,39 +181,33 @@ export class SettingsServiceCategoryCompareComponent extends Component<HTMLDivEl
         ];
 
         this._header = new CompareHeaderV3({
-            targetHeaderData: this._targetCategory.title,
-            clientHeaderData: this._clientCategory?.title,
-            label           : 'Категория',
-            variants        : this._clientData.tree
+            targetHeaderData      : this._targetCategory.title,
+            clientHeaderData      : this._clientCategory?.title,
+            label                 : 'Категория',
+            variants              : this._clientData.tree
                 .map((category) => ({
                     label   : category.title,
                     value   : category.id.toString(),
                     selected: category.id === this._clientCategory?.id,
                 })),
-            rows            : [
-                ...this._categoryCompareRows,
-                ...this._categoryCompareChildren,
+            rows                  : [
+                ...this._compareRows,
+                ...this._compareChildren,
             ],
-            onVariantChange : (e: SelectOption) => {
+            onVariantChange       : (e: SelectOption) => {
                 this._clientCategory = this._clientData.tree.find((category) => category.id.toString() === e.value);
                 this._render();
             },
-            onRename        : (title: string) => {
+            onRename              : (title: string) => {
                 this._targetCategory.title = title;
             },
+            onActivateAll         : () => this._setCompareType(CompareType.ALL),
+            onActivateOnlyItem    : () => this._setCompareType(CompareType.ITEM),
+            onActivateOnlyChildren: () => this._setCompareType(CompareType.CHILDREN),
+            onDeactivate          : () => this._setCompareType(CompareType.NONE),
         });
 
-        this._revalidate();
+        this._revalidate(this._clientCategory);
         this._header.insert(this.element, 'beforeend');
-    }
-
-    private _revalidate () {
-        if (this._clientCategory === undefined) {
-            this._header?.setValidationType(CompareResult.NO_EXIST);
-        } else if (!this.isValid) {
-            this._header?.setValidationType(CompareResult.NO_VALID);
-        } else {
-            this._header?.setValidationType(CompareResult.VALID);
-        }
     }
 }
