@@ -14,6 +14,14 @@ export enum CompareType {
     NONE     = 'none'
 }
 
+export enum CompareProcess {
+    NONE    = 'none',
+    IDLE    = 'idle',
+    PROCESS = 'process',
+    SUCCESS = 'success',
+    ERROR   = 'error'
+}
+
 export interface ICompareComponentV3 extends IComponent<HTMLElement> {
     isValid: boolean;
 

@@ -1,7 +1,6 @@
+import { ComponentPropsOptional } from '@/shared/component/Component.ts';
 import {
-    ComponentPropsOptional,
-} from '@/shared/component/Component.ts';
-import {
+    CompareProcess,
     CompareType,
     ICompareComponentV3,
 } from '@/entity/compare/v3/Compare.types.ts';
@@ -101,28 +100,35 @@ export class SettingsServiceItemCompareComponent extends CompareComponentV3 impl
     }
 
     getAction (categoryId: string): () => Promise<void> {
-        return async () => {
-            if (this._enabled) {
+        if (this._enabled) {
+            this._onBeforeAction();
+            return async () => {
+                this._onStartAction();
                 switch (this._compareType) {
                     case CompareType.ITEM:
                         // only create/update item
-                        await this._itemAction(categoryId);
+                        await this._itemAction(categoryId)
+                            .then(this._onSuccessAction.bind(this))
+                            .catch(this._onErrorAction.bind(this));
                         return;
                     case CompareType.CHILDREN:
                         // if exist - create/update children
-                        this._childrenAction();
+                        await this._childrenAction();
                         return;
                     case CompareType.ALL:
                         // all
-                        await this._itemAction(categoryId);
-                        this._childrenAction();
+                        await this._itemAction(categoryId)
+                            .then(this._onSuccessAction.bind(this))
+                            .catch(this._onErrorAction.bind(this));
+                        await this._childrenAction();
                         return;
                     default:
                         return;
                 }
-            }
+            };
+        }
 
-            return;
+        return async () => {
         };
     }
 
@@ -231,7 +237,23 @@ export class SettingsServiceItemCompareComponent extends CompareComponentV3 impl
         );
     }
 
-    private _childrenAction () {
+    private async _childrenAction () {
         // ресурсы?
+    }
+
+    private _onBeforeAction () {
+        this._header?.setProcessType(CompareProcess.IDLE);
+    }
+
+    private _onStartAction () {
+        this._header?.setProcessType(CompareProcess.PROCESS);
+    }
+
+    private _onSuccessAction () {
+        this._header?.setProcessType(CompareProcess.SUCCESS);
+    }
+
+    private _onErrorAction () {
+        this._header?.setProcessType(CompareProcess.ERROR);
     }
 }

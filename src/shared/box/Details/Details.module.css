@@ -1,10 +1,14 @@
 .container {
-    background    : var(--bg-main);
-    border-radius : var(--offset-small);
-    overflow      : visible;
+    overflow : visible;
+
+    &.main {
+        background    : var(--bg-main);
+        border-radius : var(--offset-small);
+    }
 
     &.second {
-        background : var(--bg-second);
+        background    : var(--bg-second);
+        border-radius : var(--offset-small);
     }
 
     & > summary {

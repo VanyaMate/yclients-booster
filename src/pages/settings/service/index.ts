@@ -12,6 +12,7 @@ import { MemoFetch } from '@/service/Fetcher/implementations/MemoFetch.ts';
 
 
 export const isSettingsServicePage = function (pathname: Array<string>) {
+    console.log(pathname);
     return pathname[1] === 'settings' && pathname[2] === 'service_categories';
 };
 

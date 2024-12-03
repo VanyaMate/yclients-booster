@@ -13,13 +13,16 @@
     }
 
     &.disabled {
-        pointer-events : none;
-        cursor         : default;
-        user-select    : none;
-        background     : repeating-linear-gradient(45deg, var(--bg-main), var(--bg-main) 20px, var(--bg-second) 20px, var(--bg-second) 25px);
+        cursor      : default;
+        user-select : none;
+        background  : repeating-linear-gradient(45deg, var(--bg-main), var(--bg-main) 20px, var(--bg-second) 20px, var(--bg-second) 25px);
+
+        button, select, input {
+            pointer-events : none;
+        }
 
         & > * {
-            opacity : .4;
+            opacity : .6;
         }
     }
 }

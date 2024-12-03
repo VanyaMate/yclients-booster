@@ -9,6 +9,7 @@ import css from './CompareHeaderV3.module.css';
 import { Select, SelectOption } from '@/shared/input/Select/Select.ts';
 import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import {
+    CompareProcess,
     CompareResult,
     CompareType,
     ICompareComponentV3,
@@ -39,6 +40,7 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
                                                                           ICompareComponentV3 {
     private readonly _initialTargetHeader: string;
     private readonly _selectButton: Select;
+    private readonly _processButton: Component<HTMLDivElement>;
     private _currentTargetHeader: string;
     private _isValid: boolean;
     private _validating: boolean = true;
@@ -105,6 +107,10 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
         });
 
         this._selectButton.insert(this.element, 'beforeend');
+        this._processButton = new Component<HTMLDivElement>('div', {
+            className: css.state,
+        });
+
         let input: TextInput;
 
         const content = new Details({
@@ -163,6 +169,40 @@ export class CompareHeaderV3 extends Component<HTMLDivElement> implements ICompa
             this.element.classList.remove(css.disable);
         } else {
             this.element.classList.add(css.disable);
+        }
+    }
+
+    setProcessType (process: CompareProcess) {
+        switch (process) {
+            case CompareProcess.ERROR:
+                this._selectButton.remove();
+                this._processButton.insert(this.element, 'afterbegin');
+                this._processButton.element.className = `${ css.state } ${ css.error }`;
+                this.element.classList.add(css.processAction);
+                break;
+            case CompareProcess.SUCCESS:
+                this._selectButton.remove();
+                this._processButton.insert(this.element, 'afterbegin');
+                this._processButton.element.className = `${ css.state } ${ css.success }`;
+                this.element.classList.add(css.processAction);
+                break;
+            case CompareProcess.PROCESS:
+                this._selectButton.remove();
+                this._processButton.insert(this.element, 'afterbegin');
+                this._processButton.element.className = `${ css.state } ${ css.process }`;
+                this.element.classList.add(css.processAction);
+                break;
+            case CompareProcess.IDLE:
+                this._selectButton.remove();
+                this._processButton.insert(this.element, 'afterbegin');
+                this._processButton.element.className = `${ css.state } ${ css.idle }`;
+                this.element.classList.add(css.processAction);
+                break;
+            default:
+                this._selectButton.insert(this.element, 'afterbegin');
+                this._processButton.remove();
+                this.element.classList.remove(css.processAction);
+                break;
         }
     }
 

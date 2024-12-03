@@ -29,6 +29,8 @@ export class Details extends Component<HTMLDetailsElement> {
         this.element.classList.add(css.container);
         if (type === DetailsType.SECOND) {
             this.element.classList.add(css.second);
+        } else if (type === DetailsType.MAIN) {
+            this.element.classList.add(css.main);
         }
     }
 }
