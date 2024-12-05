@@ -285,6 +285,18 @@ export class SettingsServiceItemCompareComponent extends CompareComponentV3 impl
                                                ? 'Включена' : 'Выключена'
                                              : undefined,
                     }),
+                    new CompareTextInputRowV3({
+                        targetData: this._targetService.seance_search_start.toString(),
+                        clientData: this._clientService?.seance_search_start.toString(),
+                        label     : 'Запись доступна с',
+                        type      : 'number',
+                    }),
+                    new CompareTextInputRowV3({
+                        targetData: this._targetService.seance_search_finish.toString(),
+                        clientData: this._clientService?.seance_search_finish.toString(),
+                        label     : 'Запись доступна до',
+                        type      : 'number',
+                    }),
                 ],
             }),
         ];
