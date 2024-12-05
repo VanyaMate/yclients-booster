@@ -24,6 +24,7 @@ export type SelectProps =
         defaultValue: string;
         defaultLabel: string;
         defaultShowLabel?: string;
+        showDefaultLabel?: boolean;
         list: Array<SelectOption>;
         withSearch?: boolean;
         isModal?: boolean;
@@ -38,6 +39,7 @@ export class Select extends Component<HTMLDivElement> {
     private readonly _defaultShowLabel?: string;
     private readonly _defaultValue: string              = '';
     private readonly _defaultStyleType: ButtonStyleType = ButtonStyleType.DEFAULT;
+    private readonly _showDefaultLabel: boolean         = true;
     private readonly _onChangeHandler?: SelectOnChange;
     private readonly _isModal: boolean                  = false;
     private readonly _list: Array<SelectOption>         = [];
@@ -59,6 +61,7 @@ export class Select extends Component<HTMLDivElement> {
                   defaultLabel,
                   defaultValue,
                   defaultShowLabel,
+                  showDefaultLabel,
                   styleType,
                   isModal,
                   modalLabel,
@@ -74,6 +77,7 @@ export class Select extends Component<HTMLDivElement> {
         this._defaultShowLabel = this._currentShowLabel = defaultShowLabel;
         this._defaultLabel     = this._currentLabel = defaultLabel;
         this._defaultStyleType = this._defaultStyleType ?? ButtonStyleType.DEFAULT;
+        this._showDefaultLabel = showDefaultLabel ?? true;
         this._onChangeHandler  = onChange;
         this._isModal          = isModal ?? false;
         this._list             = list;
@@ -164,7 +168,7 @@ export class Select extends Component<HTMLDivElement> {
     private _renderOptions () {
         this._optionsBox.clear();
         let selected: boolean = this._defaultValue === this._currentValue;
-        if (!this._search) {
+        if (!this._search && this._showDefaultLabel) {
             this._optionsBox.add(
                 new Button({
                     textContent: this._defaultLabel,
@@ -200,11 +204,6 @@ export class Select extends Component<HTMLDivElement> {
     }
 
     private _select (item: SelectOption) {
-        if (this._inited) {
-            this._onChangeHandler?.(item);
-        }
-
-
         this._currentValue = item.value;
         this._currentLabel = item.showLabel ?? item.label;
 
@@ -214,6 +213,10 @@ export class Select extends Component<HTMLDivElement> {
 
         this.hide();
         this._selectButton.element.textContent = this._currentLabel;
+
+        if (this._inited) {
+            this._onChangeHandler?.(item);
+        }
     }
 
     private _toggle () {

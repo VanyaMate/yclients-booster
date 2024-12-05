@@ -140,19 +140,27 @@ export type SettingsServiceItemApiResponse = {
 }
 
 export type SettingsServiceData = {
+    // запретить онлайн запись без абонемента (1 - да, 0/undefined - нет)
     abonement_restriction_value: number;
     active: number;
     api_id: string;
     api_service_id: number;
     autopayment_before_visit_time: number;
+    // название для онлайн-записи
     booking_title: string;
+    // вместимость
     capacity: number;
     category_id: number;
+    // описание в онлайн-записи
     comment: string;
+    // начало дней для записи в формате 2024-12-11
     date_from: string;
+    // конец дней для записи в формате 2024-12-11
     date_to: string;
+    // даты в формате 2024-12-11, 2024-12-13 итд
     dates: string[];
     discount: number;
+    // длительность услуги в МС
     duration: number;
     id: number;
     image_group: null | SettingsServiceImageGroup;
@@ -161,6 +169,7 @@ export type SettingsServiceData = {
     is_comment_managed_only_in_chain: boolean;
     is_composite: boolean;
     is_linked_to_composite: boolean;
+    // групповая - true, индивидуальная - false
     is_multi: boolean;
     is_need_limit_date: boolean;
     is_online: boolean;
@@ -179,8 +188,11 @@ export type SettingsServiceData = {
     salon_group_title: null | string;
     salon_service_id: number;
     schedule_template_type: number;
+    // Время в МС до которого доступна запись
     seance_search_finish: number;
+    // Время в МС с которого начаинается запись
     seance_search_start: number;
+    // Время в МС шаг записей (900 - 15м)
     seance_search_step: number;
     service_type: number;
     staff: Array<SettingsServiceCategoryServiceStuff>;

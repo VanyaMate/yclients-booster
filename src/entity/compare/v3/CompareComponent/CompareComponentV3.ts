@@ -12,6 +12,7 @@ import {
     ICompareHeaderV3,
 } from '@/entity/compare/v3/CompareHeaderV3/CompareHeaderV3.interface.ts';
 import css from './CompareComponentV3.module.css';
+import { IComponent } from '@/shared/component/Component.interface.ts';
 
 
 export type CompareComponentProps =
@@ -25,8 +26,8 @@ export abstract class CompareComponentV3 extends Component<HTMLDivElement> imple
     protected _compareType: CompareType                    = CompareType.ALL;
     protected _enabled: boolean                            = true;
 
-    protected constructor (props: CompareComponentProps) {
-        super('div', props);
+    protected constructor (props: CompareComponentProps, children: Array<IComponent<HTMLElement>> = []) {
+        super('div', props, children);
         this.element.classList.add(css.container);
     }
 
