@@ -214,6 +214,18 @@ export interface SettingsServiceCategoryServiceStuff {
     name: string;
 }
 
+export type SettingsServiceEditData = {
+    title?: string;
+    price_min: number;
+    price_max: number;
+    technological_card_id?: string;
+    length_hour?: number;
+    length_minute?: number;
+};
+
+export type SettingsServiceMassEditRecordData = Record<string, SettingsServiceEditData>;
+
+
 export type SettingsServicesTree = Array<SettingsServiceCategoryDataWithChildren>;
 export type SettingsServicesCategoriesMapper = Record<string, SettingsServiceCategoryData>;
 export type SettingsServicesMapper = Record<string, SettingsServiceData>;
