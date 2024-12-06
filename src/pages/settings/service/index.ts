@@ -6,6 +6,13 @@ import { Col } from '@/shared/box/Col/Col.ts';
 import {
     SettingsServiceMassiveUpdatePriceButton,
 } from '@/feature/SettingsServiceMassiveUpdatePriceButton/SettingsServiceMassiveUpdatePriceButton.ts';
+import {
+    SettingsServiceCategoriesCompareComponent,
+} from '@/widget/settings/service/SettingsServiceCategoriesCompareComponent/SettingsServiceCategoriesCompareComponent.ts';
+import {
+    getSalaryCriteriaListDataForCopyRequestAction,
+} from '@/action/salary_criteria/request-action/getSalaryCriteriaListDataForCopy/getSalaryCriteriaListDataForCopy.request-action.ts';
+import { MemoFetch } from '@/service/Fetcher/implementations/MemoFetch.ts';
 
 
 export const isSettingsServicePage = function (pathname: Array<string>) {
@@ -18,19 +25,19 @@ export const settingsServicePageHandler = function (pathname: Array<string>) {
         const clientId: string = pathname[3];
         const bearer           = getBearerTokenDomAction();
         const container        = document.querySelector('#page-wrapper > .wrapper-content');
-        /*        const data1            = await getSalaryCriteriaListDataForCopyRequestAction(bearer, clientId, true, 5, 1);
-         const data2            = await getSalaryCriteriaListDataForCopyRequestAction(bearer, clientId, true, 5, 1);*/
+        const data1            = await getSalaryCriteriaListDataForCopyRequestAction(bearer, clientId, true, 5, 1);
+        const data2            = await getSalaryCriteriaListDataForCopyRequestAction(bearer, clientId, true, 5, 1);
 
         if (container) {
             new Col({
                 rows: [
-                    /*                    new SettingsServiceCategoriesCompareComponent({
-                     clientId,
-                     clientData: data1.settingsCopyData,
-                     targetData: data2.settingsCopyData,
-                     bearer    : bearer,
-                     fetcher   : new MemoFetch(),
-                     }),*/
+                    new SettingsServiceCategoriesCompareComponent({
+                        clientId,
+                        clientData: data1.settingsCopyData,
+                        targetData: data2.settingsCopyData,
+                        bearer    : bearer,
+                        fetcher   : new MemoFetch(),
+                    }),
                     new SettingsServiceMassiveUpdatePriceButton({
                         clientId,
                         bearer,

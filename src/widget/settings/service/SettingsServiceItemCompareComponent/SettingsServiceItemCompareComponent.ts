@@ -32,6 +32,9 @@ import {
 import {
     CompareSelectRowV3,
 } from '@/entity/compare/v3/CompareSelectRowV3/CompareSelectRowV3.ts';
+import {
+    CompareEnableBoxV3,
+} from '@/entity/compare/v3/CompareEnableBoxV3/CompareEnableBoxV3.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -256,46 +259,28 @@ export class SettingsServiceItemCompareComponent extends CompareComponentV3 impl
                         label     : 'Предоплата %',
                         type      : 'number',
                     }),
-                    new CompareSelectRowV3({
-                        targetSelectData   : {
-                            defaultLabel    : '',
-                            defaultValue    : '',
-                            showDefaultLabel: false,
-                            list            : [
-                                {
-                                    value   : '0',
-                                    label   : 'Выключена',
-                                    selected: this._targetService.abonement_restriction_value !== 1,
-                                },
-                                {
-                                    value   : '1',
-                                    label   : 'Включена',
-                                    selected: this._targetService.abonement_restriction_value === 1,
-                                },
-                            ],
-                            showValue       : false,
+                    new CompareEnableBoxV3({
+                        label       : 'Запись без абонемента',
+                        components  : [
+                            new CompareTextInputRowV3({
+                                targetData: this._targetService.seance_search_start.toString(),
+                                clientData: this._clientService?.seance_search_start.toString(),
+                                label     : 'Запись доступна с',
+                                type      : 'number',
+                            }),
+                            new CompareTextInputRowV3({
+                                targetData: this._targetService.seance_search_finish.toString(),
+                                clientData: this._clientService?.seance_search_finish.toString(),
+                                label     : 'Запись доступна до',
+                                type      : 'number',
+                            }),
+                        ],
+                        onToggle    : () => {
                         },
-                        label              : 'Запись без абонемента',
-                        clientSelectedId   : this._clientService
-                                             ? this._clientService.abonement_restriction_value === 1
-                                               ? '1' : '0'
-                                             : undefined,
-                        clientSelectedLabel: this._clientService
-                                             ? this._clientService.abonement_restriction_value === 1
-                                               ? 'Включена' : 'Выключена'
-                                             : undefined,
-                    }),
-                    new CompareTextInputRowV3({
-                        targetData: this._targetService.seance_search_start.toString(),
-                        clientData: this._clientService?.seance_search_start.toString(),
-                        label     : 'Запись доступна с',
-                        type      : 'number',
-                    }),
-                    new CompareTextInputRowV3({
-                        targetData: this._targetService.seance_search_finish.toString(),
-                        clientData: this._clientService?.seance_search_finish.toString(),
-                        label     : 'Запись доступна до',
-                        type      : 'number',
+                        targetStatus: this._targetService.abonement_restriction_value === 1,
+                        clientStatus: this._clientService === undefined
+                                      ? undefined
+                                      : this._clientService.abonement_restriction_value === 1,
                     }),
                 ],
             }),

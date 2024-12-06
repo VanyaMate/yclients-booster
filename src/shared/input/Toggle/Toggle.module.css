@@ -1,0 +1,47 @@
+.container {
+    display : inline-block;
+
+    > label {
+        width         : 50px;
+        height        : 30px;
+        border-radius : 15px;
+        border        : 1px solid var(--border-color);
+        background    : var(--bg-second);
+        display       : inline-block;
+        transition    : var(--transition-fast);
+        cursor        : pointer;
+
+        &:after {
+            content       : '';
+            display       : inline-block;
+            width         : 26px;
+            height        : 26px;
+            border-radius : 50%;
+            border        : 1px solid var(--border-color);
+            transform     : translate(1px, 1px);
+            background    : var(--bg-main);
+            transition    : var(--transition-fast);
+        }
+    }
+
+    > input {
+        visibility : hidden;
+        width      : 0;
+        height     : 0;
+        padding    : 0;
+        margin     : 0;
+        border     : none;
+        opacity    : 0;
+        overflow   : hidden;
+    }
+
+    > input:checked ~ label {
+        background : var(--success-color);
+        border     : 1px solid var(--success-color);
+
+        &:after {
+            transform : translate(21px, 1px);
+            border    : 1px solid var(--bg-main);
+        }
+    }
+}
