@@ -6,6 +6,7 @@ import css from './CompareTextValue.module.css';
 import {
     ICompareValue,
 } from '@/entity/compare/CompareValue/CompareValue.interface.ts';
+import { Nullable } from '@/types/Nullable.ts';
 
 
 export type CompareTextValueProps =
@@ -43,7 +44,7 @@ export class CompareTextValue extends Component<HTMLDivElement> implements IComp
         }
     }
 
-    getValue (): any {
+    getValue (): Nullable<string> {
         return this._value ?? null;
     }
 }

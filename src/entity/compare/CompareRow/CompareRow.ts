@@ -8,6 +8,7 @@ import {
 import { ICompareComponent } from '@/entity/compare/Compare.types.ts';
 import css from './CompareRow.module.css';
 import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
+import { Nullable } from '@/types/Nullable.ts';
 
 
 export type CompareRowValidationMethod<TargetValue, ClientValue> = (targetValue: TargetValue, clientValue: ClientValue) => boolean;
@@ -15,16 +16,16 @@ export type CompareRowValidationMethod<TargetValue, ClientValue> = (targetValue:
 export type CompareRowV4Props<TargetValue, ClientValue> =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        targetValue: ICompareValue<any>;
-        clientValue: ICompareValue<any>;
+        targetValue: ICompareValue<Nullable<TargetValue>>;
+        clientValue: ICompareValue<Nullable<ClientValue>>;
         label: string;
-        validationMethod?: CompareRowValidationMethod<TargetValue, ClientValue>
+        validationMethod?: CompareRowValidationMethod<Nullable<TargetValue>, Nullable<ClientValue>>
     };
 
 export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivElement> implements ICompareComponent {
-    private readonly _validationMethod?: CompareRowValidationMethod<TargetValue, ClientValue>;
-    private readonly _targetValue: ICompareValue<any>;
-    private readonly _clientValue: ICompareValue<any>;
+    private readonly _validationMethod?: CompareRowValidationMethod<Nullable<TargetValue>, Nullable<ClientValue>>;
+    private readonly _targetValue: ICompareValue<Nullable<TargetValue>>;
+    private readonly _clientValue: ICompareValue<Nullable<ClientValue>>;
     private _enabled: boolean = true;
 
     constructor (props: CompareRowV4Props<TargetValue, ClientValue>) {
