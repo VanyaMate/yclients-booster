@@ -1,7 +1,4 @@
 import { startHandler } from '@/shared/lib/startHandler.ts';
-import {
-    CopyLabelsClientButton,
-} from '@/widget/labels/client/CopyLabelsClientButton/CopyLabelsClientButton.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
 import './index.css';
 
@@ -14,12 +11,11 @@ export const labelsClientPageHandler = function () {
     startHandler(() => {
         const container = document.querySelector(`#page-wrapper .wrapper-content .row`);
         const clientId  = location.pathname.split('/')[3];
+        console.log(clientId);
 
         if (container) {
             new Col({
-                rows: [
-                    new CopyLabelsClientButton({ clientId }),
-                ],
+                rows: [],
             }).insert(container, 'beforebegin');
         }
     });

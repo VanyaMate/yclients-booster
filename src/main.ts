@@ -18,8 +18,7 @@ import {
 } from '@/pages/salary_criteria';
 import { commonPageHandler } from '@/pages/_common';
 import {
-    isLabelsClientPage,
-    labelsClientPageHandler,
+    isLabelsClientPage, labelsClientPageHandler,
 } from '@/pages/labels/client';
 import {
     isOnlineBookingForm,

@@ -2,45 +2,76 @@ import {
     Component,
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
-import css from './CompareRow.module.css';
 import {
-    ICompareComponent,
-} from '@/entity/compare/CompareRow/CompareRow.interface.ts';
+    ICompareValue,
+} from '@/entity/compare/CompareValue/CompareValue.interface.ts';
+import { ICompareComponent } from '@/entity/compare/Compare.types.ts';
+import css from './CompareRow.module.css';
+import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 
 
-export type CompareRowProps =
+export type CompareRowValidationMethod<TargetValue, ClientValue> = (targetValue: TargetValue, clientValue: ClientValue) => boolean;
+
+export type CompareRowV4Props<TargetValue, ClientValue> =
     ComponentPropsOptional<HTMLDivElement>
     & {
+        targetValue: ICompareValue<any>;
+        clientValue: ICompareValue<any>;
         label: string;
-        valueFrom: string | null | undefined;
-        valueTo?: string | null;
+        validationMethod?: CompareRowValidationMethod<TargetValue, ClientValue>
     };
 
-export class CompareRow extends Component<HTMLDivElement> implements ICompareComponent<HTMLDivElement> {
-    private readonly _valid: boolean = true;
+export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivElement> implements ICompareComponent {
+    private readonly _validationMethod?: CompareRowValidationMethod<TargetValue, ClientValue>;
+    private readonly _targetValue: ICompareValue<any>;
+    private readonly _clientValue: ICompareValue<any>;
+    private _enabled: boolean = true;
 
-    constructor (props: CompareRowProps) {
-        const { valueFrom, valueTo, label, ...other } = props;
-        super('div', other);
+    constructor (props: CompareRowV4Props<TargetValue, ClientValue>) {
+        const {
+                  targetValue, clientValue, label, validationMethod, ...other
+              } = props;
+        super('div', other, [
+            new Component<HTMLDivElement>('div', {}, [ targetValue ]),
+            new Component<HTMLDivElement>('div', { textContent: label }),
+            new Component<HTMLDivElement>('div', {}, [ clientValue ]),
+        ]);
+
+        this._targetValue      = targetValue;
+        this._clientValue      = clientValue;
+        this._validationMethod = validationMethod;
         this.element.classList.add(css.container);
-        this.element.innerHTML = `
-            <span>${ valueFrom ?? '-' }</span>
-            <span class="${ css.label }">${ label }</span>
-            <span>${ valueTo ?? '-' }</span>
-        `;
+        this.element.addEventListener(CompareEvent.type, this._validate.bind(this));
+        this._validate();
+    }
 
-        if (typeof valueTo !== 'string' && typeof valueFrom === 'string') {
-            this.element.classList.add(css.critical);
-            this._valid = false;
-        } else if (valueFrom !== valueTo) {
-            this.element.classList.add(css.critical);
-            this._valid = false;
+    get isValid (): boolean {
+        if (this._enabled) {
+            if (this._validationMethod) {
+                return this._validationMethod(this._targetValue.getValue(), this._clientValue.getValue());
+            }
+
+            return this._targetValue.getValue() === this._clientValue.getValue();
+        }
+
+        return true;
+    }
+
+    enable (status: boolean): void {
+        this._enabled = status;
+
+        if (status) {
+            this.element.classList.remove(css.disabled);
         } else {
-            this.element.classList.add(css.valid);
+            this.element.classList.add(css.disabled);
         }
     }
 
-    getValid (): boolean {
-        return this._valid;
+    private _validate () {
+        if (this.isValid) {
+            this.element.classList.remove(css.invalid);
+        } else {
+            this.element.classList.add(css.invalid);
+        }
     }
 }

@@ -1,18 +1,9 @@
 import { startHandler } from '@/shared/lib/startHandler.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
 import {
-    CopySalaryCriteriaFromThisToOtherButton,
-} from '@/widget/salary_criteria/CopySalaryCriteriaFromThisToOtherButton/CopySalaryCriteriaFromThisToOtherButton.ts';
-import {
     SalaryCriteriaListInfo,
 } from '@/widget/salary_criteria/SalaryCriteriaListInfo/SalaryCriteriaListInfo.ts';
-import {
-    getBearerTokenDomAction,
-} from '@/action/bearer/dom-action/getBearerToken/getBearerToken.dom-action.ts';
-import {
-    CompareHeaderV3,
-} from '@/entity/compare/v3/CompareHeaderV3/CompareHeaderV3.ts';
-import { CompareRowV3 } from '@/entity/compare/v3/CompareRowV3/CompareRowV3.ts';
+import { CompareHeader } from '@/entity/compare/CompareHeader/CompareHeader.ts';
 
 
 export const isSalaryCriteriaPage = function (pathnameParts: Array<string>): boolean {
@@ -102,30 +93,18 @@ const mockCompareData: { rows: MockRows, items: MockItems } = {
 export const salaryCriteriaPageHandler = function () {
     startHandler(() => {
         const container = document.querySelector('.wrapper-content');
-        const clientId  = location.pathname.split('/')[3];
-        const bearer    = getBearerTokenDomAction();
+/*        const clientId  = location.pathname.split('/')[3];
+        const bearer    = getBearerTokenDomAction();*/
 
         if (container) {
             new Col({
                 rows: [
-                    new CopySalaryCriteriaFromThisToOtherButton(clientId, bearer),
                     new SalaryCriteriaListInfo(),
-                    new CompareHeaderV3({
+                    new CompareHeader({
                         targetHeaderData: 'Original',
                         label           : 'Original',
                         clientHeaderData: 'Original',
-                        rows            : [
-                            new CompareRowV3({
-                                targetData: 'Original',
-                                label     : 'Original',
-                                clientData: 'Original',
-                            }),
-                            new CompareRowV3({
-                                targetData: 'Original',
-                                label     : 'Original',
-                                clientData: 'Original2',
-                            }),
-                        ],
+                        rows            : [],
                         variants       : [
                             {
                                 value: '1',
@@ -144,7 +123,7 @@ export const salaryCriteriaPageHandler = function () {
                             console.log('rerender children with', variant);
                         },
                     }),
-                    new CompareHeaderV3({
+                    new CompareHeader({
                         targetHeaderData: 'Original',
                         label           : 'Original',
                         clientHeaderData: 'Original2',
@@ -154,7 +133,7 @@ export const salaryCriteriaPageHandler = function () {
                         },
                     }),
                     ...Object.keys(mockOriginalData.items).map((key) => (
-                        new CompareHeaderV3({
+                        new CompareHeader({
                             targetHeaderData: mockOriginalData.items[key].title,
                             clientHeaderData: mockCompareData.items[key]?.title,
                             label           : 'item',
@@ -162,14 +141,7 @@ export const salaryCriteriaPageHandler = function () {
                                 label: mockCompareData.items[key].title,
                                 value: key,
                             })),
-                            rows            : [
-                                new CompareRowV3({
-                                    targetData: mockOriginalData.items[key].description,
-                                    clientData: mockCompareData.items[key]?.description,
-                                    label     : 'описание',
-                                }),
-
-                            ],
+                            rows            : [],
                             onVariantChange: () => {
                             },
                         })

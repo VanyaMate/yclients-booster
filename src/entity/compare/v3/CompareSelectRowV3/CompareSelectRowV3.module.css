@@ -1,8 +1,0 @@
-.container {
-    .select {
-        width   : fit-content;
-        padding : 0 25px 0 var(--offset-small);
-        border  : none;
-        height  : calc(30px - var(--offset-extra-small) * 2);
-    }
-}

@@ -1,10 +1,36 @@
 .container {
-    padding         : var(--offset-small);
-    border-radius   : var(--offset-small);
-    display         : flex;
-    justify-content : space-between;
-    align-items     : center;
-    gap             : var(--offset-small);
+    display        : flex;
+    flex-direction : row;
+    gap            : var(--offset-small);
+    align-items    : center;
+
+    &.disabled {
+        background : repeating-linear-gradient(45deg, var(--bg-main), var(--bg-main) 20px, var(--bg-second) 20px, var(--bg-second) 25px);
+
+        button, select, input {
+            pointer-events : none;
+            cursor         : default;
+            user-select    : none;
+        }
+
+        & > * {
+            opacity : .4;
+        }
+    }
+
+    &.invalid {
+        & > *:nth-child(2) {
+            background : var(--danger-color);
+            color      : var(--on-danger-color);
+            border     : 1px solid var(--danger-color);
+        }
+    }
+
+    .empty {
+        color       : var(--color-gray);
+        font-style  : italic;
+        user-select : none;
+    }
 
     & > * {
         &:nth-child(1) {
@@ -13,40 +39,18 @@
         }
 
         &:nth-child(2) {
-            text-align : center;
-            flex       : 1;
+            text-align    : center;
+            flex          : 1;
+            padding       : var(--offset-extra-small);
+            border-radius : var(--offset-small);
+            border        : 1px solid var(--color-gray);
+            background    : var(--color-light-gray);
+            color         : var(--color-dark-gray);
         }
 
         &:nth-child(3) {
             text-align : right;
             flex       : 2;
         }
-    }
-
-    .label {
-        background    : var(--bg-main);
-        padding       : var(--offset-extra-small);
-        font-size     : 12px;
-        color         : var(--color-black);
-        border-radius : var(--offset-extra-small);
-    }
-
-    .select {
-        display : inline-block;
-    }
-
-    &.valid {
-        background : var(--success-color);
-        color      : var(--on-success-color);
-    }
-
-    &.warning {
-        background : var(--warning-color);
-        color      : var(--on-warning-color);
-    }
-
-    &.critical {
-        background : var(--danger-color);
-        color      : var(--on-danger-color);
     }
 }

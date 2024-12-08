@@ -35,24 +35,25 @@ export type SelectProps =
     }
 
 export class Select extends Component<HTMLDivElement> {
-    private readonly _defaultLabel: string              = '';
+    private readonly _defaultLabel: string                    = '';
     private readonly _defaultShowLabel?: string;
-    private readonly _defaultValue: string              = '';
-    private readonly _defaultStyleType: ButtonStyleType = ButtonStyleType.DEFAULT;
-    private readonly _showDefaultLabel: boolean         = true;
+    private readonly _defaultValue: string                    = '';
+    private readonly _defaultStyleType: ButtonStyleType       = ButtonStyleType.DEFAULT;
+    private readonly _showDefaultLabel: boolean               = true;
     private readonly _onChangeHandler?: SelectOnChange;
-    private readonly _isModal: boolean                  = false;
-    private readonly _list: Array<SelectOption>         = [];
+    private readonly _isModal: boolean                        = false;
+    private readonly _list: Array<SelectOption>               = [];
     private readonly _selectButton: Button;
     private readonly _dropdown: Col;
     private readonly _optionsBox: Col;
-    private readonly _modal: Modal | null               = null;
-    private _search: string                             = '';
-    private _currentLabel: string                       = '';
+    private readonly _modal: Modal | null                     = null;
+    private readonly _onChangeHandlers: Array<SelectOnChange> = [];
+    private _search: string                                   = '';
+    private _currentLabel: string                             = '';
     private _currentShowLabel?: string;
-    private _currentValue: string                       = '';
-    private _inited: boolean                            = false;
-    private _showValue: boolean                         = true;
+    private _currentValue: string                             = '';
+    private _inited: boolean                                  = false;
+    private _showValue: boolean                               = true;
 
     constructor (props: SelectProps) {
         const {
@@ -165,6 +166,10 @@ export class Select extends Component<HTMLDivElement> {
         this.element.classList.remove(css.show);
     }
 
+    public onChange (callback: SelectOnChange) {
+        this._onChangeHandlers.push(callback);
+    }
+
     private _renderOptions () {
         this._optionsBox.clear();
         let selected: boolean = this._defaultValue === this._currentValue;
@@ -216,6 +221,7 @@ export class Select extends Component<HTMLDivElement> {
 
         if (this._inited) {
             this._onChangeHandler?.(item);
+            this._onChangeHandlers.forEach((callback) => callback(item));
         }
     }
 

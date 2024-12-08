@@ -1,0 +1,12 @@
+.container {
+    color       : var(--color-black);
+    font-weight : bold;
+
+    &.empty {
+        color : var(--color-gray);
+    }
+
+    &.isNotValue {
+        font-weight : normal;
+    }
+}

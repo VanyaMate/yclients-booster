@@ -1,30 +1,27 @@
 import { ComponentPropsOptional } from '@/shared/component/Component.ts';
 import {
-    CompareType,
-    ICompareComponentV3,
-} from '@/entity/compare/v3/Compare.types.ts';
-import {
     SettingsServiceCategoryDataWithChildren,
     SettingsServiceCopyData,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 import {
-    CompareHeaderV3,
-} from '@/entity/compare/v3/CompareHeaderV3/CompareHeaderV3.ts';
-import { CompareRowV3 } from '@/entity/compare/v3/CompareRowV3/CompareRowV3.ts';
-import {
     SettingsServiceItemCompareComponent,
 } from '@/widget/settings/service/SettingsServiceItemCompareComponent/SettingsServiceItemCompareComponent.ts';
-import { CompareEvent } from '@/entity/compare/v3/CompareEvent.ts';
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import {
     createSettingsServiceCategoryRequestAction,
 } from '@/action/settings/service_categories/request-action/createSettingsServiceCategory/createSettingsServiceCategory.request-action.ts';
 import { SelectOption } from '@/shared/input/Select/Select.ts';
-import { CompareBoxV3 } from '@/entity/compare/v3/CompareBoxV3/CompareBoxV3.ts';
 import {
-    CompareComponentV3,
-} from '@/entity/compare/v3/CompareComponent/CompareComponentV3.ts';
+    CompareType,
+    ICompareComponent,
+} from '@/entity/compare/Compare.types.ts';
+import {
+    CompareComponent,
+} from '@/entity/compare/CompareComponent/CompareComponent.ts';
+import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
+import { CompareBox } from '@/entity/compare/CompareBox/CompareBox.ts';
+import { CompareHeader } from '@/entity/compare/CompareHeader/CompareHeader.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -44,7 +41,7 @@ export type SettingsServiceCategoryCompareComponentProps =
         logger?: ILogger;
     };
 
-export class SettingsServiceCategoryCompareComponent extends CompareComponentV3 implements ICompareComponentV3 {
+export class SettingsServiceCategoryCompareComponent extends CompareComponent implements ICompareComponent {
     private readonly _clientId: string;
     private readonly _clientData: SettingsServiceCopyData;
     private readonly _targetCategory: SettingsServiceCategoryDataWithChildren;
@@ -137,7 +134,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponentV3 
     private _render () {
         this.element.innerHTML = ``;
         this._compareChildren  = [
-            new CompareBoxV3({
+            new CompareBox({
                 title     : 'Сервисы',
                 level     : 3,
                 components: this._serviceComponents = this._targetCategory.children.map((service) => (
@@ -154,33 +151,14 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponentV3 
         ];
 
         this._compareRows = [
-            new CompareBoxV3({
+            new CompareBox({
                 title     : 'Поля категории',
                 level     : 2,
-                components: [
-                    new CompareRowV3({
-                        targetData: this._targetCategory.booking_title,
-                        clientData: this._clientCategory?.booking_title,
-                        label     : 'Букинг заголовок',
-                    }),
-                    new CompareRowV3({
-                        targetData: this._targetCategory.sex ? 'Муж' : 'Жен',
-                        clientData: this._clientCategory?.sex === undefined
-                                    ? undefined : this._clientCategory.sex
-                                                  ? 'Муж'
-                                                  : 'Жен',
-                        label     : 'Пол',
-                    }),
-                    new CompareRowV3({
-                        targetData: this._targetCategory.translations.length.toString(),
-                        clientData: this._clientCategory?.translations.length.toString(),
-                        label     : 'Переводы',
-                    }),
-                ],
+                components: [],
             }),
         ];
 
-        this._header = new CompareHeaderV3({
+        this._header = new CompareHeader({
             targetHeaderData      : this._targetCategory.title,
             clientHeaderData      : this._clientCategory?.title,
             label                 : 'Категория',

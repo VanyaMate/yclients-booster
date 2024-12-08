@@ -3,9 +3,6 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import {
-    ICompareComponentV3,
-} from '@/entity/compare/v3/Compare.types.ts';
-import {
     SettingsServiceCopyData,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 import {
@@ -15,6 +12,7 @@ import { Col } from '@/shared/box/Col/Col.ts';
 import { Button } from '@/shared/buttons/Button/Button.ts';
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
+import { ICompareComponent } from '@/entity/compare/Compare.types.ts';
 
 
 export type SettingsServiceCategoriesCompareComponentProps =
@@ -34,7 +32,7 @@ export type SettingsServiceCategoriesCompareComponentProps =
         logger?: ILogger;
     };
 
-export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDivElement> implements ICompareComponentV3 {
+export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDivElement> implements ICompareComponent {
     private _clientId: string;
     private _clientData: SettingsServiceCopyData;
     private _targetData: SettingsServiceCopyData;

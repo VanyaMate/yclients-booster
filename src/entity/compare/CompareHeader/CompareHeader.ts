@@ -1,85 +1,240 @@
 import {
+    ICompareHeader,
+} from '@/entity/compare/CompareHeader/CompareHeader.interface.ts';
+import {
     Component,
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
-import css from './CompareHeader.module.css';
-import { Select, SelectOption } from '@/shared/input/Select/Select.ts';
-import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import {
+    CompareProcess, CompareResult,
+    CompareType,
     ICompareComponent,
-} from '@/entity/compare/CompareRow/CompareRow.interface.ts';
+} from '@/entity/compare/Compare.types.ts';
+import { Select, SelectOption } from '@/shared/input/Select/Select.ts';
+import css from './CompareHeader.module.css';
+import { TextInput } from '@/shared/input/TextInput/TextInput.ts';
+import { Details } from '@/shared/box/Details/Details.ts';
+import { Col } from '@/shared/box/Col/Col.ts';
+import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
+import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 
-
-export enum CompareState {
-    VALID,
-    WARNING,
-    CRITICAL
-}
 
 export type CompareHeaderProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        titleFrom: string;
-        label?: string;
-        idTo?: string | null;
-        titleTo?: string | null;
-        forceState?: CompareState;
-        variants?: Array<{ id: string, title: string }>;
-        onVariantChange?: (id: string) => void;
-        modalLabel?: string;
+        targetHeaderData: string;
+        clientHeaderData?: string;
+        label: string;
+        rows: Array<ICompareComponent>;
+        variants: Array<SelectOption>;
+        onVariantChange: (option: SelectOption) => void;
+        onActivateAll?: () => void;
+        onActivateOnlyChildren?: () => void;
+        onActivateOnlyItem?: () => void;
+        onDeactivate?: () => void;
+        onRename?: (name: string) => void;
     };
 
-export class CompareHeader extends Component<HTMLDivElement> implements ICompareComponent<HTMLDivElement> {
+export class CompareHeader extends Component<HTMLDivElement> implements ICompareHeader,
+                                                                        ICompareComponent {
+    private readonly _initialTargetHeader: string;
+    private readonly _selectButton: Select;
+    private readonly _processButton: Component<HTMLDivElement>;
+    private _currentTargetHeader: string;
+    private _isValid: boolean;
+    private _validating: boolean = true;
+
     constructor (props: CompareHeaderProps) {
         const {
-                  label      = '',
-                  titleFrom,
-                  titleTo,
-                  variants   = [],
-                  idTo,
-                  forceState = CompareState.VALID,
+                  targetHeaderData,
+                  label,
+                  clientHeaderData,
+                  onActivateOnlyChildren,
+                  onActivateOnlyItem,
+                  onActivateAll,
+                  onDeactivate,
+                  variants,
                   onVariantChange,
-                  modalLabel,
+                  onRename,
+                  rows,
                   ...other
               } = props;
         super('div', other);
         this.element.classList.add(css.container);
-        this.element.innerHTML = `
-                <span>${ titleFrom }</span>
-                <span>${ label }</span>
-            `;
+        this._initialTargetHeader = this._currentTargetHeader = targetHeaderData;
+        this._isValid             = this._initialTargetHeader === clientHeaderData;
 
-        if (typeof titleTo !== 'string' || forceState === CompareState.CRITICAL) {
-            this.element.classList.add(css.critical);
-        } else if (titleFrom !== titleTo || forceState === CompareState.WARNING) {
-            this.element.classList.add(css.warning);
-        } else {
-            this.element.classList.add(css.valid);
+        this._selectButton = new Select({
+            defaultValue    : CompareType.ALL,
+            defaultLabel    : 'Все',
+            defaultShowLabel: '✓',
+            list            : [
+                {
+                    label    : 'Только это',
+                    showLabel: '→',
+                    value    : CompareType.ITEM,
+                },
+                {
+                    label    : 'Только дочерние',
+                    showLabel: '↓',
+                    value    : CompareType.CHILDREN,
+                },
+                {
+                    label    : 'Ничего не делать',
+                    showLabel: '🗙',
+                    value    : CompareType.NONE,
+                },
+            ],
+            onChange        : (data) => {
+                switch (data.value as CompareType) {
+                    case CompareType.ALL:
+                        return onActivateAll?.();
+                    case CompareType.ITEM:
+                        return onActivateOnlyItem?.();
+                    case CompareType.CHILDREN:
+                        return onActivateOnlyChildren?.();
+                    case CompareType.NONE:
+                        return onDeactivate?.();
+                    default:
+                        break;
+                }
+            },
+            isModal         : true,
+            modalLabel      : `Варианты действия`,
+            className       : css.select,
+            showValue       : false,
+        });
+
+        this._selectButton.insert(this.element, 'beforeend');
+        this._processButton = new Component<HTMLDivElement>('div', {
+            className: css.state,
+        });
+
+        let input: TextInput;
+
+        const content = new Details({
+            className: css.content,
+            header   : new Component<HTMLDivElement>('div', { className: css.data }, [
+                input = new TextInput({
+                    type       : 'text',
+                    value      : targetHeaderData,
+                    placeholder: label,
+                    required   : true,
+                    oninput    : () => {
+                        this._currentTargetHeader = input.getValue();
+                        onRename?.(this._currentTargetHeader);
+                        this._updateValidation(clientHeaderData);
+                    },
+                }),
+                new Component<HTMLDivElement>('div', { textContent: label }),
+                new Component<HTMLDivElement>('div', {}, [
+                    new Select({
+                        defaultValue: '0',
+                        defaultLabel: 'Создать новый',
+                        list        : variants,
+                        isModal     : true,
+                        modalLabel  : `Выберите ${ label }`,
+                        showValue   : false,
+                        className   : css.headerSelect,
+                        onChange    : onVariantChange,
+                        withSearch  : true,
+                    }),
+                ]),
+            ]),
+            details  : new Col({
+                rows     : rows.length
+                           ? rows
+                           : [ new Component<HTMLDivElement>('div', { textContent: 'Ничего нет' }) ],
+                className: css.rows,
+            }),
+        });
+
+        content.insert(this.element, 'beforeend');
+        this._updateValidation(clientHeaderData);
+    }
+
+    get isValid (): boolean {
+        if (this._validating) {
+            return this._isValid;
         }
 
-        if (variants.length) {
-            const select = new Select({
-                defaultLabel: 'Создать новый',
-                defaultValue: '-1',
-                list        : variants.map((variant) => ({
-                    label   : variant.title,
-                    value   : variant.id,
-                    selected: variant.id === idTo,
-                })),
-                withSearch  : true,
-                styleType   : ButtonStyleType.DEFAULT,
-                isModal     : true,
-                className   : css.select,
-                modalLabel  : modalLabel ?? 'Выберите вариант',
-                onChange    : (option: SelectOption) => onVariantChange?.(option.value),
-            });
-            new Component('span', {}, [ select ]).insert(this.element, 'beforeend');
+        return true;
+    }
+
+    enable (status: boolean): void {
+        this._validating = status;
+
+        if (status) {
+            this.element.classList.remove(css.disable);
         } else {
-            this.element.innerHTML += `<span>${ titleTo ?? '-' }</span>`;
+            this.element.classList.add(css.disable);
         }
     }
 
-    getValid (): boolean {
-        return this.element.classList.contains(css.valid);
+    setProcessType (process: CompareProcess) {
+        switch (process) {
+            case CompareProcess.ERROR:
+                this._selectButton.remove();
+                this._processButton.insert(this.element, 'afterbegin');
+                this._processButton.element.className = `${ css.state } ${ css.error }`;
+                this.element.classList.add(css.processAction);
+                break;
+            case CompareProcess.SUCCESS:
+                this._selectButton.remove();
+                this._processButton.insert(this.element, 'afterbegin');
+                this._processButton.element.className = `${ css.state } ${ css.success }`;
+                this.element.classList.add(css.processAction);
+                break;
+            case CompareProcess.PROCESS:
+                this._selectButton.remove();
+                this._processButton.insert(this.element, 'afterbegin');
+                this._processButton.element.className = `${ css.state } ${ css.process }`;
+                this.element.classList.add(css.processAction);
+                break;
+            case CompareProcess.IDLE:
+                this._selectButton.remove();
+                this._processButton.insert(this.element, 'afterbegin');
+                this._processButton.element.className = `${ css.state } ${ css.idle }`;
+                this.element.classList.add(css.processAction);
+                break;
+            default:
+                this._selectButton.insert(this.element, 'afterbegin');
+                this._processButton.remove();
+                this.element.classList.remove(css.processAction);
+                break;
+        }
+    }
+
+    setValidationType (type: CompareResult): void {
+        switch (type) {
+            case CompareResult.VALID:
+                this._selectButton.setStyleType(ButtonStyleType.DEFAULT);
+                break;
+            case CompareResult.NO_VALID:
+                this._selectButton.setStyleType(ButtonStyleType.WARNING);
+                break;
+            case CompareResult.NO_EXIST:
+                this._selectButton.setStyleType(ButtonStyleType.DANGER);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private _updateValidation (headerCompare?: string) {
+        if (typeof headerCompare !== 'string') {
+            this._selectButton.setStyleType(ButtonStyleType.DANGER);
+            this.element.classList.add(css.invalid);
+            this._isValid = false;
+        } else if (headerCompare !== this._currentTargetHeader) {
+            this._selectButton.setStyleType(ButtonStyleType.WARNING);
+            this.element.classList.add(css.invalid);
+            this._isValid = false;
+        } else {
+            this._selectButton.setStyleType(ButtonStyleType.DEFAULT);
+            this.element.classList.remove(css.invalid);
+            this._isValid = true;
+        }
+        this.element.dispatchEvent(CompareEvent);
     }
 }
