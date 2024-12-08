@@ -31,6 +31,20 @@ import {
 import {
     CompareToggleValue,
 } from '@/entity/compare/CompareValue/CompareToggleValue/CompareToggleValue.ts';
+import {
+    CompareSelectValue,
+} from '@/entity/compare/CompareValue/CompareSelectValue/CompareSelectValue.ts';
+import {
+    CompareImageValue,
+} from '@/entity/compare/CompareValue/CompareImageValue/CompareImageValue.ts';
+import {
+    CompareTimeSelectsValue,
+} from '@/entity/compare/CompareValue/CompareTimeSelectsValue/CompareTimeSelectsValue.ts';
+import {
+    ComparePriceSelectType,
+    ComparePriceWithSelectValue,
+} from '@/entity/compare/CompareValue/ComparePriceWithSelectValue/ComparePriceWithSelectValue.ts';
+import { SelectVariantType } from '@/shared/input/Select/Select.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -136,28 +150,82 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
     private _render () {
         this.element.innerHTML = ``;
 
-        const online: Array<ICompareComponent> = [
+        const prepaidTargetPercents                                 = this._targetService.price_prepaid_amount === 0;
+        const onlinePrepaidComponents: Array<ICompareComponent>     = [
             new CompareRow({
-                targetValue: new CompareTextInputValue({
-                    type : 'number',
-                    value: this._targetService.price_min.toString(),
+                targetValue     : new ComparePriceWithSelectValue({
+                    value: [
+                        prepaidTargetPercents
+                        ? this._targetService.price_prepaid_percent.toString()
+                        : this._targetService.price_prepaid_amount.toString(),
+                        prepaidTargetPercents ? ComparePriceSelectType.PERCENTS
+                                              : ComparePriceSelectType.RUBLES,
+                    ],
                 }),
-                clientValue: new CompareTextValue({
-                    value: this._clientService?.price_min.toString(),
+                clientValue     : new CompareTextValue({
+                    value: this._clientService ?
+                           this._clientService.price_prepaid_amount
+                           ? `${ this._clientService.price_prepaid_amount } ₽`
+                           : `${ this._clientService.price_prepaid_percent } %`
+                                               : undefined,
                 }),
-                label      : 'Время до',
-            }),
-            new CompareRow({
-                targetValue: new CompareTextInputValue({
-                    type : 'number',
-                    value: this._targetService.price_min.toString(),
-                }),
-                clientValue: new CompareTextValue({
-                    value: this._clientService?.price_min.toString(),
-                }),
-                label      : 'Время после',
+                label           : 'Предоплата',
+                validationMethod: (targetValue, clientValue) => {
+                    if (targetValue && clientValue) {
+                        return targetValue.join(' ') === clientValue;
+                    }
+
+                    return targetValue === clientValue;
+                },
             }),
         ];
+        const disableOnlineOrderWithoutAbonement: ICompareComponent = new CompareRow<boolean, string>({
+            targetValue     : new CompareToggleValue({
+                value                   : this._targetService.abonement_restriction_value === 1,
+                onChange                : (status) => {
+                    // Осуждаю
+                    requestAnimationFrame(() => {
+                        enableOnlinePrepaid.enable(!status);
+                    });
+                },
+                executeOnChangeAfterInit: true,
+            }),
+            clientValue     : new CompareTextValue({
+                value: this._clientService
+                       ? this._clientService.abonement_restriction_value.toString()
+                       : undefined,
+                label: this._clientService?.abonement_restriction_value
+                       ? 'Вкл' : 'Выкл',
+            }),
+            label           : 'Запретить онлайн запись без абонемента',
+            validationMethod: (targetValue, clientValue) => {
+                return targetValue ? clientValue === '1'
+                                   : clientValue === undefined || clientValue === '0';
+            },
+        });
+
+        const enableOnlinePrepaid: ICompareComponent = new CompareRow<boolean, string>({
+            targetValue     : new CompareToggleValue({
+                value                   : !!this._targetService.online_invoicing_status,
+                onChange                : (status) => {
+                    onlinePrepaidComponents.forEach((component) => component.enable(status));
+                    disableOnlineOrderWithoutAbonement.enable(!status);
+                },
+                executeOnChangeAfterInit: true,
+            }),
+            clientValue     : new CompareTextValue({
+                value: this._clientService
+                       ? this._clientService.online_invoicing_status.toString()
+                       : undefined,
+                label: this._clientService?.online_invoicing_status
+                       ? 'Вкл' : 'Выкл',
+            }),
+            label           : 'Онлайн запись',
+            validationMethod: (targetValue, clientValue) => {
+                return targetValue ? clientValue === '2'
+                                   : clientValue === '0';
+            },
+        });
 
         this._compareRows = [
             new CompareBox({
@@ -185,37 +253,72 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
                         label      : 'Максимальная цена',
                     }),
                     new CompareRow({
-                        targetValue: new CompareTextInputValue({
-                            type : 'number',
-                            value: this._targetService.duration.toString(),
-                        }),
-                        clientValue: new CompareTextValue({
-                            value: this._clientService?.duration.toString(),
-                        }),
-                        label      : 'Длительность',
-                    }),
-                    new CompareRow<boolean, string>({
-                        targetValue     : new CompareToggleValue({
-                            value                   : !!this._targetService.online_invoicing_status,
-                            onChange                : (status) => {
-                                online.forEach((com) => com.enable(status));
-                            },
-                            executeOnChangeAfterInit: true,
+                        targetValue     : new CompareTimeSelectsValue({
+                            value: [
+                                Math.floor(this._targetService.duration / 60 / 60).toString(),
+                                Math.floor(this._targetService.duration / 60 % 60).toString(),
+                            ],
                         }),
                         clientValue     : new CompareTextValue({
                             value: this._clientService
-                                   ? this._clientService.online_invoicing_status.toString()
+                                   ? `${ Math.floor(this._clientService.duration / 60 / 60).toString() }ч ${ Math.floor(this._clientService.duration / 60 % 60).toString() }м`
                                    : undefined,
-                            label: this._clientService?.online_invoicing_status
-                                   ? 'Вкл' : 'Выкл',
                         }),
-                        label           : 'Онлайн запись',
+                        label           : 'Длительность',
                         validationMethod: (targetValue, clientValue) => {
-                            return targetValue ? clientValue === '2'
-                                               : clientValue === '0';
+                            if (targetValue !== null && clientValue !== null) {
+                                return `${ targetValue[0] }ч ${ targetValue[1] }м` === clientValue;
+                            }
+
+                            return targetValue === clientValue;
                         },
                     }),
-                    ...online,
+                    new CompareRow({
+                        targetValue: new CompareSelectValue({
+                            defaultLabel    : '',
+                            defaultValue    : '',
+                            showDefaultLabel: false,
+                            list            : [
+                                {
+                                    value   : 'Индивидуальный',
+                                    label   : 'Индивидуальный',
+                                    selected: !this._targetService.is_multi,
+                                },
+                                {
+                                    value   : 'Групповой',
+                                    label   : 'Групповой',
+                                    selected: this._targetService.is_multi,
+                                },
+                            ],
+                            showValue       : false,
+                            variant         : SelectVariantType.MINIMAL,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientService
+                                   ? this._clientService.is_multi ? 'Групповой'
+                                                                  : 'Индивидуальный'
+                                   : undefined,
+                        }),
+                        label      : 'Тип',
+                    }),
+                    new CompareBox({
+                        title     : 'Онлайн запись',
+                        level     : 3,
+                        components: [
+                            new CompareRow({
+                                targetValue: new CompareImageValue({
+                                    src: this._targetService.image_group?.images?.basic.path,
+                                }),
+                                clientValue: new CompareImageValue({
+                                    src: this._clientService?.image_group?.images?.basic.path,
+                                }),
+                                label      : 'Картинка',
+                            }),
+                            enableOnlinePrepaid,
+                            ...onlinePrepaidComponents,
+                            disableOnlineOrderWithoutAbonement,
+                        ],
+                    }),
                 ],
             }),
         ];

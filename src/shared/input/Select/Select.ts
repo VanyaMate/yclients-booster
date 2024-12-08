@@ -16,6 +16,11 @@ export type SelectOption = {
     showLabel?: string;
 }
 
+export enum SelectVariantType {
+    DEFAULT,
+    MINIMAL
+}
+
 export type SelectOnChange = (data: SelectOption) => void;
 
 export type SelectProps =
@@ -32,6 +37,7 @@ export type SelectProps =
         showValue?: boolean;
         styleType?: ButtonStyleType;
         onChange?: SelectOnChange;
+        variant?: SelectVariantType;
     }
 
 export class Select extends Component<HTMLDivElement> {
@@ -69,6 +75,7 @@ export class Select extends Component<HTMLDivElement> {
                   showValue = true,
                   onChange,
                   className,
+                  variant,
                   ...other
               } = props;
 
@@ -85,6 +92,10 @@ export class Select extends Component<HTMLDivElement> {
         this._showValue        = showValue;
 
         this.element.classList.add(css.container);
+
+        if (variant === SelectVariantType.MINIMAL) {
+            this.element.classList.add(css.minimal);
+        }
 
         this._selectButton = new Button({
             textContent: this._currentShowLabel ?? this._currentLabel,

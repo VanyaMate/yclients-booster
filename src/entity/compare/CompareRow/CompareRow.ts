@@ -30,7 +30,11 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
 
     constructor (props: CompareRowV4Props<TargetValue, ClientValue>) {
         const {
-                  targetValue, clientValue, label, validationMethod, ...other
+                  targetValue,
+                  clientValue,
+                  label,
+                  validationMethod,
+                  ...other
               } = props;
         super('div', other, [
             new Component<HTMLDivElement>('div', {}, [ targetValue ]),

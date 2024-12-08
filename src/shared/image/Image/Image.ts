@@ -12,11 +12,15 @@ export type ImageProps =
     };
 
 export class Image extends Component<HTMLDivElement> {
+    public image: Component<HTMLImageElement>;
+
     constructor (props: ImageProps) {
         const { containerClassName, ...other } = props;
+        let image;
         super('div', { className: containerClassName }, [
-            new Component<HTMLImageElement>('img', other),
+            image = new Component<HTMLImageElement>('img', other),
         ]);
+        this.image = image;
         this.element.classList.add(css.container);
     }
 }

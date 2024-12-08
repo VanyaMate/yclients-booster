@@ -3,11 +3,12 @@
     flex-direction : row;
     gap            : var(--offset-small);
     align-items    : center;
+    transition     : var(--transition-fast);
 
     &.disabled {
         background : repeating-linear-gradient(45deg, var(--bg-main), var(--bg-main) 20px, var(--bg-second) 20px, var(--bg-second) 25px);
 
-        button, select, input {
+        button, select, input, label {
             pointer-events : none;
             cursor         : default;
             user-select    : none;
@@ -46,6 +47,7 @@
             border        : 1px solid var(--color-gray);
             background    : var(--color-light-gray);
             color         : var(--color-dark-gray);
+            transition    : var(--transition-fast);
         }
 
         &:nth-child(3) {

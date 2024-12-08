@@ -50,6 +50,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent im
     private readonly _logger?: ILogger;
     private _serviceComponents: Array<SettingsServiceItemCompareComponent> = [];
     private _clientCategory?: SettingsServiceCategoryDataWithChildren;
+    private _revalidateTrigger: boolean                                    = false;
 
     constructor (props: SettingsServiceCategoryCompareComponentProps) {
         const {
@@ -71,7 +72,15 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent im
         this._logger         = logger;
         this._clientCategory = this._clientData.tree.find((category) => category.title === this._targetCategory.title);
 
-        this.element.addEventListener(CompareEvent.type, this._revalidate.bind(this, this._clientCategory));
+        this.element.addEventListener(CompareEvent.type, () => {
+            if (!this._revalidateTrigger) {
+                this._revalidateTrigger = true;
+                setTimeout(() => {
+                    this._revalidate(this._clientCategory);
+                    this._revalidateTrigger = false;
+                });
+            }
+        });
         this._render();
     }
 

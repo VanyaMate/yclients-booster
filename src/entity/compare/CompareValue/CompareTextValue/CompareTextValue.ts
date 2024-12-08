@@ -9,18 +9,18 @@ import {
 import { Nullable } from '@/types/Nullable.ts';
 
 
-export type CompareTextValueProps =
+export type CompareTextValueProps<ValueType> =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        value?: string;
+        value?: ValueType;
         label?: string;
     };
 
-export class CompareTextValue extends Component<HTMLDivElement> implements ICompareValue<string> {
-    private readonly _value?: string;
+export class CompareTextValue<ValueType> extends Component<HTMLDivElement> implements ICompareValue<ValueType> {
+    private readonly _value?: ValueType;
     private readonly _label?: string;
 
-    constructor (props: CompareTextValueProps) {
+    constructor (props: CompareTextValueProps<ValueType>) {
         const { label, value, ...other } = props;
         super('div', other);
 
@@ -32,7 +32,7 @@ export class CompareTextValue extends Component<HTMLDivElement> implements IComp
         if (this._value === undefined) {
             this.element.textContent = '-';
             this.element.classList.add(css.isNotValue);
-        } else if (this._value.trim() === '') {
+        } else if (typeof this._value === 'string' && this._value.trim() === '') {
             this.element.textContent = 'Пусто';
             this.element.classList.add(css.empty);
             this.element.classList.add(css.isNotValue);
@@ -40,11 +40,11 @@ export class CompareTextValue extends Component<HTMLDivElement> implements IComp
             this.element.textContent = this._label;
             this.element.classList.add(css.isNotValue);
         } else {
-            this.element.textContent = this._value.toString();
+            this.element.textContent = this._value?.toString() ?? '-';
         }
     }
 
-    getValue (): Nullable<string> {
+    getValue (): Nullable<ValueType> {
         return this._value ?? null;
     }
 }

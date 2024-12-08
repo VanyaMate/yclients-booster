@@ -1,0 +1,8 @@
+.container {
+    & > img {
+        border        : 1px solid var(--border-color);
+        border-radius : var(--offset-small);
+        max-width     : 100%;
+        width         : 300px;
+    }
+}
