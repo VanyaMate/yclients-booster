@@ -18,7 +18,7 @@
         user-select : none;
         background  : repeating-linear-gradient(45deg, var(--bg-main), var(--bg-main) 20px, var(--bg-second) 20px, var(--bg-second) 25px);
 
-        button, select, input, label {
+        button, select, input, label, [data-is-input="true"] {
             pointer-events : none;
         }
 

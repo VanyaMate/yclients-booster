@@ -1,0 +1,34 @@
+.container {
+    display        : flex;
+    flex-direction : column;
+    gap            : var(--offset-extra-small);
+
+    .header {
+        display        : flex;
+        flex-direction : row;
+        gap            : var(--offset-small);
+
+        .label {
+            font-size : 12px;
+            color     : var(--color-dark-gray);
+        }
+
+        .value {
+            font-size   : 12px;
+            color       : var(--color-black);
+            font-weight : bold;
+        }
+    }
+
+    .input {
+        &::-webkit-slider-runnable-track {
+            background    : var(--bg-second);
+            border-radius : var(--offset-small);
+            padding       : var(--offset-small);
+        }
+
+        &::-webkit-slider-thumb {
+            cursor : pointer;
+        }
+    }
+}

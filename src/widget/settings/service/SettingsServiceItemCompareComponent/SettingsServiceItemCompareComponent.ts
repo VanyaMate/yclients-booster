@@ -45,6 +45,12 @@ import {
     ComparePriceWithSelectValue,
 } from '@/entity/compare/CompareValue/ComparePriceWithSelectValue/ComparePriceWithSelectValue.ts';
 import { SelectVariantType } from '@/shared/input/Select/Select.ts';
+import {
+    CompareDateValue,
+} from '@/entity/compare/CompareValue/CompareDateValue/CompareDateValue.ts';
+import {
+    CompareTimeRangeValue,
+} from '@/entity/compare/CompareValue/CompareTimeRangeValue/CompareTimeRangeValue.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -195,7 +201,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
                        ? this._clientService.abonement_restriction_value.toString()
                        : undefined,
                 label: this._clientService?.abonement_restriction_value
-                       ? 'Вкл' : 'Выкл',
+                       ? 'Да' : 'Нет',
             }),
             label           : 'Запретить онлайн запись без абонемента',
             validationMethod: (targetValue, clientValue) => {
@@ -218,7 +224,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
                        ? this._clientService.online_invoicing_status.toString()
                        : undefined,
                 label: this._clientService?.online_invoicing_status
-                       ? 'Вкл' : 'Выкл',
+                       ? 'Да' : 'Нет',
             }),
             label           : 'Онлайн запись',
             validationMethod: (targetValue, clientValue) => {
@@ -226,6 +232,36 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
                                    : clientValue === '0';
             },
         });
+
+        const timepickers: Array<ICompareComponent> = [
+            new CompareRow({
+                targetValue: new CompareDateValue({
+                    value: [],
+                }),
+                clientValue: new CompareTextValue({
+                    value: 'none',
+                }),
+                label      : 'Диапазон дат',
+            }),
+            new CompareRow({
+                targetValue: new CompareTimeRangeValue({
+                    value: [ 0, 0 ],
+                }),
+                clientValue: new CompareTextValue({
+                    value: 'none',
+                }),
+                label      : 'Начало с',
+            }),
+            new CompareRow({
+                targetValue: new CompareTimeRangeValue({
+                    value: [ 0, 0 ],
+                }),
+                clientValue: new CompareTextValue({
+                    value: 'none',
+                }),
+                label      : 'Конец до',
+            }),
+        ];
 
         this._compareRows = [
             new CompareBox({
@@ -317,6 +353,26 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
                             enableOnlinePrepaid,
                             ...onlinePrepaidComponents,
                             disableOnlineOrderWithoutAbonement,
+                            new CompareRow({
+                                targetValue: new CompareToggleValue({
+                                    value                   : !!this._targetService.dates.length || this._targetService.seance_search_start !== 0 || this._targetService.seance_search_finish !== 86400,
+                                    onChange                : (status) => {
+                                        timepickers.forEach((picker) => picker.enable(status));
+                                    },
+                                    executeOnChangeAfterInit: true,
+                                }),
+                                clientValue: new CompareTextValue({
+                                    value: this._clientService
+                                           ? (!!this._clientService?.dates.length || this._clientService?.seance_search_start !== 0 || this._clientService?.seance_search_finish !== 86400)
+                                           : undefined,
+                                    label: this._clientService
+                                           ? (!!this._clientService?.dates.length || this._clientService?.seance_search_start !== 0 || this._clientService?.seance_search_finish !== 86400)
+                                             ? 'Да' : 'Нет'
+                                           : undefined,
+                                }),
+                                label      : 'Услуга доступна ограниченное время',
+                            }),
+                            ...timepickers,
                         ],
                     }),
                 ],
