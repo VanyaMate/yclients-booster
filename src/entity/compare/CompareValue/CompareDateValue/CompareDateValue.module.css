@@ -1,4 +1,14 @@
 .container {
-    width     : 100%;
-    max-width : 300px;
+    width       : 100%;
+    max-width   : 300px;
+    user-select : none;
+    display     : inline-block;
+}
+
+.disable {
+    opacity : .6;
+
+    :global(.-day-) {
+        pointer-events : none;
+    }
 }

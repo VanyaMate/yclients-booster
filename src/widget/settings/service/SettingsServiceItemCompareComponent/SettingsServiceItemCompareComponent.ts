@@ -236,30 +236,73 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
         const timepickers: Array<ICompareComponent> = [
             new CompareRow({
                 targetValue: new CompareDateValue({
-                    value: [],
+                    value: [ this._targetService.date_from, this._targetService.date_to ],
+                    range: true,
                 }),
-                clientValue: new CompareTextValue({
-                    value: 'none',
+                clientValue: new CompareDateValue({
+                    value  : this._clientService
+                             ? [ this._clientService.date_from, this._clientService.date_to ]
+                             : undefined,
+                    range  : true,
+                    disable: true,
                 }),
                 label      : 'Диапазон дат',
             }),
             new CompareRow({
-                targetValue: new CompareTimeRangeValue({
-                    value: [ 0, 0 ],
+                targetValue     : new CompareTimeRangeValue({
+                    value: [
+                        Math.floor(this._targetService.seance_search_start / 60 / 60),
+                        Math.floor(this._targetService.seance_search_start / 60 % 60),
+                    ],
                 }),
-                clientValue: new CompareTextValue({
-                    value: 'none',
+                clientValue     : new CompareTextValue({
+                    value: this._clientService ?
+                           `${ Math.floor(this._clientService.seance_search_start / 60 / 60) }ч ${ Math.floor(this._clientService.seance_search_start / 60 % 60) }м`
+                                               : undefined,
                 }),
-                label      : 'Начало с',
+                label           : 'Время записи с',
+                validationMethod: (targetValue, clientValue) => {
+                    if (targetValue && clientValue) {
+                        return `${ targetValue[0] }ч ${ targetValue[1] }м` === clientValue;
+                    }
+
+                    return targetValue === clientValue;
+                },
             }),
             new CompareRow({
-                targetValue: new CompareTimeRangeValue({
-                    value: [ 0, 0 ],
+                targetValue     : new CompareTimeRangeValue({
+                    value: [
+                        Math.floor(this._targetService.seance_search_finish / 60 / 60),
+                        Math.floor(this._targetService.seance_search_finish / 60 % 60),
+                    ],
                 }),
-                clientValue: new CompareTextValue({
-                    value: 'none',
+                clientValue     : new CompareTextValue({
+                    value: this._clientService ?
+                           `${ Math.floor(this._clientService.seance_search_finish / 60 / 60) }ч ${ Math.floor(this._clientService.seance_search_finish / 60 % 60) }м`
+                                               : undefined,
                 }),
-                label      : 'Конец до',
+                label           : 'Время записи до',
+                validationMethod: (targetValue, clientValue) => {
+                    if (targetValue && clientValue) {
+                        return `${ targetValue[0] }ч ${ targetValue[1] }м` === clientValue;
+                    }
+
+                    return targetValue === clientValue;
+                },
+            }),
+            new CompareRow({
+                targetValue: new CompareDateValue({
+                    value        : this._targetService.dates,
+                    range        : false,
+                    multipleDates: true,
+                }),
+                clientValue: new CompareDateValue({
+                    value        : this._clientService?.dates,
+                    range        : false,
+                    multipleDates: true,
+                    disable      : true,
+                }),
+                label      : 'Выбор дат',
             }),
         ];
 

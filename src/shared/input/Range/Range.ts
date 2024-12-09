@@ -28,8 +28,11 @@ export class Range extends Component<HTMLDivElement> {
 
         this._input = new Component<HTMLInputElement>('input', {
             ...other,
-            type : 'range',
-            value: other.value ?? other.min ?? '0',
+            type   : 'range',
+            value  : other.value ?? other.min ?? '0',
+            oninput: () => {
+                onChange?.(this.getValue());
+            },
         });
         this._input.element.classList.add(css.input);
         this._input.insert(this.element, 'afterbegin');
@@ -58,6 +61,10 @@ export class Range extends Component<HTMLDivElement> {
                 this._showValue!.element.textContent = this._input.element.value;
             });
         }
+    }
+
+    get input () {
+        return this._input;
     }
 
     getValue (): number {
