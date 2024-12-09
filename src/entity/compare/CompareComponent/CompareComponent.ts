@@ -11,7 +11,7 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import {
-    ICompareHeader
+    ICompareHeader,
 } from '@/entity/compare/CompareHeader/CompareHeader.interface.ts';
 
 
@@ -19,6 +19,13 @@ export type CompareComponentProps =
     ComponentPropsOptional<HTMLDivElement>
     & {};
 
+/**
+ * Для кастомных нужен:
+ * 1. Список всех клиента "clientItems"
+ * 2. Один таргетный "targetItem"
+ * 3. clientId
+ * 4. bearer?
+ */
 export abstract class CompareComponent extends Component<HTMLDivElement> implements ICompareComponent {
     protected _header?: ICompareHeader;
     protected _compareRows: Array<ICompareComponent>     = [];
@@ -84,4 +91,6 @@ export abstract class CompareComponent extends Component<HTMLDivElement> impleme
             this._header?.setValidationType(CompareResult.VALID);
         }
     }
+
+    protected abstract _render (): void;
 }
