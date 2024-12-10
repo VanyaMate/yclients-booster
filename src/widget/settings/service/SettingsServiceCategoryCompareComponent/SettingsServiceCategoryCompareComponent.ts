@@ -140,7 +140,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent im
         return this._serviceComponents.every((component) => component.isValid);
     }
 
-    private _render () {
+    protected _render () {
         this.element.innerHTML = ``;
         this._compareChildren  = [
             new CompareBox({

@@ -40,9 +40,9 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
         throw new Error('Method not implemented.');
     }
 
-    public getAction (): Promise<ResourceInstance> {
+    public getAction () {
         if (this._enabled) {
-
+            console.log(this._clientId);
         }
     }
 

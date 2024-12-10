@@ -153,7 +153,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
         };
     }
 
-    private _render () {
+    protected _render () {
         this.element.innerHTML = ``;
 
         const prepaidTargetPercents                                 = this._targetService.price_prepaid_amount === 0;

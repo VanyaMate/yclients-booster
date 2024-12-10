@@ -21,4 +21,7 @@ export class ResourcesCompareComponent extends CompareComponent {
     public get isValid (): boolean {
         throw new Error('Method not implemented.');
     }
+
+    protected _render (): void {
+    }
 }

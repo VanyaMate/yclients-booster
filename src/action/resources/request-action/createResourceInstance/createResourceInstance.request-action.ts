@@ -7,6 +7,7 @@ import {
 
 // я растроен :(
 export const createResourceInstanceRequestAction = async function (resourceId: string, createData: ResourceInstanceCreateData, logger?: ILogger): Promise<ResourceInstance> {
+    logger?.log('tets');
     const formData = new FormData();
     formData.append('title', createData.title);
     return fetch(`https://yclients.com/resource_instances/save/${ resourceId }/0`, {

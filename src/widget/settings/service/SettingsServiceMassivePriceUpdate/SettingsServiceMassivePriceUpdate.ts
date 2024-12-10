@@ -156,6 +156,7 @@ export class SettingsServiceMassivePriceUpdate extends Component<HTMLDivElement>
             if (service) {
                 const cardIds: Set<number> = new Set();
                 service.staff.forEach((staff) => cardIds.add(staff.technological_card_id));
+                // Удаление card с id === 0
                 cardIds.delete(0);
 
                 compareData[data.id] = {
