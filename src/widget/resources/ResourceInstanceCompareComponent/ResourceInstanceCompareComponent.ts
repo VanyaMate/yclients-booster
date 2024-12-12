@@ -11,39 +11,60 @@ import {
 import {
     CompareTextValue,
 } from '@/entity/compare/CompareValue/CompareTextValue/CompareTextValue.ts';
+import {
+    createResourceInstanceRequestAction,
+} from '@/action/resources/request-action/createResourceInstance/createResourceInstance.request-action.ts';
+import {
+    uploadResourceInstancesRequestAction,
+} from '@/action/resources/request-action/uploadResourceInstances/uploadResourceInstances.request-action.ts';
 
+
+type AsyncCallback = (data: any) => Promise<any>;
 
 export type ResourceInstanceCompareComponentProps =
     CompareComponentProps
     & {
-        clientId: string;
+        resourceId: string;
         clientInstances: Array<ResourceInstance>;
         targetInstance: ResourceInstance;
     };
 
 export class ResourceInstanceCompareComponent extends CompareComponent {
+    private readonly _resourceId: string;
     private _clientInstances: Array<ResourceInstance>;
     private _targetInstance: ResourceInstance;
     private _clientInstance?: ResourceInstance;
-    private _clientId: string;
 
     constructor (props: ResourceInstanceCompareComponentProps) {
-        const { clientId, clientInstances, targetInstance, ...other } = props;
+        const { resourceId, clientInstances, targetInstance, ...other } = props;
         super(other);
-        this._clientId        = clientId;
+        this._resourceId      = resourceId;
         this._clientInstances = clientInstances;
         this._targetInstance  = targetInstance;
         this._clientInstance  = this._clientInstances.find((instance) => instance.title === targetInstance.title);
     }
 
     public get isValid (): boolean {
-        throw new Error('Method not implemented.');
+        if (this._enabled) {
+            return true;
+        }
+
+        return true;
     }
 
-    public getAction () {
+    public getActions (): Array<AsyncCallback> {
         if (this._enabled) {
-            console.log(this._clientId);
+            return [
+                async () => createResourceInstanceRequestAction(this._resourceId, { title: this._targetInstance.title }),
+                async () => uploadResourceInstancesRequestAction(this._resourceId),
+                async (resourceInstances: Array<ResourceInstance>) => {
+                    console.log(resourceInstances.find((resource) => resource.title === this._targetInstance.title), resourceInstances, this._targetInstance.title);
+                    return;
+                },
+            ];
         }
+
+        return [];
     }
 
     protected _render (): void {
@@ -59,6 +80,9 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
                             type       : 'text',
                             value      : this._targetInstance.title,
                             placeholder: 'Пусто',
+                            onInput    : (title) => {
+                                this._targetInstance.title = title;
+                            },
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientInstance?.title,

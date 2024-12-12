@@ -11,16 +11,26 @@ export type TextInputType =
     | 'password'
     | 'email';
 
+export type TextInputHandler = (input: string) => void;
+
 export type TextInputProps =
     Omit<ComponentPropsOptional<HTMLInputElement>, 'type'>
     & {
         type: TextInputType;
+        onInput?: TextInputHandler;
     };
 
 export class TextInput extends Component<HTMLInputElement> {
     constructor (props: TextInputProps) {
-        super('input', props);
+        const { onInput, ...other } = props;
+        super('input', other);
         this.element.classList.add(css.container);
+
+        if (onInput) {
+            this.element.addEventListener('input', (event) => {
+                onInput(((event.target) as HTMLInputElement).value);
+            });
+        }
     }
 
     getValue (): string {
@@ -30,6 +40,11 @@ export class TextInput extends Component<HTMLInputElement> {
     setValue (value: string): void {
         this.element.value = value;
         this.element.dispatchEvent(new CustomEvent('change', {
+            detail: {
+                target: this.element,
+            },
+        }));
+        this.element.dispatchEvent(new CustomEvent('input', {
             detail: {
                 target: this.element,
             },
