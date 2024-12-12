@@ -1,5 +1,5 @@
-export const fetchResponseToDom = async function (request: Response): Promise<Document> {
-    return request
+export const fetchResponseToDom = async function (response: Response): Promise<Document> {
+    return response
         .text()
         .then((text: string) => {
             const domParser = new DOMParser();
