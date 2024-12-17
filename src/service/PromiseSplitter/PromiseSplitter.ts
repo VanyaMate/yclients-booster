@@ -6,17 +6,18 @@ import {
 export type PromiseSplitterExecInitItem = {
     chain: PromiseSplitterChain;
     onBefore?: () => void;
-    onSuccess?: () => void;
+    onSuccess?: (data: unknown) => void;
     onError?: () => void;
     onFinally?: () => void;
 }
-export type PromiseSplitterChain = Array<(data: any) => Promise<any>>;
+export type PromiseSplitterChain = Array<(data: unknown) => Promise<unknown>>;
 
 export class PromiseSplitter {
     private _chains: Array<PromiseSplitterExecInitItem> = [];
     private _finishedChains: number                     = 0;
     private _chainsIsActive: boolean                    = false;
     private _activeChainIndex: number                   = 0;
+    private _response: Array<unknown>                   = [];
 
     constructor (
         private readonly _limit: number,
@@ -24,8 +25,8 @@ export class PromiseSplitter {
     ) {
     }
 
-    async exec (chains: Array<PromiseSplitterExecInitItem>): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
+    async exec (chains: Array<PromiseSplitterExecInitItem>): Promise<Array<unknown>> {
+        return new Promise<Array<unknown>>((resolve, reject) => {
             if (this._chainsIsActive) {
                 reject(new Error(ERROR_PROMISE_SPLITTER_IS_ACTIVE));
             }
@@ -41,13 +42,17 @@ export class PromiseSplitter {
         });
     }
 
-    private async _nextChain (resolve: () => void) {
-        const chain = this._chains[this._activeChainIndex++];
+    private async _nextChain (resolve: (response: Array<unknown>) => void) {
+        const index = this._activeChainIndex++;
+        const chain = this._chains[index];
 
         if (chain) {
             chain.onBefore?.();
             this._nextChainItem(null, chain.chain, 0, 0)
-                .then(() => chain.onSuccess?.())
+                .then((data: unknown) => {
+                    this._response[index] = data;
+                    chain.onSuccess?.(data);
+                })
                 .catch(() => chain.onError?.())
                 .finally(() => {
                     chain.onFinally?.();
@@ -56,11 +61,11 @@ export class PromiseSplitter {
                 });
         } else if (this._finishedChains === this._chains.length) {
             this._chainsIsActive = false;
-            resolve();
+            resolve(this._response);
         }
     }
 
-    private async _nextChainItem (data: any, chain: PromiseSplitterChain, index: number, retry: number = 0): Promise<any> {
+    private async _nextChainItem (data: unknown, chain: PromiseSplitterChain, index: number, retry: number = 0): Promise<unknown> {
         if (retry > this._retry) {
             throw new Error(ERROR_PROMISE_SPLITTER_NO_RETRIES);
         }
@@ -72,5 +77,7 @@ export class PromiseSplitter {
                 .then((data: any) => this._nextChainItem(data, chain, index + 1, 0))
                 .catch(() => this._nextChainItem(data, chain, index, retry + 1));
         }
+
+        return data;
     }
 }

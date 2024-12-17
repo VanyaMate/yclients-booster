@@ -185,7 +185,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
                 },
             }),
         ];
-        const disableOnlineOrderWithoutAbonement: ICompareComponent = new CompareRow<boolean, string>({
+        const disableOnlineOrderWithoutAbonement: ICompareComponent = new CompareRow({
             targetValue     : new CompareToggleValue({
                 value                   : this._targetService.abonement_restriction_value === 1,
                 onChange                : (status) => {
@@ -210,7 +210,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
             },
         });
 
-        const enableOnlinePrepaid: ICompareComponent = new CompareRow<boolean, string>({
+        const enableOnlinePrepaid: ICompareComponent = new CompareRow({
             targetValue     : new CompareToggleValue({
                 value                   : !!this._targetService.online_invoicing_status,
                 onChange                : (status) => {

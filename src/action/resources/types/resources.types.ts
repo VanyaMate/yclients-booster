@@ -28,3 +28,8 @@ export type ResourceCreateData = {
     title: string;
     description: string;
 }
+
+export type ResourceUpdateData = {
+    title: string;
+    description: string;
+}

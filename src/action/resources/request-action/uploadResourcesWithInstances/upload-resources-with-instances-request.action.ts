@@ -8,7 +8,7 @@ import {
 } from '@/action/resources/request-action/uploadResourceInstances/uploadResourceInstances.request-action.ts';
 
 
-export const uploadResourcesRequestAction = async function (clientId: string, logger?: ILogger): Promise<Array<Resource>> {
+export const uploadResourcesWithInstancesRequestAction = async function (clientId: string, logger?: ILogger): Promise<Array<Resource>> {
     logger?.log(`получение ресурсов клиента "${ clientId }"`);
     return fetch(`https://yclients.com/resources/${ clientId }`, {
         method: 'GET',

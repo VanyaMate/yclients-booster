@@ -3,12 +3,14 @@ import {
     ResourceInstanceUpdateData,
 } from '@/action/resources/types/resources.types.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
+import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
+import { Fetch } from '@/service/Fetcher/implementations/Fetch.ts';
 
 
-export const updateResourceInstanceRequestAction = async function (resourceId: string, instanceId: string, updateData: ResourceInstanceUpdateData, logger?: ILogger): Promise<ResourceInstance> {
+export const updateResourceInstanceRequestAction = async function (resourceId: string, instanceId: string, updateData: ResourceInstanceUpdateData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<ResourceInstance> {
     logger?.log(`обновление данных эксемляра "${ instanceId }" ресурса "${ resourceId }"`);
 
-    return fetch(`https://yclients.com/resource_instances/save/${ resourceId }/${ instanceId }`, {
+    return fetcher.fetch(`https://yclients.com/resource_instances/save/${ resourceId }/${ instanceId }`, {
         method: `POST`,
     })
         .then((response) => {

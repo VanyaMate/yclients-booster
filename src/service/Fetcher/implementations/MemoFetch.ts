@@ -4,7 +4,7 @@ import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 export class MemoFetch implements IFetcher {
     private _cache: Record<string, Promise<Response>> = {};
 
-    fetch (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> {
+    async fetch (requestInfo: RequestInfo, requestInit: RequestInit): Promise<Response> {
         const method: string    = requestInit.method ?? 'GET';
         const url: string       = typeof requestInfo === 'string' ? requestInfo
                                                                   : requestInfo.url;

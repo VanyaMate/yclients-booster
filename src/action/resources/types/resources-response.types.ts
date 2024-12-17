@@ -3,5 +3,6 @@ export type ResourcesResponse = {
     success: boolean,
     meta: {
         count: number;
+        message: string;
     }
 }

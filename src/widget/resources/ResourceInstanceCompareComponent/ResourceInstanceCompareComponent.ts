@@ -25,6 +25,7 @@ import {
 import {
     updateResourceInstanceRequestAction,
 } from '@/action/resources/request-action/updateResourceInstance/updateResourceInstance.request-action.ts';
+import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 
 
 export type ResourceInstanceCompareComponentProps =
@@ -35,11 +36,13 @@ export type ResourceInstanceCompareComponentProps =
         targetInstance: ResourceInstance;
         promiseSplitterRetry?: number;
         logger?: ILogger;
+        fetcher?: IFetcher;
     };
 
 export class ResourceInstanceCompareComponent extends CompareComponent {
     private readonly _resourceId: string;
     private readonly _logger?: ILogger;
+    private readonly _fetcher?: IFetcher;
     private readonly _promiseSplitter: PromiseSplitter;
     private readonly _clientInstances: Array<ResourceInstance>;
     private readonly _targetInstance: ResourceInstance;
@@ -52,6 +55,7 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
                   targetInstance,
                   promiseSplitterRetry = 1,
                   logger,
+                  fetcher,
                   ...other
               } = props;
         super(other);
@@ -61,22 +65,32 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
         this._clientInstance  = this._clientInstances.find((instance) => instance.title === targetInstance.title);
         this._promiseSplitter = new PromiseSplitter(1, promiseSplitterRetry);
         this._logger          = logger;
+        this._fetcher         = fetcher;
     }
 
     public get isValid (): boolean {
         if (this._enabled) {
-            return true;
+            return (
+                this._targetInstance.title === this._clientInstance?.title &&
+                this._compareRows.every((component) => component.isValid)
+            );
         }
 
         return true;
     }
 
-    public getAction (): () => Promise<ResourceInstance | null> {
+    public getAction (resourceId: string = this._resourceId): () => Promise<ResourceInstance | null> {
         if (this._enabled) {
             if (this._clientInstance) {
                 // update
                 return async () => {
-                    return await updateResourceInstanceRequestAction(this._resourceId, this._clientInstance!.id, { title: this._targetInstance.title }, this._logger);
+                    return await updateResourceInstanceRequestAction(
+                        resourceId,
+                        this._clientInstance!.id,
+                        { title: this._targetInstance.title },
+                        this._fetcher,
+                        this._logger,
+                    );
                 };
             } else {
                 // create
@@ -86,10 +100,10 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
                     await this._promiseSplitter.exec([
                         {
                             chain: [
-                                async () => createResourceInstanceRequestAction(this._resourceId, { title: this._targetInstance.title }, this._logger),
-                                async () => uploadResourceInstancesRequestAction(this._resourceId, this._logger),
-                                async (instances: Array<ResourceInstance>) => {
-                                    resourceInstance = await findLastResourceInstanceByTitleAction(instances, this._targetInstance.title);
+                                async () => createResourceInstanceRequestAction(resourceId, { title: this._targetInstance.title }, this._fetcher, this._logger),
+                                async () => uploadResourceInstancesRequestAction(resourceId, this._logger),
+                                async (instances: unknown) => {
+                                    resourceInstance = await findLastResourceInstanceByTitleAction(instances as Array<ResourceInstance>, this._targetInstance.title);
                                 },
                             ],
                         },

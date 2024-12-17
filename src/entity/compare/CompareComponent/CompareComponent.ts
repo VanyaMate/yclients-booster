@@ -25,6 +25,8 @@ export type CompareComponentProps =
  * 2. Один таргетный "targetItem"
  * 3. clientId
  * 4. bearer?
+ * 5. logger?
+ * 6. fetcher?
  */
 export abstract class CompareComponent extends Component<HTMLDivElement> implements ICompareComponent {
     protected _header?: ICompareHeader;

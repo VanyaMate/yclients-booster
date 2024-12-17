@@ -5,16 +5,19 @@ import {
 import {
     ResourcesResponse,
 } from '@/action/resources/types/resources-response.types.ts';
+import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
+import { Fetch } from '@/service/Fetcher/implementations/Fetch.ts';
 
 
-export const createResourceInstanceRequestAction = async function (resourceId: string, createData: ResourceInstanceCreateData, logger?: ILogger): Promise<boolean> {
+export const createResourceInstanceRequestAction = async function (resourceId: string, createData: ResourceInstanceCreateData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<boolean> {
     logger?.log(`создание экземпляра ресурса "${ createData.title }" для "${ resourceId }"`);
 
     const formData = new FormData();
     formData.append('title', createData.title);
 
-    return fetch(`https://yclients.com/resource_instances/save/${ resourceId }/0`, {
-        method: 'POST', body: formData,
+    return fetcher.fetch(`https://yclients.com/resource_instances/save/${ resourceId }/0`, {
+        method: 'POST',
+        body  : formData,
     })
         .then((response) => response.json())
         .then((data: ResourcesResponse) => {
