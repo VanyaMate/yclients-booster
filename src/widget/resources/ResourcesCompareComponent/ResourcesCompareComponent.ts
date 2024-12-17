@@ -58,6 +58,8 @@ export class ResourcesCompareComponent extends CompareComponent {
             promiseSplitter?.limit ?? PROMISE_SPLITTER_MAX_REQUESTS,
             promiseSplitter?.retry ?? PROMISE_SPLITTER_MAX_RETRY,
         );
+
+        this._render();
     }
 
     public get isValid (): boolean {

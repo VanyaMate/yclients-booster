@@ -79,7 +79,7 @@ export class GetGoodsCategoriesIdsTable extends Component<HTMLDivElement> {
                     return {
                         chain    : [
                             async () => getGoodsCategoryRequestAction(this._clientId, categoryMeta.id),
-                            async (data: GoodsCategoryFullData) => this._table.updateRow(index, [ data.title, data.id ]),
+                            async (data: unknown) => this._table.updateRow(index, [ (data as GoodsCategoryFullData).title, (data as GoodsCategoryFullData).id ]),
                         ],
                         onBefore : () => {
                             this._logger.log(`обновление данных категории "${ categoryMeta.title }"`);

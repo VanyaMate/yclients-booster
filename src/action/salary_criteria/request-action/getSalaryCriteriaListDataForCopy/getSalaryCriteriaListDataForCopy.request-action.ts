@@ -38,8 +38,8 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
         list.map((item) => ({
             chain: [
                 async () => getSalaryCriteriaRequestAction(clientId, item.id, logger),
-                async (data: SalaryCriteriaFullData) => {
-                    dataForCopy.criteriaList.push(data);
+                async (data: unknown) => {
+                    dataForCopy.criteriaList.push(data as SalaryCriteriaFullData);
                     return data;
                 },
             ],
@@ -62,11 +62,14 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
                 return {
                     chain: [
                         async () => getSettingsServicesByCategoryRequestAction(bearer, clientId, category.id.toString(), logger),
-                        async (response: SettingsServiceItemApiResponse) => {
-                            data.children = response.data;
-                            response.data.forEach((service) => {
-                                dataForCopy.settingsCopyData.servicesMapper[service.id.toString()] = service;
-                            });
+                        async (response: unknown) => {
+                            // ну и дичь :D
+                            if (((val): val is SettingsServiceItemApiResponse => !!val)(response)) {
+                                data.children = response.data;
+                                response.data.forEach((service) => {
+                                    dataForCopy.settingsCopyData.servicesMapper[service.id.toString()] = service;
+                                });
+                            }
                         },
                     ],
                 };

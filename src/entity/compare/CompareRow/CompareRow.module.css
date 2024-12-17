@@ -6,7 +6,7 @@
     transition     : var(--transition-fast);
 
     &.disabled {
-        background : repeating-linear-gradient(45deg, var(--bg-main), var(--bg-main) 20px, var(--bg-second) 20px, var(--bg-second) 25px);
+        background : repeating-linear-gradient(45deg, transparent, transparent 20px, var(--color-dark-black-opacity-hard) 20px, var(--color-dark-black-opacity-hard) 25px);
 
         button, select, input, label, [data-is-input="true"] {
             pointer-events : none;

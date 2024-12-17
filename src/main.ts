@@ -28,6 +28,7 @@ import {
     isSettingsServicePage,
     settingsServicePageHandler,
 } from '@/pages/settings/service';
+import { isResourcesPage, resourcesPageHandler } from '@/pages/resources';
 
 
 const pathParts = location.pathname.split('/');
@@ -46,6 +47,8 @@ if (isGoodsPage(pathParts)) {
     onlineBookingFormPageHandler();
 } else if (isSettingsServicePage(pathParts)) {
     settingsServicePageHandler(pathParts);
+} else if (isResourcesPage(pathParts)) {
+    resourcesPageHandler(pathParts);
 }
 
 commonPageHandler();

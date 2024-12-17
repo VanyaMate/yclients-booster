@@ -26,6 +26,8 @@ import {
     updateResourceInstanceRequestAction,
 } from '@/action/resources/request-action/updateResourceInstance/updateResourceInstance.request-action.ts';
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
+import { CompareType } from '@/entity/compare/Compare.types.ts';
+import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 
 
 export type ResourceInstanceCompareComponentProps =
@@ -66,6 +68,9 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
         this._promiseSplitter = new PromiseSplitter(1, promiseSplitterRetry);
         this._logger          = logger;
         this._fetcher         = fetcher;
+
+        this.element.addEventListener(CompareEvent.type, this._revalidate.bind(this, this._clientInstance));
+        this._render();
     }
 
     public get isValid (): boolean {
@@ -144,18 +149,24 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
         ];
 
         this._header = new CompareHeader({
-            targetHeaderData: this._targetInstance.title,
-            clientHeaderData: this._clientInstance?.title,
-            label           : 'Экземпляр',
-            rows            : this._compareRows,
-            variants        : this._clientInstances.map((instance) => ({
+            targetHeaderData      : this._targetInstance.title,
+            clientHeaderData      : this._clientInstance?.title,
+            label                 : 'Экземпляр',
+            rows                  : this._compareRows,
+            variants              : this._clientInstances.map((instance) => ({
                 label   : instance.title,
                 value   : instance.id,
                 selected: instance.id === this._clientInstance?.id,
             })),
-            onVariantChange : ((instanceVariant) => {
+            onVariantChange       : ((instanceVariant) => {
                 this._clientInstance = this._clientInstances.find((instance) => instance.id === instanceVariant.value);
+                this._render();
+                this.element.dispatchEvent(CompareEvent);
             }),
+            onActivateAll         : () => this._setCompareType(CompareType.ALL),
+            onActivateOnlyItem    : () => this._setCompareType(CompareType.ITEM),
+            onActivateOnlyChildren: () => this._setCompareType(CompareType.CHILDREN),
+            onDeactivate          : () => this._setCompareType(CompareType.NONE),
         });
 
         this._header.insert(this.element, 'afterbegin');
