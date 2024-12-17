@@ -11,15 +11,18 @@ import {
 import {
     CompareTextValue,
 } from '@/entity/compare/CompareValue/CompareTextValue/CompareTextValue.ts';
+import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 import {
     createResourceInstanceRequestAction,
 } from '@/action/resources/request-action/createResourceInstance/createResourceInstance.request-action.ts';
+import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import {
     uploadResourceInstancesRequestAction,
 } from '@/action/resources/request-action/uploadResourceInstances/uploadResourceInstances.request-action.ts';
+import {
+    findLastResourceInstanceByTitleAction,
+} from '@/action/resources/action/findLastResourceInstanceByTitle.action.ts';
 
-
-type AsyncCallback = (data: any) => Promise<any>;
 
 export type ResourceInstanceCompareComponentProps =
     CompareComponentProps
@@ -27,6 +30,8 @@ export type ResourceInstanceCompareComponentProps =
         resourceId: string;
         clientInstances: Array<ResourceInstance>;
         targetInstance: ResourceInstance;
+        promiseSplitterRetry?: number;
+        logger?: ILogger;
     };
 
 export class ResourceInstanceCompareComponent extends CompareComponent {
@@ -34,14 +39,25 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
     private _clientInstances: Array<ResourceInstance>;
     private _targetInstance: ResourceInstance;
     private _clientInstance?: ResourceInstance;
+    private _logger?: ILogger;
+    private _promiseSplitter: PromiseSplitter;
 
     constructor (props: ResourceInstanceCompareComponentProps) {
-        const { resourceId, clientInstances, targetInstance, ...other } = props;
+        const {
+                  resourceId,
+                  clientInstances,
+                  targetInstance,
+                  promiseSplitterRetry = 1,
+                  logger,
+                  ...other
+              } = props;
         super(other);
         this._resourceId      = resourceId;
         this._clientInstances = clientInstances;
         this._targetInstance  = targetInstance;
         this._clientInstance  = this._clientInstances.find((instance) => instance.title === targetInstance.title);
+        this._promiseSplitter = new PromiseSplitter(1, promiseSplitterRetry);
+        this._logger          = logger;
     }
 
     public get isValid (): boolean {
@@ -52,19 +68,33 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
         return true;
     }
 
-    public getActions (): Array<AsyncCallback> {
+    public getAction (): () => Promise<ResourceInstance | null> {
         if (this._enabled) {
-            return [
-                async () => createResourceInstanceRequestAction(this._resourceId, { title: this._targetInstance.title }),
-                async () => uploadResourceInstancesRequestAction(this._resourceId),
-                async (resourceInstances: Array<ResourceInstance>) => {
-                    console.log(resourceInstances.find((resource) => resource.title === this._targetInstance.title), resourceInstances, this._targetInstance.title);
-                    return;
-                },
-            ];
+            if (this._clientInstance) {
+                // update
+            } else {
+                // create
+                return async () => {
+                    let resourceInstance: ResourceInstance | null = null;
+
+                    await this._promiseSplitter.exec([
+                        {
+                            chain: [
+                                async () => createResourceInstanceRequestAction(this._resourceId, { title: this._targetInstance.title }, this._logger),
+                                async () => uploadResourceInstancesRequestAction(this._resourceId, this._logger),
+                                async (instances: Array<ResourceInstance>) => {
+                                    resourceInstance = await findLastResourceInstanceByTitleAction(instances, this._targetInstance.title);
+                                },
+                            ],
+                        },
+                    ]);
+
+                    return resourceInstance;
+                };
+            }
         }
 
-        return [];
+        return async () => null;
     }
 
     protected _render (): void {
