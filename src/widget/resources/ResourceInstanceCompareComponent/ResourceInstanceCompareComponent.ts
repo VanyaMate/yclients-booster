@@ -73,17 +73,6 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
         this._render();
     }
 
-    public get isValid (): boolean {
-        if (this._enabled) {
-            return (
-                this._targetInstance.title === this._clientInstance?.title &&
-                this._compareRows.every((component) => component.isValid)
-            );
-        }
-
-        return true;
-    }
-
     public getAction (resourceId: string = this._resourceId): () => Promise<ResourceInstance | null> {
         if (this._enabled) {
             if (this._clientInstance) {

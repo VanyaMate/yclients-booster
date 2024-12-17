@@ -42,7 +42,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
     private readonly _processButton: Component<HTMLDivElement>;
     private _currentTargetHeader: string;
     private _isValid: boolean;
-    private _validating: boolean = true;
+    private _enabled: boolean = true;
 
     constructor (props: CompareHeaderProps) {
         const {
@@ -154,7 +154,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
     }
 
     get isValid (): boolean {
-        if (this._validating) {
+        if (this._enabled) {
             return this._isValid;
         }
 
@@ -162,7 +162,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
     }
 
     enable (status: boolean): void {
-        this._validating = status;
+        this._enabled = status;
 
         if (status) {
             this.element.classList.remove(css.disable);

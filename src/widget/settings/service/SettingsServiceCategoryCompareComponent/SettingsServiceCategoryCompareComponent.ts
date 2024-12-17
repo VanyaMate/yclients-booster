@@ -84,20 +84,10 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent im
         this._render();
     }
 
-    get isValid () {
-        if (this._enabled) {
-            return (
-                this._currentCategoryIsValid() &&
-                this._childrenIsValid()
-            );
-        }
-        return true;
-    }
-
     getAction (): () => Promise<void> {
         return async () => {
             if (this._clientCategory !== undefined) {
-                if (this._currentCategoryIsValid()) {
+                if (this._headerIsValid() && this._rowsIsValid()) {
                     if (this._childrenIsValid()) {
                         console.log('NOTHING');
                     } else {
@@ -126,18 +116,6 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent im
 
             return;
         };
-    }
-
-    private _currentCategoryIsValid () {
-        return (
-            this._clientCategory !== undefined &&
-            (this._header?.isValid ?? false) &&
-            this._compareRows.every((component) => component.isValid)
-        );
-    }
-
-    private _childrenIsValid () {
-        return this._serviceComponents.every((component) => component.isValid);
     }
 
     protected _render () {

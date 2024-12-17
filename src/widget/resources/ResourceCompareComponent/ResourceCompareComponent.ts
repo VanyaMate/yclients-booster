@@ -85,24 +85,15 @@ export class ResourceCompareComponent extends CompareComponent {
         this._render();
     }
 
-    public get isValid (): boolean {
-        if (this._enabled) {
-            return (
-                this._targetResource.title === this._clientResource?.title &&
-                this._compareRows.every((component) => component.isValid) &&
-                this._compareChildren.every((component) => component.isValid)
-            );
-        }
-
-        return true;
-    }
-
     public getAction (): () => Promise<Resource | null> {
         if (this._enabled) {
             if (this._clientResource) {
                 // update
+                // 1. if header || rows not valid -> update
+                // 2. if children not valid -> update
+
                 return async () => {
-                    return await updateResourceRequestAction(
+                    const resource = await updateResourceRequestAction(
                         this._clientId,
                         this._clientResource!.id,
                         {
@@ -112,6 +103,15 @@ export class ResourceCompareComponent extends CompareComponent {
                         this._fetcher,
                         this._logger,
                     );
+
+                    const instances: Array<unknown> = await this._promiseSplitter.exec(
+                        this._resourceInstancesCompareComponents.map(
+                            (component) => ({ chain: [ component.getAction(resource.id) ] }),
+                        ),
+                    );
+
+                    resource.instances = instances.filter(Boolean) as Array<ResourceInstance>;
+                    return resource;
                 };
             } else {
                 // create

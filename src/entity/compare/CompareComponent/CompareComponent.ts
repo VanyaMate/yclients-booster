@@ -40,8 +40,6 @@ export abstract class CompareComponent extends Component<HTMLDivElement> impleme
         this.element.classList.add(css.container);
     }
 
-    public abstract get isValid (): boolean;
-
     public enable (status: boolean): void {
         this._enabled = status;
 
@@ -50,6 +48,56 @@ export abstract class CompareComponent extends Component<HTMLDivElement> impleme
         } else {
             this.element.classList.add(css.disable);
         }
+    }
+
+    public get isValid () {
+        if (this._enabled) {
+            switch (this._compareType) {
+                case CompareType.ALL:
+                    return (
+                        this._header!.isValid &&
+                        this._compareRows.every((row) => row.isValid) &&
+                        this._compareChildren.every((child) => child.isValid)
+                    );
+                case CompareType.ITEM:
+                    return (
+                        this._header!.isValid &&
+                        this._compareRows.every((row) => row.isValid)
+                    );
+                case CompareType.CHILDREN:
+                    return (
+                        this._compareChildren.every((child) => child.isValid)
+                    );
+                default:
+                    return true;
+            }
+        }
+
+        return true;
+    }
+
+    protected _headerIsValid () {
+        if (this._header && this._enabled && this._compareType === CompareType.ITEM || this._compareType === CompareType.ALL) {
+            return this._header?.isValid;
+        }
+
+        return true;
+    }
+
+    protected _rowsIsValid () {
+        if (this._enabled && this._compareType === CompareType.ITEM || this._compareType === CompareType.ALL) {
+            return this._compareChildren.every((component) => component.isValid);
+        }
+
+        return true;
+    }
+
+    protected _childrenIsValid () {
+        if (this._enabled && this._compareType === CompareType.CHILDREN || this._compareType === CompareType.ALL) {
+            return this._compareChildren.every((component) => component.isValid);
+        }
+
+        return true;
     }
 
     protected _setCompareType (value: CompareType): void {
