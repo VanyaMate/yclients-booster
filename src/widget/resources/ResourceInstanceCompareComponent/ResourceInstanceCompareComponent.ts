@@ -22,6 +22,9 @@ import {
 import {
     findLastResourceInstanceByTitleAction,
 } from '@/action/resources/action/findLastResourceInstanceByTitle.action.ts';
+import {
+    updateResourceInstanceRequestAction,
+} from '@/action/resources/request-action/updateResourceInstance/updateResourceInstance.request-action.ts';
 
 
 export type ResourceInstanceCompareComponentProps =
@@ -36,11 +39,11 @@ export type ResourceInstanceCompareComponentProps =
 
 export class ResourceInstanceCompareComponent extends CompareComponent {
     private readonly _resourceId: string;
-    private _clientInstances: Array<ResourceInstance>;
-    private _targetInstance: ResourceInstance;
+    private readonly _logger?: ILogger;
+    private readonly _promiseSplitter: PromiseSplitter;
+    private readonly _clientInstances: Array<ResourceInstance>;
+    private readonly _targetInstance: ResourceInstance;
     private _clientInstance?: ResourceInstance;
-    private _logger?: ILogger;
-    private _promiseSplitter: PromiseSplitter;
 
     constructor (props: ResourceInstanceCompareComponentProps) {
         const {
@@ -72,6 +75,9 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
         if (this._enabled) {
             if (this._clientInstance) {
                 // update
+                return async () => {
+                    return await updateResourceInstanceRequestAction(this._resourceId, this._clientInstance!.id, { title: this._targetInstance.title }, this._logger);
+                };
             } else {
                 // create
                 return async () => {

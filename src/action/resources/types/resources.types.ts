@@ -20,6 +20,10 @@ export type ResourceInstanceCreateData = {
     title: string;
 }
 
+export type ResourceInstanceUpdateData = {
+    title: string;
+}
+
 export type ResourceCreateData = {
     title: string;
     description: string;
