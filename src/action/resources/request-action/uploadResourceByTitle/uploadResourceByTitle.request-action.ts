@@ -23,10 +23,11 @@ export const uploadResourceByTitleRequestAction = async function (clientId: stri
                 let _title;
                 let id;
 
-                for (let i = resourcesRows.length; i >= 0; i--) {
+                for (let i = resourcesRows.length - 1; i >= 0; i--) {
                     resourceRow        = resourcesRows[i];
                     link               = resourceRow.children[1]?.querySelector('a');
                     descriptionElement = resourceRow.children[2];
+
                     if (link && descriptionElement) {
                         id     = link.href.split('/').slice(-1)[0];
                         _title = link.textContent!.trim();
@@ -44,11 +45,13 @@ export const uploadResourceByTitleRequestAction = async function (clientId: stri
                     }
                 }
 
-                logger?.error(`ресурс "${ title }" клиента "${ clientId }" не найден`);
-                throw new Error(`ресурс "${ title }" клиента "${ clientId }" не найден`);
+                throw new Error(`не найден нужный ресурс`);
             }
 
-            logger?.error(`не получилось получить ресурсы клиента "${ clientId }"`);
-            throw new Error(`не получилось получить ресурсы клиента "${ clientId }"`);
+            throw new Error(`не найдена таблица`);
+        })
+        .catch((e: Error) => {
+            logger?.error(`не получилось получить ресурсы клиента "${ clientId }". ${ e.message }`);
+            throw e;
         });
 };

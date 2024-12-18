@@ -6,9 +6,18 @@ import {
 import {
     uploadResourceInstancesRequestAction,
 } from '@/action/resources/request-action/uploadResourceInstances/uploadResourceInstances.request-action.ts';
+import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
+import {
+    PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY,
+} from '@/service/PromiseSplitter/const/const.ts';
 
 
-export const uploadResourcesWithInstancesRequestAction = async function (clientId: string, logger?: ILogger): Promise<Array<Resource>> {
+export const uploadResourcesWithInstancesRequestAction = async function (
+    clientId: string,
+    limit: number = PROMISE_SPLITTER_MAX_REQUESTS,
+    retry: number = PROMISE_SPLITTER_MAX_RETRY,
+    logger?: ILogger,
+): Promise<Array<Resource>> {
     logger?.log(`получение ресурсов клиента "${ clientId }"`);
     return fetch(`https://yclients.com/resources/${ clientId }`, {
         method: 'GET',
@@ -24,23 +33,36 @@ export const uploadResourcesWithInstancesRequestAction = async function (clientI
                 let link;
                 let descriptionElement;
                 let id;
-                let resourceInstances;
                 for (let i = 0; i < resourcesRows.length; i++) {
                     resourceRow        = resourcesRows[i];
                     link               = resourceRow.children[1]?.querySelector('a');
                     descriptionElement = resourceRow.children[2];
 
                     if (link && descriptionElement) {
-                        id                = link.href.split('/').slice(-1)[0];
-                        resourceInstances = await uploadResourceInstancesRequestAction(id, logger);
+                        id = link.href.split('/').slice(-1)[0];
                         resources.push({
                             id         : id,
                             title      : link.textContent!.trim(),
                             description: descriptionElement.textContent!.trim(),
-                            instances  : resourceInstances,
+                            instances  : [],
                         });
                     }
                 }
+                // await uploadResourceInstancesRequestAction(id, logger);
+
+                const promiseSplitter = new PromiseSplitter(limit, retry);
+                await promiseSplitter.exec(
+                    resources.map((row) => ({
+                        chain    : [
+                            () => uploadResourceInstancesRequestAction(row.id, logger),
+                        ],
+                        onSuccess: (data: unknown) => {
+                            if (Array.isArray(data)) {
+                                row.instances = data;
+                            }
+                        },
+                    })),
+                );
 
                 logger?.success(`успешно получено ${ resources.length } ресурсов клиента "${ clientId }"`);
                 return resources;

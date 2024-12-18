@@ -76,8 +76,20 @@ export abstract class CompareComponent extends Component<HTMLDivElement> impleme
         return true;
     }
 
+    protected _itemIsValid () {
+        if (this._enabled && (this._compareType === CompareType.ITEM || this._compareType === CompareType.ALL)) {
+            if (this._header) {
+                return this._header.isValid && this._compareRows.every((row) => row.isValid);
+            }
+
+            return this._compareRows.every((row) => row.isValid);
+        }
+
+        return true;
+    }
+
     protected _headerIsValid () {
-        if (this._header && this._enabled && this._compareType === CompareType.ITEM || this._compareType === CompareType.ALL) {
+        if (this._header && this._enabled && (this._compareType === CompareType.ITEM || this._compareType === CompareType.ALL)) {
             return this._header?.isValid;
         }
 
@@ -85,7 +97,7 @@ export abstract class CompareComponent extends Component<HTMLDivElement> impleme
     }
 
     protected _rowsIsValid () {
-        if (this._enabled && this._compareType === CompareType.ITEM || this._compareType === CompareType.ALL) {
+        if (this._enabled && (this._compareType === CompareType.ITEM || this._compareType === CompareType.ALL)) {
             return this._compareChildren.every((component) => component.isValid);
         }
 
@@ -93,7 +105,7 @@ export abstract class CompareComponent extends Component<HTMLDivElement> impleme
     }
 
     protected _childrenIsValid () {
-        if (this._enabled && this._compareType === CompareType.CHILDREN || this._compareType === CompareType.ALL) {
+        if (this._enabled && (this._compareType === CompareType.CHILDREN || this._compareType === CompareType.ALL)) {
             return this._compareChildren.every((component) => component.isValid);
         }
 

@@ -93,24 +93,27 @@ export class ResourceCompareComponent extends CompareComponent {
                 // 2. if children not valid -> update
 
                 return async () => {
-                    const resource = await updateResourceRequestAction(
-                        this._clientId,
-                        this._clientResource!.id,
-                        {
-                            title      : this._targetResource.title,
-                            description: this._targetResource.description,
-                        },
-                        this._fetcher,
-                        this._logger,
-                    );
+                    const resource = this._itemIsValid() ? this._clientResource!
+                                                         : await updateResourceRequestAction(
+                            this._clientId,
+                            this._clientResource!.id,
+                            {
+                                title      : this._targetResource.title,
+                                description: this._targetResource.description,
+                            },
+                            this._fetcher,
+                            this._logger,
+                        );
 
-                    const instances: Array<unknown> = await this._promiseSplitter.exec(
-                        this._resourceInstancesCompareComponents.map(
-                            (component) => ({ chain: [ component.getAction(resource.id) ] }),
-                        ),
-                    );
+                    const instances: Array<unknown> = this._childrenIsValid()
+                                                      ? this._clientResource!.instances
+                                                      : await this._promiseSplitter.exec(
+                            this._resourceInstancesCompareComponents.map(
+                                (component) => ({ chain: [ component.getAction(resource!.id) ] }),
+                            ),
+                        );
 
-                    resource.instances = instances.filter(Boolean) as Array<ResourceInstance>;
+                    resource!.instances = instances.filter(Boolean) as Array<ResourceInstance>;
                     return resource;
                 };
             } else {
@@ -188,8 +191,9 @@ export class ResourceCompareComponent extends CompareComponent {
             clientHeaderData      : this._clientResource?.title,
             label                 : 'Ресурс',
             variants              : this._clientResources.map((resource) => ({
-                label: resource.title,
-                value: resource.id,
+                label   : resource.title,
+                value   : resource.id,
+                selected: resource.title === this._targetResource.title,
             })),
             onVariantChange       : (variant) => {
                 this._clientResource = this._clientResources.find((resource) => resource.id === variant.value);
@@ -204,6 +208,9 @@ export class ResourceCompareComponent extends CompareComponent {
             onActivateOnlyItem    : () => this._setCompareType(CompareType.ITEM),
             onActivateOnlyChildren: () => this._setCompareType(CompareType.CHILDREN),
             onDeactivate          : () => this._setCompareType(CompareType.NONE),
+            onRename              : (title) => {
+                this._targetResource.title = title;
+            },
         });
 
         this._header.insert(this.element, 'afterbegin');

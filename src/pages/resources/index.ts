@@ -1,9 +1,6 @@
 import {
-    uploadResourcesWithInstancesRequestAction,
-} from '@/action/resources/request-action/uploadResourcesWithInstances/upload-resources-with-instances-request.action.ts';
-import {
-    ResourcesCompareComponent,
-} from '@/widget/resources/ResourcesCompareComponent/ResourcesCompareComponent.ts';
+    ResourceCopyFormComponent,
+} from '@/widget/resources/ResourceCopyFormComponent/ResourceCopyFormComponent.ts';
 
 
 export const isResourcesPage = function (pathname: Array<string>) {
@@ -17,13 +14,8 @@ export const resourcesPageHandler = async function (pathname: Array<string>) {
     console.log('container', container);
 
     if (container) {
-        const data1 = await uploadResourcesWithInstancesRequestAction(clientId);
-        const data2 = await uploadResourcesWithInstancesRequestAction(clientId);
-
-        new ResourcesCompareComponent({
-            targetData: data1,
-            clientData: data2,
-            clientId  : clientId,
+        new ResourceCopyFormComponent({
+            clientId: clientId,
         })
             .insert(container, 'afterbegin');
     }

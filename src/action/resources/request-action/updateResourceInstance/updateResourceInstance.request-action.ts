@@ -10,8 +10,12 @@ import { Fetch } from '@/service/Fetcher/implementations/Fetch.ts';
 export const updateResourceInstanceRequestAction = async function (resourceId: string, instanceId: string, updateData: ResourceInstanceUpdateData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<ResourceInstance> {
     logger?.log(`обновление данных эксемляра "${ instanceId }" ресурса "${ resourceId }"`);
 
+    const formData = new FormData();
+    formData.set('title', updateData.title);
+
     return fetcher.fetch(`https://yclients.com/resource_instances/save/${ resourceId }/${ instanceId }`, {
         method: `POST`,
+        body  : formData,
     })
         .then((response) => {
             if (response.ok) {

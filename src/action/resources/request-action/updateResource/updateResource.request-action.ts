@@ -13,8 +13,13 @@ import {
 export const updateResourceRequestAction = async function (clientId: string, resourceId: string, updateData: ResourceUpdateData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<Resource> {
     logger?.log(`обновление ресурса "${ resourceId }" клиента "${ clientId }"`);
 
+    const formData = new FormData();
+    formData.set('title', updateData.title);
+    formData.set('description', updateData.description);
+
     return fetcher.fetch(`https://yclients.com/resources/save/${ clientId }/${ resourceId }`, {
         method: 'POST',
+        body  : formData,
     })
         .then((response) => {
             if (response.ok) {

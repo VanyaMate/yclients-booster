@@ -3,14 +3,6 @@ import {
 } from '@/entity/compare/CompareComponent/CompareComponent.ts';
 import { ResourceInstance } from '@/action/resources/types/resources.types.ts';
 import { CompareHeader } from '@/entity/compare/CompareHeader/CompareHeader.ts';
-import { CompareRow } from '@/entity/compare/CompareRow/CompareRow.ts';
-import { CompareBox } from '@/entity/compare/CompareBox/CompareBox.ts';
-import {
-    CompareTextInputValue,
-} from '@/entity/compare/CompareValue/CompareTextInputValue/CompareTextInputValue.ts';
-import {
-    CompareTextValue,
-} from '@/entity/compare/CompareValue/CompareTextValue/CompareTextValue.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 import {
     createResourceInstanceRequestAction,
@@ -114,29 +106,6 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
     protected _render (): void {
         this.element.innerHTML = ``;
 
-        this._compareRows = [
-            new CompareBox({
-                level     : 5,
-                title     : 'Основные настройки',
-                components: [
-                    new CompareRow({
-                        targetValue: new CompareTextInputValue({
-                            type       : 'text',
-                            value      : this._targetInstance.title,
-                            placeholder: 'Пусто',
-                            onInput    : (title) => {
-                                this._targetInstance.title = title;
-                            },
-                        }),
-                        clientValue: new CompareTextValue({
-                            value: this._clientInstance?.title,
-                        }),
-                        label      : 'Название',
-                    }),
-                ],
-            }),
-        ];
-
         this._header = new CompareHeader({
             targetHeaderData      : this._targetInstance.title,
             clientHeaderData      : this._clientInstance?.title,
@@ -144,8 +113,8 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
             rows                  : this._compareRows,
             variants              : this._clientInstances.map((instance) => ({
                 label   : instance.title,
+                selected: instance.title === this._targetInstance.title,
                 value   : instance.id,
-                selected: instance.id === this._clientInstance?.id,
             })),
             onVariantChange       : ((instanceVariant) => {
                 this._clientInstance = this._clientInstances.find((instance) => instance.id === instanceVariant.value);
@@ -156,6 +125,9 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
             onActivateOnlyItem    : () => this._setCompareType(CompareType.ITEM),
             onActivateOnlyChildren: () => this._setCompareType(CompareType.CHILDREN),
             onDeactivate          : () => this._setCompareType(CompareType.NONE),
+            onRename              : (title) => {
+                this._targetInstance.title = title;
+            },
         });
 
         this._header.insert(this.element, 'afterbegin');
