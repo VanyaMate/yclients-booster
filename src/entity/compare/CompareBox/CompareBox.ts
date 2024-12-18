@@ -29,6 +29,14 @@ export class CompareBox extends Component<HTMLDivElement> implements ICompareCom
             className  : css.title,
         })
             .insert(this.element, 'afterbegin');
+
+        if (this._compareComponents.length === 0) {
+            new Component<HTMLDivElement>('div', {
+                textContent: 'Ничего нет',
+                className  : css.empty,
+            })
+                .insert(this.element, 'beforeend');
+        }
     }
 
     get isValid () {

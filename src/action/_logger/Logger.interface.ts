@@ -5,5 +5,7 @@ export interface ILogger {
 
     error (log: string): void;
 
+    warning (log: string): void;
+
     reset (): void;
 }

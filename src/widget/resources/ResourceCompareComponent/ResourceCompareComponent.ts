@@ -1,15 +1,14 @@
 import {
-    CompareComponent, CompareComponentProps,
+    CompareComponent,
+    CompareComponentProps,
 } from '@/entity/compare/CompareComponent/CompareComponent.ts';
 import { CompareHeader } from '@/entity/compare/CompareHeader/CompareHeader.ts';
 import {
-    Resource, ResourceInstance,
+    Resource,
+    ResourceInstance,
 } from '@/action/resources/types/resources.types.ts';
 import { CompareBox } from '@/entity/compare/CompareBox/CompareBox.ts';
 import { CompareRow } from '@/entity/compare/CompareRow/CompareRow.ts';
-import {
-    CompareTextInputValue,
-} from '@/entity/compare/CompareValue/CompareTextInputValue/CompareTextInputValue.ts';
 import {
     CompareTextValue,
 } from '@/entity/compare/CompareValue/CompareTextValue/CompareTextValue.ts';
@@ -19,7 +18,8 @@ import {
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 import {
-    PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY,
+    PROMISE_SPLITTER_MAX_REQUESTS,
+    PROMISE_SPLITTER_MAX_RETRY,
 } from '@/service/PromiseSplitter/const/const.ts';
 import {
     createResourceRequestAction,
@@ -33,6 +33,12 @@ import {
 } from '@/action/resources/request-action/updateResource/updateResource.request-action.ts';
 import { CompareType } from '@/entity/compare/Compare.types.ts';
 import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
+import {
+    deleteResourceInstanceRequestAction,
+} from '@/action/resources/request-action/deleteResourceInstance/deleteResourceInstance.request-action.ts';
+import {
+    CompareTextareaValue,
+} from '@/entity/compare/CompareValue/CompareTextareaValue/CompareTextareaValue.ts';
 
 
 export type ResourceCompareComponentProps =
@@ -105,13 +111,11 @@ export class ResourceCompareComponent extends CompareComponent {
                             this._logger,
                         );
 
-                    const instances: Array<unknown> = this._childrenIsValid()
-                                                      ? this._clientResource!.instances
-                                                      : await this._promiseSplitter.exec(
-                            this._resourceInstancesCompareComponents.map(
-                                (component) => ({ chain: [ component.getAction(resource!.id) ] }),
-                            ),
-                        );
+                    const instances: Array<unknown> = await this._promiseSplitter.exec(
+                        this._resourceInstancesCompareComponents.map(
+                            (component) => ({ chain: [ component.getAction(resource!.id) ] }),
+                        ),
+                    );
 
                     resource!.instances = instances.filter(Boolean) as Array<ResourceInstance>;
                     return resource;
@@ -119,6 +123,10 @@ export class ResourceCompareComponent extends CompareComponent {
             } else {
                 // create
                 return async () => {
+                    if (this._isNoCreateNew()) {
+                        return null;
+                    }
+
                     await createResourceRequestAction(
                         this._clientId,
                         {
@@ -129,7 +137,12 @@ export class ResourceCompareComponent extends CompareComponent {
                         this._logger,
                     );
 
-                    const resource                  = await uploadResourceByTitleRequestAction(this._clientId, this._targetResource.title, this._logger);
+                    const resource = await uploadResourceByTitleRequestAction(this._clientId, this._targetResource.title, this._logger);
+
+                    if (resource.instances.length === 1) {
+                        await deleteResourceInstanceRequestAction(resource.id, resource.instances[0].id, this._logger);
+                    }
+
                     const instances: Array<unknown> = await this._promiseSplitter.exec(
                         this._resourceInstancesCompareComponents.map(
                             (component) => ({ chain: [ component.getAction(resource.id) ] }),
@@ -150,15 +163,33 @@ export class ResourceCompareComponent extends CompareComponent {
 
         this._compareRows = [
             new CompareBox({
-                level     : 3,
+                level     : 4,
+                title     : 'Информация',
+                components: [
+                    new CompareRow({
+                        targetValue: new CompareTextValue({
+                            value: this._targetResource.id,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientResource?.id,
+                        }),
+                        label      : 'Id',
+                        validate   : false,
+                    }),
+                ],
+            }),
+            new CompareBox({
+                level     : 4,
                 title     : 'Настройки ресурса',
                 components: [
                     new CompareRow({
                         label      : `Описание`,
-                        targetValue: new CompareTextInputValue({
+                        targetValue: new CompareTextareaValue({
                             placeholder: 'Пусто',
-                            type       : 'text',
                             value      : this._targetResource.description,
+                            onInput    : (description) => {
+                                this._targetResource.description = description;
+                            },
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientResource?.description,
@@ -193,7 +224,7 @@ export class ResourceCompareComponent extends CompareComponent {
             variants              : this._clientResources.map((resource) => ({
                 label   : resource.title,
                 value   : resource.id,
-                selected: resource.title === this._targetResource.title,
+                selected: resource.title === this._clientResource?.title,
             })),
             onVariantChange       : (variant) => {
                 this._clientResource = this._clientResources.find((resource) => resource.id === variant.value);

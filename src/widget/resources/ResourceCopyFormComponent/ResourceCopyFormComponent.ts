@@ -54,14 +54,26 @@ export class ResourceCopyFormComponent extends Component<HTMLDivElement> {
     }
 
     private async _renderCompareForm (targetClientID: string) {
+        this.element.innerHTML = ``;
+
         const actionButton = new Button({
             styleType  : ButtonStyleType.PRIMARY,
             textContent: 'Преобразовать',
             onclick    : async () => {
                 actionButton.setLoading(true);
                 await compareForm.getAction()();
-                actionButton.setLoading(false);
-                actionButton.element.disabled = true;
+                logger.log(`завершено`);
+                actionButton.remove();
+
+                const refreshButton = new Button({
+                    styleType  : ButtonStyleType.DANGER,
+                    textContent: 'Обновить данные',
+                    onclick    : () => {
+                        this._renderCompareForm(targetClientID);
+                    },
+                });
+
+                refreshButton.insert(compareForm.element, 'beforebegin');
             },
         });
 
@@ -89,7 +101,7 @@ export class ResourceCopyFormComponent extends Component<HTMLDivElement> {
             },
         });
 
-        actionForm.add(compareForm);
         actionForm.add(actionButton);
+        actionForm.add(compareForm);
     }
 }

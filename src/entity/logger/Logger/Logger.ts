@@ -27,6 +27,10 @@ export class Logger extends Component<HTMLDivElement> implements ILogger {
         this.element.insertAdjacentHTML('afterbegin', `<div class="${ css.neutral } ${ css.item }" data-index="${ ++this._logsAmount }"><span>></span><span>${ log }</span></div>`);
     }
 
+    warning (log: string): void {
+        this.element.insertAdjacentHTML('afterbegin', `<div class="${ css.warning } ${ css.item }" data-index="${ ++this._logsAmount }"><span>></span><span>${ log }</span></div>`);
+    }
+
     reset () {
         this.element.innerHTML = '';
         this._logsAmount       = 0;

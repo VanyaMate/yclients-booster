@@ -20,6 +20,11 @@ import {
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import { CompareType } from '@/entity/compare/Compare.types.ts';
 import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
+import { CompareRow } from '@/entity/compare/CompareRow/CompareRow.ts';
+import { CompareBox } from '@/entity/compare/CompareBox/CompareBox.ts';
+import {
+    CompareTextValue,
+} from '@/entity/compare/CompareValue/CompareTextValue/CompareTextValue.ts';
 
 
 export type ResourceInstanceCompareComponentProps =
@@ -70,13 +75,17 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
             if (this._clientInstance) {
                 // update
                 return async () => {
-                    return await updateResourceInstanceRequestAction(
-                        resourceId,
-                        this._clientInstance!.id,
-                        { title: this._targetInstance.title },
-                        this._fetcher,
-                        this._logger,
-                    );
+                    if (!this._itemIsValid()) {
+                        return await updateResourceInstanceRequestAction(
+                            resourceId,
+                            this._clientInstance!.id,
+                            { title: this._targetInstance.title },
+                            this._fetcher,
+                            this._logger,
+                        );
+                    }
+
+                    return this._clientInstance!;
                 };
             } else {
                 // create
@@ -89,7 +98,7 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
                                 async () => createResourceInstanceRequestAction(resourceId, { title: this._targetInstance.title }, this._fetcher, this._logger),
                                 async () => uploadResourceInstancesRequestAction(resourceId, this._logger),
                                 async (instances: unknown) => {
-                                    resourceInstance = await findLastResourceInstanceByTitleAction(instances as Array<ResourceInstance>, this._targetInstance.title);
+                                    resourceInstance = await findLastResourceInstanceByTitleAction(instances as Array<ResourceInstance>, this._targetInstance.title, this._logger);
                                 },
                             ],
                         },
@@ -106,6 +115,25 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
     protected _render (): void {
         this.element.innerHTML = ``;
 
+        this._compareRows = [
+            new CompareBox({
+                level     : 5,
+                title     : 'Информация',
+                components: [
+                    new CompareRow({
+                        targetValue: new CompareTextValue({
+                            value: this._targetInstance.id,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientInstance?.id,
+                        }),
+                        label      : 'Id',
+                        validate   : false,
+                    }),
+                ],
+            }),
+        ];
+
         this._header = new CompareHeader({
             targetHeaderData      : this._targetInstance.title,
             clientHeaderData      : this._clientInstance?.title,
@@ -113,7 +141,7 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
             rows                  : this._compareRows,
             variants              : this._clientInstances.map((instance) => ({
                 label   : instance.title,
-                selected: instance.title === this._targetInstance.title,
+                selected: instance.title === this._clientInstance?.title,
                 value   : instance.id,
             })),
             onVariantChange       : ((instanceVariant) => {

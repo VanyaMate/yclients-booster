@@ -15,7 +15,7 @@ export const createResourceInstanceRequestAction = async function (resourceId: s
     const formData = new FormData();
     formData.append('title', createData.title);
 
-    return fetcher.fetch(`https://yclients.com/resource_instances/save/${ resourceId }/0`, {
+    return fetcher.fetch(`https://yclients.com/resource_instances/save/${ resourceId }/0?title=${ createData.title }`, {
         method: 'POST',
         body  : formData,
     })

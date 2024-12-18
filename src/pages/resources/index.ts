@@ -11,8 +11,6 @@ export const resourcesPageHandler = async function (pathname: Array<string>) {
     const clientId  = pathname[2];
     const container = document.querySelector(`#page-wrapper > .wrapper-content`);
 
-    console.log('container', container);
-
     if (container) {
         new ResourceCopyFormComponent({
             clientId: clientId,

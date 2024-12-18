@@ -3,6 +3,9 @@ import { Resource } from '@/action/resources/types/resources.types.ts';
 import {
     fetchResponseToDom,
 } from '@/helper/action/fetchResponseToDom/fetchResponseToDom.ts';
+import {
+    uploadResourceInstancesRequestAction,
+} from '@/action/resources/request-action/uploadResourceInstances/uploadResourceInstances.request-action.ts';
 
 
 export const uploadResourceByTitleRequestAction = async function (clientId: string, title: string, logger?: ILogger): Promise<Resource> {
@@ -34,12 +37,13 @@ export const uploadResourceByTitleRequestAction = async function (clientId: stri
 
                         if (_title === title) {
                             logger?.success(`ресурс "${ title }" клиента "${ clientId }" получен`);
-
+                            const instances = await uploadResourceInstancesRequestAction(id, logger);
+                            
                             return {
                                 id         : id,
                                 title      : _title,
                                 description: descriptionElement.textContent!.trim(),
-                                instances  : [],
+                                instances  : instances,
                             };
                         }
                     }

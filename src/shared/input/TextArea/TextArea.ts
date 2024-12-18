@@ -5,12 +5,25 @@ import {
 import css from './TextArea.module.css';
 
 
-export type TextAreaProps = ComponentPropsOptional<HTMLTextAreaElement>;
+export type TextAreaInputHandler = (input: string) => void;
+
+export type TextAreaProps =
+    ComponentPropsOptional<HTMLTextAreaElement>
+    & {
+        onInput?: TextAreaInputHandler;
+    };
 
 export class TextArea extends Component<HTMLTextAreaElement> {
     constructor (props: TextAreaProps) {
-        super('textarea', props);
+        const { onInput, ...other } = props;
+        super('textarea', other);
         this.element.classList.add(css.container);
+
+        if (onInput) {
+            this.element.addEventListener('input', (event) => {
+                onInput(((event.target) as HTMLTextAreaElement).value);
+            });
+        }
     }
 
     getValue (): string {

@@ -76,6 +76,10 @@ export abstract class CompareComponent extends Component<HTMLDivElement> impleme
         return true;
     }
 
+    protected _isNoCreateNew () {
+        return this._compareType === CompareType.NONE || this._compareType === CompareType.CHILDREN;
+    }
+
     protected _itemIsValid () {
         if (this._enabled && (this._compareType === CompareType.ITEM || this._compareType === CompareType.ALL)) {
             if (this._header) {

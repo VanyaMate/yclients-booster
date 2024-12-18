@@ -38,7 +38,17 @@ export const uploadResourceInstancesRequestAction = async function (resourceId: 
                 return instances;
             }
 
-            logger?.error(`не получилось получить экземпляры ресурса "${ resourceId }"`);
-            throw new Error('ошибка запроса');
+            const noExistNotification = dom.querySelector(`.page-table > .text-center > .font-bold`);
+
+            if (noExistNotification) {
+                logger?.warning(`у ресурса "${ resourceId }" нет экземпляров или что-то пошло не так`);
+                return [];
+            }
+
+            throw new Error('не найдена ни таблица ни предупреждение');
+        })
+        .catch((e: Error) => {
+            logger?.error(`не получилось получить экземпляры ресурса "${ resourceId }". ${ e.message }`);
+            throw e;
         });
 };

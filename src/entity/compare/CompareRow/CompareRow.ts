@@ -19,14 +19,16 @@ export type CompareRowV4Props<TargetValue, ClientValue> =
         targetValue: ICompareValue<Nullable<TargetValue>>;
         clientValue: ICompareValue<Nullable<ClientValue>>;
         label: string;
-        validationMethod?: CompareRowValidationMethod<Nullable<TargetValue>, Nullable<ClientValue>>
+        validationMethod?: CompareRowValidationMethod<Nullable<TargetValue>, Nullable<ClientValue>>;
+        validate?: boolean;
     };
 
 export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivElement> implements ICompareComponent {
     private readonly _validationMethod?: CompareRowValidationMethod<Nullable<TargetValue>, Nullable<ClientValue>>;
     private readonly _targetValue: ICompareValue<Nullable<TargetValue>>;
     private readonly _clientValue: ICompareValue<Nullable<ClientValue>>;
-    private _enabled: boolean = true;
+    private readonly _validating: boolean = true;
+    private _enabled: boolean             = true;
 
     constructor (props: CompareRowV4Props<TargetValue, ClientValue>) {
         const {
@@ -34,6 +36,7 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
                   clientValue,
                   label,
                   validationMethod,
+                  validate = true,
                   ...other
               } = props;
         super('div', other, [
@@ -42,6 +45,7 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
             new Component<HTMLDivElement>('div', {}, [ clientValue ]),
         ]);
 
+        this._validating       = validate;
         this._targetValue      = targetValue;
         this._clientValue      = clientValue;
         this._validationMethod = validationMethod;
@@ -51,7 +55,7 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
     }
 
     get isValid (): boolean {
-        if (this._enabled) {
+        if (this._enabled && this._validating) {
             if (this._validationMethod) {
                 return this._validationMethod(this._targetValue.getValue(), this._clientValue.getValue());
             }

@@ -10,7 +10,8 @@
   },
   "devDependencies": {
     "typescript": "~5.6.2",
-    "vite": "^5.4.10"
+    "vite": "^5.4.10",
+    "vite-plugin-javascript-obfuscator": "^3.1.0"
   },
   "dependencies": {
     "-": "^0.0.1",

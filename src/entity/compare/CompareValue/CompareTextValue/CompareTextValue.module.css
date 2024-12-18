@@ -3,7 +3,8 @@
     font-weight : bold;
 
     &.empty {
-        color : var(--color-gray);
+        color      : var(--color-gray);
+        font-style : italic;
     }
 
     &.isNotValue {

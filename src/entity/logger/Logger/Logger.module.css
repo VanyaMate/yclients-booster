@@ -35,4 +35,8 @@
     .neutral {
         color : var(--color-dark-gray);
     }
+
+    .warning {
+        color : var(--color-orange);
+    }
 }

@@ -30,7 +30,7 @@ export const updateResourceRequestAction = async function (clientId: string, res
         })
         .then((response: ResourcesResponse) => {
             if (response.success) {
-                logger?.success(`ресурс "${ resourceId }" клиента ${ clientId } обновлен`);
+                logger?.success(`ресурс "${ resourceId }" клиента "${ clientId }" обновлен`);
 
                 return {
                     id         : resourceId,
