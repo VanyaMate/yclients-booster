@@ -26,6 +26,9 @@ import { CompareRow } from '@/entity/compare/CompareRow/CompareRow.ts';
 import {
     CompareTextValue,
 } from '@/entity/compare/CompareValue/CompareTextValue/CompareTextValue.ts';
+import {
+    CompareTextInputValue,
+} from '@/entity/compare/CompareValue/CompareTextInputValue/CompareTextInputValue.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -139,7 +142,22 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
             new CompareBox({
                 title     : 'Основные настройки',
                 level     : 2,
-                components: [],
+                components: [
+                    new CompareRow({
+                        targetValue: new CompareTextInputValue({
+                            value      : this._targetCategory.booking_title,
+                            type       : 'text',
+                            placeholder: 'Пусто',
+                            onInput    : (title) => {
+                                this._targetCategory.booking_title = title;
+                            },
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientCategory?.booking_title,
+                        }),
+                        label      : 'Название для онлайн записи',
+                    }),
+                ],
             }),
         ];
 

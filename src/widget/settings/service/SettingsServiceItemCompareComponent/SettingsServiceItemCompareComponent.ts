@@ -376,12 +376,12 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             showDefaultLabel: false,
                             list            : [
                                 {
-                                    value   : 'Индивидуальный',
+                                    value   : false,
                                     label   : 'Индивидуальный',
                                     selected: !this._targetService.is_multi,
                                 },
                                 {
-                                    value   : 'Групповой',
+                                    value   : true,
                                     label   : 'Групповой',
                                     selected: this._targetService.is_multi,
                                 },
@@ -390,10 +390,11 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             variant         : SelectVariantType.MINIMAL,
                         }),
                         clientValue: new CompareTextValue({
-                            value: this._clientService
+                            value: this._clientService?.is_multi,
+                            label: this._clientService
                                    ? this._clientService.is_multi ? 'Групповой'
                                                                   : 'Индивидуальный'
-                                   : undefined,
+                                   : '',
                         }),
                         label      : 'Тип',
                     }),

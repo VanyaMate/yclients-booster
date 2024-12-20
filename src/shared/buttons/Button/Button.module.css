@@ -11,7 +11,7 @@
 }
 
 .container {
-    padding       : var(--offset-small);
+    padding       : var(--offset-extra-small) var(--offset-small);
     border-radius : var(--offset-small);
     background    : var(--bg-second);
     color         : var(--color-black);

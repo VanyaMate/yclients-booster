@@ -11,7 +11,7 @@ import { Modal } from '@/shared/modal/Modal/Modal.ts';
 
 export type SelectOption = {
     selected?: boolean;
-    value: string;
+    value: any;
     label: string;
     showLabel?: string;
 }
@@ -54,12 +54,13 @@ export class Select extends Component<HTMLDivElement> {
     private readonly _optionsBox: Col;
     private readonly _modal: Modal | null                     = null;
     private readonly _onChangeHandlers: Array<SelectOnChange> = [];
+    private readonly _currentShowLabel?: string;
+    private readonly _showValue: boolean                      = true;
+    private readonly _hideOnDomClickHandler: (event: MouseEvent) => void;
+    private readonly _inited: boolean                         = false;
     private _search: string                                   = '';
     private _currentLabel: string                             = '';
-    private _currentShowLabel?: string;
     private _currentValue: string                             = '';
-    private _inited: boolean                                  = false;
-    private _showValue: boolean                               = true;
 
     constructor (props: SelectProps) {
         const {
@@ -81,15 +82,16 @@ export class Select extends Component<HTMLDivElement> {
 
         super('div', other);
 
-        this._defaultValue     = this._currentValue = defaultValue;
-        this._defaultShowLabel = this._currentShowLabel = defaultShowLabel;
-        this._defaultLabel     = this._currentLabel = defaultLabel;
-        this._defaultStyleType = this._defaultStyleType ?? ButtonStyleType.DEFAULT;
-        this._showDefaultLabel = showDefaultLabel ?? true;
-        this._onChangeHandler  = onChange;
-        this._isModal          = isModal ?? false;
-        this._list             = list;
-        this._showValue        = showValue;
+        this._defaultValue          = this._currentValue = defaultValue;
+        this._defaultShowLabel      = this._currentShowLabel = defaultShowLabel;
+        this._defaultLabel          = this._currentLabel = defaultLabel;
+        this._defaultStyleType      = this._defaultStyleType ?? ButtonStyleType.DEFAULT;
+        this._showDefaultLabel      = showDefaultLabel ?? true;
+        this._onChangeHandler       = onChange;
+        this._isModal               = isModal ?? false;
+        this._list                  = list;
+        this._showValue             = showValue;
+        this._hideOnDomClickHandler = this._hideOnDocumentClick.bind(this);
 
         this.element.classList.add(css.container);
 
@@ -171,10 +173,12 @@ export class Select extends Component<HTMLDivElement> {
 
     public show () {
         this.element.classList.add(css.show);
+        document.addEventListener('click', this._hideOnDomClickHandler);
     }
 
     public hide () {
         this.element.classList.remove(css.show);
+        document.removeEventListener('click', this._hideOnDomClickHandler);
     }
 
     public onChange (callback: SelectOnChange) {
@@ -250,6 +254,22 @@ export class Select extends Component<HTMLDivElement> {
             }
 
             this.show();
+        }
+    }
+
+    private _hideOnDocumentClick (event: MouseEvent) {
+        let target: HTMLElement | null = event.target as HTMLElement;
+
+        if (target) {
+            while (target) {
+                if (target === this.element) {
+                    return;
+                }
+
+                target = target.parentElement;
+            }
+
+            this.hide();
         }
     }
 }
