@@ -6,7 +6,7 @@ export const findLastResourceInstanceByTitleAction = async function (instances: 
     logger?.log(`поиск экземляра ресурса по заголовку "${ title }"`);
 
     for (let i = instances.length - 1; i >= 0; i--) {
-        if (instances[i].title === title) {
+        if (instances[i].title.trim() === title.trim()) {
             logger?.success(`экземляр ресурса по заголовку "${ title }" найден`);
             return instances[i];
         }

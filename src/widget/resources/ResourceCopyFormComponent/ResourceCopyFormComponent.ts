@@ -18,8 +18,8 @@ import { MemoFetch } from '@/service/Fetcher/implementations/MemoFetch.ts';
 export type ResourceCopyFormComponentProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        clientId: string;
-    };
+    clientId: string;
+};
 
 export class ResourceCopyFormComponent extends Component<HTMLDivElement> {
     private readonly _clientId: string;

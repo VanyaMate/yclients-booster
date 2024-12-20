@@ -6,18 +6,18 @@ import obfuscatorPlugin from 'vite-plugin-javascript-obfuscator';
 
 export default defineConfig({
     plugins: [
-        obfuscatorPlugin({
-            options: {
-                debugProtection: true,
-                // deadCodeInjection: true,         // NOT WORKING
-                optionsPreset: 'low-obfuscation',
-                renameGlobals: true,
-                // renameProperties : true,         // NOT WORKING
-                splitStrings         : true,
-                controlFlowFlattening: true,
-                transformObjectKeys  : true,
-            },
-        }),
+        /*        obfuscatorPlugin({
+         options: {
+         debugProtection: true,
+         // deadCodeInjection: true,         // NOT WORKING
+         optionsPreset: 'low-obfuscation',
+         renameGlobals: true,
+         // renameProperties : true,         // NOT WORKING
+         splitStrings         : true,
+         controlFlowFlattening: true,
+         transformObjectKeys  : true,
+         },
+         }),*/
         crx({ manifest }),
     ],
     css    : {

@@ -33,3 +33,5 @@ export type ResourceUpdateData = {
     title: string;
     description: string;
 }
+
+export type ResourceMapper = Record<string, Resource>;

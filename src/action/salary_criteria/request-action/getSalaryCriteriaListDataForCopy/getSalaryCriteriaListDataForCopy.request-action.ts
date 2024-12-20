@@ -1,6 +1,7 @@
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import {
-    SalaryCriteriaFullData, SalaryCriteriaListDataForCopy,
+    SalaryCriteriaFullData,
+    SalaryCriteriaListDataForCopy,
 } from '@/action/salary_criteria/types/salary-criteria.types.ts';
 import {
     getSalaryCriteriaListRequestAction,
@@ -16,9 +17,13 @@ import {
     getSettingsServicesByCategoryRequestAction,
 } from '@/action/settings/service_categories/request-action/getSettingsServicesByCategory/getSettingsServicesByCategory.request-action.ts';
 import {
-    SettingsServiceItemApiResponse,
     SettingsServiceCategoryDataWithChildren,
+    SettingsServiceItemApiResponse,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
+import { Is } from '@/types/Is.ts';
+import {
+    uploadResourcesWithInstancesRequestAction,
+} from '@/action/resources/request-action/uploadResourcesWithInstances/upload-resources-with-instances-request.action.ts';
 
 
 export const getSalaryCriteriaListDataForCopyRequestAction = async function (bearer: string, clientId: string, forceUploadServices: boolean, maxSplit: number, maxRetry: number, logger?: ILogger): Promise<SalaryCriteriaListDataForCopy> {
@@ -31,6 +36,7 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
             tree            : [],
             categoriesMapper: {},
             servicesMapper  : {},
+            resources       : [],
         },
     };
 
@@ -49,7 +55,9 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
     const hasServices = dataForCopy.criteriaList.some((item) => item.rules.some((rule) => !!rule.context.services));
 
     if (hasServices || forceUploadServices) {
-        const serviceCategories = await getSettingsServiceCategoriesRequestAction(bearer, clientId, logger);
+        const serviceCategories                = await getSettingsServiceCategoriesRequestAction(bearer, clientId, logger);
+        dataForCopy.settingsCopyData.resources = await uploadResourcesWithInstancesRequestAction(clientId, maxSplit, maxRetry, logger);
+
         await splitter.exec(
             serviceCategories.data.map((category) => {
                 dataForCopy.settingsCopyData.categoriesMapper[category.id.toString()] = category;
@@ -64,7 +72,7 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
                         async () => getSettingsServicesByCategoryRequestAction(bearer, clientId, category.id.toString(), logger),
                         async (response: unknown) => {
                             // ну и дичь :D
-                            if (((val): val is SettingsServiceItemApiResponse => !!val)(response)) {
+                            if (Is<SettingsServiceItemApiResponse>(response)) {
                                 data.children = response.data;
                                 response.data.forEach((service) => {
                                     dataForCopy.settingsCopyData.servicesMapper[service.id.toString()] = service;

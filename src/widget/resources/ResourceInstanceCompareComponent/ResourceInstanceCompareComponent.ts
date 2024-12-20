@@ -33,12 +33,11 @@ export type ResourceInstanceCompareComponentProps =
         resourceId: string;
         clientInstances: Array<ResourceInstance>;
         targetInstance: ResourceInstance;
-        promiseSplitterRetry?: number;
         logger?: ILogger;
         fetcher?: IFetcher;
     };
 
-export class ResourceInstanceCompareComponent extends CompareComponent {
+export class ResourceInstanceCompareComponent extends CompareComponent<ResourceInstance> {
     private readonly _resourceId: string;
     private readonly _logger?: ILogger;
     private readonly _fetcher?: IFetcher;
@@ -52,7 +51,6 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
                   resourceId,
                   clientInstances,
                   targetInstance,
-                  promiseSplitterRetry = 1,
                   logger,
                   fetcher,
                   ...other
@@ -62,7 +60,7 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
         this._clientInstances = clientInstances;
         this._targetInstance  = targetInstance;
         this._clientInstance  = this._clientInstances.find((instance) => instance.title === targetInstance.title);
-        this._promiseSplitter = new PromiseSplitter(1, promiseSplitterRetry);
+        this._promiseSplitter = new PromiseSplitter(1, 3);
         this._logger          = logger;
         this._fetcher         = fetcher;
 
@@ -70,46 +68,8 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
         this._render();
     }
 
-    public getAction (resourceId: string = this._resourceId): () => Promise<ResourceInstance | null> {
-        if (this._enabled) {
-            if (this._clientInstance) {
-                // update
-                return async () => {
-                    if (!this._itemIsValid()) {
-                        return await updateResourceInstanceRequestAction(
-                            resourceId,
-                            this._clientInstance!.id,
-                            { title: this._targetInstance.title },
-                            this._fetcher,
-                            this._logger,
-                        );
-                    }
-
-                    return this._clientInstance!;
-                };
-            } else {
-                // create
-                return async () => {
-                    let resourceInstance: ResourceInstance | null = null;
-
-                    await this._promiseSplitter.exec([
-                        {
-                            chain: [
-                                async () => createResourceInstanceRequestAction(resourceId, { title: this._targetInstance.title }, this._fetcher, this._logger),
-                                async () => uploadResourceInstancesRequestAction(resourceId, this._logger),
-                                async (instances: unknown) => {
-                                    resourceInstance = await findLastResourceInstanceByTitleAction(instances as Array<ResourceInstance>, this._targetInstance.title, this._logger);
-                                },
-                            ],
-                        },
-                    ]);
-
-                    return resourceInstance;
-                };
-            }
-        }
-
-        return async () => null;
+    public getAction (resourceId: string): () => Promise<ResourceInstance | null> {
+        return super.getAction(resourceId ?? this._resourceId);
     }
 
     protected _render (): void {
@@ -154,10 +114,44 @@ export class ResourceInstanceCompareComponent extends CompareComponent {
             onActivateOnlyChildren: () => this._setCompareType(CompareType.CHILDREN),
             onDeactivate          : () => this._setCompareType(CompareType.NONE),
             onRename              : (title) => {
-                this._targetInstance.title = title;
+                this._targetInstance.title = title.trim();
             },
         });
 
         this._header.insert(this.element, 'afterbegin');
+    }
+
+    protected async _action (resourceId: string) {
+        if (this._clientInstance) {
+            if (this._itemIsValid()) {
+                return this._clientInstance;
+            } else {
+                return await updateResourceInstanceRequestAction(
+                    resourceId,
+                    this._clientInstance!.id,
+                    { title: this._targetInstance.title },
+                    this._fetcher,
+                    this._logger,
+                );
+            }
+        }
+
+        const [ instance ] = await this._promiseSplitter.exec([
+            {
+                chain: [
+                    async () => createResourceInstanceRequestAction(resourceId, { title: this._targetInstance.title }, this._fetcher, this._logger),
+                    async () => uploadResourceInstancesRequestAction(resourceId, this._logger),
+                    async (instances: unknown) => {
+                        return await findLastResourceInstanceByTitleAction(instances as Array<ResourceInstance>, this._targetInstance.title, this._logger);
+                    },
+                ],
+            },
+        ]);
+
+        if (instance) {
+            return instance as ResourceInstance;
+        }
+
+        throw new Error('не удалось создать ресурс');
     }
 }

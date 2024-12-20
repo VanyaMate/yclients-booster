@@ -25,8 +25,8 @@ export class PromiseSplitter {
     ) {
     }
 
-    async exec (chains: Array<PromiseSplitterExecInitItem>): Promise<Array<unknown>> {
-        return new Promise<Array<unknown>>((resolve, reject) => {
+    async exec<T> (chains: Array<PromiseSplitterExecInitItem>): Promise<Array<T>> {
+        return new Promise<Array<T>>((resolve, reject) => {
             if (this._chainsIsActive) {
                 reject(new Error(ERROR_PROMISE_SPLITTER_IS_ACTIVE));
             }
@@ -37,12 +37,12 @@ export class PromiseSplitter {
             this._activeChainIndex = 0;
 
             for (let i = 0; i < this._limit; i++) {
-                this._nextChain(resolve);
+                this._nextChain<T>(resolve);
             }
         });
     }
 
-    private async _nextChain (resolve: (response: Array<unknown>) => void) {
+    private async _nextChain<T> (resolve: (response: Array<T>) => void) {
         const index = this._activeChainIndex++;
         const chain = this._chains[index];
 
@@ -57,11 +57,11 @@ export class PromiseSplitter {
                 .finally(() => {
                     chain.onFinally?.();
                     this._finishedChains += 1;
-                    this._nextChain.call(this, resolve);
+                    this._nextChain(resolve);
                 });
         } else if (this._finishedChains === this._chains.length) {
             this._chainsIsActive = false;
-            resolve(this._response);
+            resolve(this._response as Array<T>);
         }
     }
 

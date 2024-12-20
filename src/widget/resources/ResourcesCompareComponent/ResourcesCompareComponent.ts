@@ -17,18 +17,18 @@ import { Col } from '@/shared/box/Col/Col.ts';
 export type ResourcesCompareComponentProps =
     CompareComponentProps
     & {
-        clientId: string;
-        clientData: Array<Resource>;
-        targetData: Array<Resource>;
-        logger?: ILogger;
-        fetcher?: IFetcher;
-        promiseSplitter?: {
-            limit?: number;
-            retry?: number;
-        };
+    clientId: string;
+    clientData: Array<Resource>;
+    targetData: Array<Resource>;
+    logger?: ILogger;
+    fetcher?: IFetcher;
+    promiseSplitter?: {
+        limit?: number;
+        retry?: number;
     };
+};
 
-export class ResourcesCompareComponent extends CompareComponent {
+export class ResourcesCompareComponent extends CompareComponent<Array<Resource>> {
     private readonly _clientId: string;
     private readonly _clientData: Array<Resource>;
     private readonly _targetData: Array<Resource>;
@@ -70,20 +70,14 @@ export class ResourcesCompareComponent extends CompareComponent {
         return true;
     }
 
-    public getAction (): () => Promise<Array<Resource>> {
-        if (this._enabled) {
-            return async () => {
-                const resources: Array<unknown> = await this._promiseSplitter.exec(
-                    this._resourceCompareComponents.map(
-                        (component) => ({ chain: [ component.getAction() ] }),
-                    ),
-                );
+    protected async _action () {
+        const resources: Array<unknown> = await this._promiseSplitter.exec(
+            this._resourceCompareComponents.map(
+                (component) => ({ chain: [ component.getAction() ] }),
+            ),
+        );
 
-                return resources.filter(Boolean) as Array<Resource>;
-            };
-        }
-
-        return async () => [];
+        return resources.filter(Boolean) as Array<Resource>;
     }
 
     protected _render (): void {

@@ -8,9 +8,6 @@ import {
 } from '@/widget/settings/service/SettingsServiceItemCompareComponent/SettingsServiceItemCompareComponent.ts';
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
-import {
-    createSettingsServiceCategoryRequestAction,
-} from '@/action/settings/service_categories/request-action/createSettingsServiceCategory/createSettingsServiceCategory.request-action.ts';
 import { SelectOption } from '@/shared/input/Select/Select.ts';
 import {
     CompareType,
@@ -22,6 +19,13 @@ import {
 import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 import { CompareBox } from '@/entity/compare/CompareBox/CompareBox.ts';
 import { CompareHeader } from '@/entity/compare/CompareHeader/CompareHeader.ts';
+import {
+    Resource,
+} from '@/action/resources/types/resources.types.ts';
+import { CompareRow } from '@/entity/compare/CompareRow/CompareRow.ts';
+import {
+    CompareTextValue,
+} from '@/entity/compare/CompareValue/CompareTextValue/CompareTextValue.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -31,6 +35,8 @@ export type SettingsServiceCategoryCompareComponentProps =
         clientId: string;
         // Текущие данные пользователя
         clientData: SettingsServiceCopyData;
+        // Ресурсы таргета
+        targetResources: Array<Resource>;
         // Сравниваемая категория
         targetCategory: SettingsServiceCategoryDataWithChildren;
         // Bearer token для запроса
@@ -41,9 +47,10 @@ export type SettingsServiceCategoryCompareComponentProps =
         logger?: ILogger;
     };
 
-export class SettingsServiceCategoryCompareComponent extends CompareComponent implements ICompareComponent {
+export class SettingsServiceCategoryCompareComponent extends CompareComponent<SettingsServiceCategoryDataWithChildren> implements ICompareComponent {
     private readonly _clientId: string;
     private readonly _clientData: SettingsServiceCopyData;
+    private readonly _targetResources: Array<Resource>;
     private readonly _targetCategory: SettingsServiceCategoryDataWithChildren;
     private readonly _bearer: string;
     private readonly _fetcher?: IFetcher;
@@ -56,6 +63,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent im
         const {
                   targetCategory,
                   clientData,
+                  targetResources,
                   clientId,
                   bearer,
                   fetcher,
@@ -64,13 +72,14 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent im
               } = props;
         super(other);
 
-        this._clientId       = clientId;
-        this._clientData     = clientData;
-        this._targetCategory = targetCategory;
-        this._bearer         = bearer;
-        this._fetcher        = fetcher;
-        this._logger         = logger;
-        this._clientCategory = this._clientData.tree.find((category) => category.title === this._targetCategory.title);
+        this._clientId        = clientId;
+        this._clientData      = clientData;
+        this._targetResources = targetResources;
+        this._targetCategory  = targetCategory;
+        this._bearer          = bearer;
+        this._fetcher         = fetcher;
+        this._logger          = logger;
+        this._clientCategory  = this._clientData.tree.find((category) => category.title === this._targetCategory.title);
 
         this.element.addEventListener(CompareEvent.type, () => {
             if (!this._revalidateTrigger) {
@@ -84,38 +93,9 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent im
         this._render();
     }
 
-    getAction (): () => Promise<void> {
-        return async () => {
-            if (this._clientCategory !== undefined) {
-                if (this._headerIsValid() && this._rowsIsValid()) {
-                    if (this._childrenIsValid()) {
-                        console.log('NOTHING');
-                    } else {
-                        Promise.all(this._serviceComponents.map((component) => component.getAction(this._clientCategory!.id.toString())()));
-                    }
-                } else {
-                    console.log(`UPDATE CATEGORY [${ this._clientCategory.id }] FOR`, this._clientId);
-                    Promise.all(this._serviceComponents.map((component) => component.getAction(this._clientCategory!.id.toString())()));
-                }
-            } else {
-                console.log('CREATE NEW CATEGORY FOR', this._clientId);
-                return createSettingsServiceCategoryRequestAction(this._bearer, this._clientId, {
-                    title        : this._targetCategory.title,
-                    service_count: 0,
-                    services     : [],
-                    translations : this._targetCategory.translations,
-                    staff        : [],
-                    api_id       : this._targetCategory.api_id,
-                    booking_title: this._targetCategory.booking_title ?? this._targetCategory.title,
-                }, this._fetcher, this._logger)
-                    .then((response) => {
-                        console.log(`CATEGORY CREATED ${ response.id }`);
-                        this._serviceComponents.map((component) => component.getAction(response.id.toString())());
-                    });
-            }
-
-            return;
-        };
+    protected async _action (): Promise<SettingsServiceCategoryDataWithChildren | null> {
+        this._serviceComponents.forEach((service) => service.getAction()());
+        return null;
     }
 
     protected _render () {
@@ -126,12 +106,14 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent im
                 level     : 3,
                 components: this._serviceComponents = this._targetCategory.children.map((service) => (
                     new SettingsServiceItemCompareComponent({
-                        clientId      : this._clientId,
-                        targetService : service,
-                        clientServices: this._clientCategory?.children,
-                        bearer        : this._bearer,
-                        fetcher       : this._fetcher,
-                        logger        : this._logger,
+                        clientId          : this._clientId,
+                        targetService     : service,
+                        clientServices    : this._clientCategory?.children,
+                        bearer            : this._bearer,
+                        fetcher           : this._fetcher,
+                        logger            : this._logger,
+                        targetResourceList: this._targetResources,
+                        clientResourceList: this._clientData.resources,
                     })
                 )),
             }),
@@ -139,7 +121,23 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent im
 
         this._compareRows = [
             new CompareBox({
-                title     : 'Поля категории',
+                title     : 'Информация',
+                level     : 2,
+                components: [
+                    new CompareRow({
+                        targetValue: new CompareTextValue({
+                            value: this._targetCategory.id,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientCategory?.id,
+                        }),
+                        label      : 'Id',
+                        validate   : false,
+                    }),
+                ],
+            }),
+            new CompareBox({
+                title     : 'Основные настройки',
                 level     : 2,
                 components: [],
             }),

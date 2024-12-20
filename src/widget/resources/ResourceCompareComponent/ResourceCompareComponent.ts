@@ -44,18 +44,18 @@ import {
 export type ResourceCompareComponentProps =
     CompareComponentProps
     & {
-        clientId: string,
-        targetResource: Resource,
-        clientResources: Array<Resource>,
-        logger?: ILogger,
-        fetcher?: IFetcher,
-        promiseSplitter?: {
-            limit?: number,
-            retry?: number,
-        },
-    }
+    clientId: string,
+    targetResource: Resource,
+    clientResources: Array<Resource>,
+    logger?: ILogger,
+    fetcher?: IFetcher,
+    promiseSplitter?: {
+        limit?: number,
+        retry?: number,
+    },
+}
 
-export class ResourceCompareComponent extends CompareComponent {
+export class ResourceCompareComponent extends CompareComponent<Resource> {
     private readonly _logger?: ILogger;
     private readonly _fetcher?: IFetcher;
     private readonly _promiseSplitter: PromiseSplitter;
@@ -91,71 +91,62 @@ export class ResourceCompareComponent extends CompareComponent {
         this._render();
     }
 
-    public getAction (): () => Promise<Resource | null> {
-        if (this._enabled) {
-            if (this._clientResource) {
-                // update
-                // 1. if header || rows not valid -> update
-                // 2. if children not valid -> update
+    protected async _action (): Promise<Resource | null> {
+        if (this._clientResource) {
+            const resource = this._itemIsValid() ? this._clientResource!
+                                                 : await updateResourceRequestAction(
+                    this._clientId,
+                    this._clientResource!.id,
+                    {
+                        title      : this._targetResource.title,
+                        description: this._targetResource.description,
+                    },
+                    this._fetcher,
+                    this._logger,
+                );
 
-                return async () => {
-                    const resource = this._itemIsValid() ? this._clientResource!
-                                                         : await updateResourceRequestAction(
-                            this._clientId,
-                            this._clientResource!.id,
-                            {
-                                title      : this._targetResource.title,
-                                description: this._targetResource.description,
-                            },
-                            this._fetcher,
-                            this._logger,
-                        );
+            const instances: Array<unknown> = this._childrenIsValid()
+                                              ? this._clientResource!.instances
+                                              : await this._promiseSplitter.exec(
+                    this._resourceInstancesCompareComponents.map(
+                        (component) => ({ chain: [ component.getAction(resource!.id) ] }),
+                    ),
+                );
 
-                    const instances: Array<unknown> = await this._promiseSplitter.exec(
-                        this._resourceInstancesCompareComponents.map(
-                            (component) => ({ chain: [ component.getAction(resource!.id) ] }),
-                        ),
-                    );
-
-                    resource!.instances = instances.filter(Boolean) as Array<ResourceInstance>;
-                    return resource;
-                };
-            } else {
-                // create
-                return async () => {
-                    if (this._isNoCreateNew()) {
-                        return null;
-                    }
-
-                    await createResourceRequestAction(
-                        this._clientId,
-                        {
-                            title      : this._targetResource.title,
-                            description: this._targetResource.description,
-                        },
-                        this._fetcher,
-                        this._logger,
-                    );
-
-                    const resource = await uploadResourceByTitleRequestAction(this._clientId, this._targetResource.title, this._logger);
-
-                    if (resource.instances.length === 1) {
-                        await deleteResourceInstanceRequestAction(resource.id, resource.instances[0].id, this._logger);
-                    }
-
-                    const instances: Array<unknown> = await this._promiseSplitter.exec(
-                        this._resourceInstancesCompareComponents.map(
-                            (component) => ({ chain: [ component.getAction(resource.id) ] }),
-                        ),
-                    );
-
-                    resource.instances = instances.filter(Boolean) as Array<ResourceInstance>;
-                    return resource;
-                };
+            resource!.instances = instances.filter(Boolean) as Array<ResourceInstance>;
+            return resource;
+        } else {
+            if (this._isNoCreateNew()) {
+                return null;
             }
-        }
 
-        return async () => null;
+            await createResourceRequestAction(
+                this._clientId,
+                {
+                    title      : this._targetResource.title,
+                    description: this._targetResource.description,
+                },
+                this._fetcher,
+                this._logger,
+            );
+
+            const resource = await uploadResourceByTitleRequestAction(this._clientId, this._targetResource.title, this._logger);
+
+            if (resource.instances.length === 1) {
+                await deleteResourceInstanceRequestAction(resource.id, resource.instances[0].id, this._logger);
+            }
+
+            const instances: Array<unknown> = this._childrenIsValid()
+                                              ? []
+                                              : await this._promiseSplitter.exec(
+                    this._resourceInstancesCompareComponents.map(
+                        (component) => ({ chain: [ component.getAction(resource.id) ] }),
+                    ),
+                );
+
+            resource.instances = instances.filter(Boolean) as Array<ResourceInstance>;
+            return resource;
+        }
     }
 
     protected _render (): void {

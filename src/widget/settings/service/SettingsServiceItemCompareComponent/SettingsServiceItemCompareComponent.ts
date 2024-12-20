@@ -1,5 +1,4 @@
 import {
-    CompareProcess,
     CompareType,
     ICompareComponent,
 } from '@/entity/compare/Compare.types.ts';
@@ -23,12 +22,6 @@ import {
 } from '@/entity/compare/CompareValue/CompareTextValue/CompareTextValue.ts';
 import { CompareHeader } from '@/entity/compare/CompareHeader/CompareHeader.ts';
 import {
-    createSettingsServiceItemRequestAction,
-} from '@/action/settings/service_categories/request-action/createSettingsServiceItem/createSettingsServiceItem.request-action.ts';
-import {
-    base64ImageLoad,
-} from '@/action/common/base64-image-loader/base64-image-loader.request-action.ts';
-import {
     CompareToggleValue,
 } from '@/entity/compare/CompareValue/CompareToggleValue/CompareToggleValue.ts';
 import {
@@ -51,6 +44,34 @@ import {
 import {
     CompareTimeRangeValue,
 } from '@/entity/compare/CompareValue/CompareTimeRangeValue/CompareTimeRangeValue.ts';
+import {
+    Resource,
+} from '@/action/resources/types/resources.types.ts';
+import {
+    ResourceCompareComponent,
+} from '@/widget/resources/ResourceCompareComponent/ResourceCompareComponent.ts';
+import {
+    createSettingsServiceItemRequestAction,
+} from '@/action/settings/service_categories/request-action/createSettingsServiceItem/createSettingsServiceItem.request-action.ts';
+import {
+    base64ImageLoad,
+} from '@/action/common/base64-image-loader/base64-image-loader.request-action.ts';
+import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
+import {
+    PROMISE_SPLITTER_MAX_REQUESTS,
+    PROMISE_SPLITTER_MAX_RETRY,
+} from '@/service/PromiseSplitter/const/const.ts';
+import { isArray } from '@vanyamate/types-kit';
+import {
+    updateSettingsServiceByTargetRequestAction,
+} from '@/action/settings/service_categories/request-action/updateSettingsServiceByTarget/updateSettingsServiceByTarget.request-action.ts';
+import {
+    formatDateToDayMonthYear,
+    getDatesBetween,
+} from '@/helper/lib/date/getDatesBetween/getDatesBetween.ts';
+import {
+    validateDates,
+} from '@/entity/compare/CompareValue/CompareDateValue/lib/validateDates.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -68,89 +89,55 @@ export type SettingsServiceItemCompareComponentProps =
         fetcher?: IFetcher;
         // ILogger для логирования
         logger?: ILogger;
+        // Список ресурсов target клиента
+        targetResourceList: Array<Resource>;
+        // Список ресурсов клиента
+        clientResourceList?: Array<Resource>;
     };
 
-export class SettingsServiceItemCompareComponent extends CompareComponent implements ICompareComponent {
-    private _clientId: string;
+export class SettingsServiceItemCompareComponent extends CompareComponent<SettingsServiceData> implements ICompareComponent {
+    private readonly _clientId: string;
+    private readonly _bearer: string;
+    private readonly _fetcher?: IFetcher;
+    private readonly _logger?: ILogger;
+    private readonly _promiseSplitter: PromiseSplitter;
     private _clientServices: Array<SettingsServiceData>;
     private _targetService: SettingsServiceData;
     private _clientService?: SettingsServiceData;
-    private _bearer: string;
-    private _fetcher?: IFetcher;
-    private _logger?: ILogger;
+    private _targetResourceList: Array<Resource>;
+    private _clientResourceList: Array<Resource>;
+    private _compareResourcesComponents: Array<ResourceCompareComponent> = [];
 
     constructor (props: SettingsServiceItemCompareComponentProps) {
         const {
-                  clientServices = [],
+                  clientServices     = [],
                   clientId,
                   targetService,
                   bearer,
                   fetcher,
                   logger,
+                  targetResourceList,
+                  clientResourceList = [],
                   ...other
               } = props;
         super(other);
 
-        this._clientId       = clientId;
-        this._clientServices = clientServices;
-        this._targetService  = targetService;
-        this._bearer         = bearer;
-        this._fetcher        = fetcher;
-        this._logger         = logger;
-        this._clientService  = this._clientServices.find((service) => service.title === this._targetService.title);
+        this._clientId           = clientId;
+        this._clientServices     = clientServices;
+        this._targetService      = targetService;
+        this._bearer             = bearer;
+        this._fetcher            = fetcher;
+        this._logger             = logger;
+        this._targetResourceList = targetResourceList;
+        this._clientResourceList = clientResourceList;
+        this._clientService      = this._clientServices.find((service) => service.title === this._targetService.title);
+        this._promiseSplitter    = new PromiseSplitter(
+            PROMISE_SPLITTER_MAX_REQUESTS,
+            PROMISE_SPLITTER_MAX_RETRY,
+        );
 
         this.element.addEventListener(CompareEvent.type, this._revalidate.bind(this, this._clientService));
         this._render();
-    }
-
-    get isValid () {
-        if (this._enabled) {
-            return (
-                this._clientService !== undefined &&
-                (
-                    this._header
-                    ? this._header.isValid
-                    : (this._clientService.title === this._targetService.title)
-                ) &&
-                this._compareRows.every((row) => row.isValid) &&
-                this._compareChildren.every((child) => child.isValid)
-            );
-        }
-
-        return true;
-    }
-
-    getAction (categoryId: string): () => Promise<void> {
-        if (this._enabled) {
-            this._onBeforeAction();
-            return async () => {
-                this._onStartAction();
-                switch (this._compareType) {
-                    case CompareType.ITEM:
-                        // only create/update item
-                        await this._itemAction(categoryId)
-                            .then(this._onSuccessAction.bind(this))
-                            .catch(this._onErrorAction.bind(this));
-                        return;
-                    case CompareType.CHILDREN:
-                        // if exist - create/update children
-                        await this._childrenAction();
-                        return;
-                    case CompareType.ALL:
-                        // all
-                        await this._itemAction(categoryId)
-                            .then(this._onSuccessAction.bind(this))
-                            .catch(this._onErrorAction.bind(this));
-                        await this._childrenAction();
-                        return;
-                    default:
-                        return;
-                }
-            };
-        }
-
-        return async () => {
-        };
     }
 
     protected _render () {
@@ -233,20 +220,31 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
             },
         });
 
+        let bottomDatePicker: CompareDateValue;
         const timepickers: Array<ICompareComponent> = [
             new CompareRow({
-                targetValue: new CompareDateValue({
-                    value: [ this._targetService.date_from, this._targetService.date_to ],
-                    range: true,
+                targetValue     : new CompareDateValue({
+                    value   : [ this._targetService.date_from, this._targetService.date_to ],
+                    range   : true,
+                    onChange: (data) => {
+                        const range = getDatesBetween(data.dates[0], data.dates.slice(-1)[0]);
+
+                        this._targetService.date_from = data.formatted[0];
+                        this._targetService.date_to   = data.formatted.slice(-1)[0];
+                        this._targetService.dates     = range.map(formatDateToDayMonthYear);
+
+                        bottomDatePicker.setDateByRange(range);
+                    },
                 }),
-                clientValue: new CompareDateValue({
+                clientValue     : new CompareDateValue({
                     value  : this._clientService
                              ? [ this._clientService.date_from, this._clientService.date_to ]
                              : undefined,
                     range  : true,
                     disable: true,
                 }),
-                label      : 'Диапазон дат',
+                label           : 'Диапазон дат',
+                validationMethod: validateDates,
             }),
             new CompareRow({
                 targetValue     : new CompareTimeRangeValue({
@@ -291,22 +289,41 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
                 },
             }),
             new CompareRow({
-                targetValue: new CompareDateValue({
+                targetValue     : bottomDatePicker = new CompareDateValue({
                     value        : this._targetService.dates,
                     range        : false,
                     multipleDates: true,
+                    onChange     : ({ formatted }) => {
+                        this._targetService.dates = formatted;
+                    },
                 }),
-                clientValue: new CompareDateValue({
+                clientValue     : new CompareDateValue({
                     value        : this._clientService?.dates,
                     range        : false,
                     multipleDates: true,
                     disable      : true,
                 }),
-                label      : 'Выбор дат',
+                label           : 'Выбор дат',
+                validationMethod: validateDates,
             }),
         ];
 
         this._compareRows = [
+            new CompareBox({
+                level     : 3,
+                title     : 'Информация',
+                components: [
+                    new CompareRow({
+                        label      : 'Id',
+                        targetValue: new CompareTextValue({
+                            value: this._targetService.id,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientService?.id,
+                        }),
+                    }),
+                ],
+            }),
             new CompareBox({
                 level     : 3,
                 title     : 'Основные настройки',
@@ -422,6 +439,28 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
             }),
         ];
 
+        this._compareChildren = [
+            new CompareBox({
+                level     : 4,
+                title     : 'Ресурсы',
+                components: this._compareResourcesComponents = this._targetService.resources
+                    .map((resourceId) => {
+                        const targetResource = this._targetResourceList.find((resource) => resource.id === resourceId.toString());
+
+                        if (targetResource) {
+                            return new ResourceCompareComponent({
+                                clientId       : this._clientId,
+                                targetResource : targetResource,
+                                clientResources: this._clientResourceList,
+                                logger         : this._logger,
+                                fetcher        : this._fetcher,
+                            });
+                        }
+                    })
+                    .filter((component) => !!component),
+            }),
+        ];
+
         this._header = new CompareHeader({
             targetHeaderData      : this._targetService.title,
             clientHeaderData      : this._clientService?.title,
@@ -432,7 +471,10 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
                     value   : service.id.toString(),
                     selected: service.id === this._clientService?.id,
                 })),
-            rows                  : this._compareRows,
+            rows                  : [
+                ...this._compareRows,
+                ...this._compareChildren,
+            ],
             onVariantChange       : (e) => {
                 this._clientService = this._clientServices.find((service) => service.id.toString() === e.value);
                 this._render();
@@ -451,72 +493,127 @@ export class SettingsServiceItemCompareComponent extends CompareComponent implem
         this._header.insert(this.element, 'beforeend');
     }
 
-    private async _itemAction (categoryId: string) {
-        if (this.isValid) {
-            console.log('Nothing');
-            return;
-        }
-
+    protected async _action (categoryId: string) {
         if (this._clientService) {
-            console.log('update service', this._clientService.id);
-            return;
+            if (this._itemIsValid()) {
+                if (this._childrenIsValid()) {
+                    // return item
+                    return this._clientService;
+                } else {
+                    // action children
+                    const children = await new PromiseSplitter(1, 3)
+                        .exec<Resource>(
+                            this._compareResourcesComponents.map((component) => ({
+                                chain: [ component.getAction() ],
+                            })),
+                        );
+
+                    this._clientService.resources = children.filter(Boolean).map((resource) => Number(resource.id));
+                    // update item
+                    return await updateSettingsServiceByTargetRequestAction(
+                        this._bearer,
+                        this._clientId,
+                        this._clientService,
+                        this._clientService,
+                        this._logger,
+                    );
+                    // return item
+                }
+            } else {
+                if (this._childrenIsValid()) {
+                    // update item
+                    return await updateSettingsServiceByTargetRequestAction(
+                        this._bearer,
+                        this._clientId,
+                        this._clientService,
+                        this._targetService,
+                        this._logger,
+                    );
+                    // return item
+                } else {
+                    // action children
+                    const children = await new PromiseSplitter(1, 3)
+                        .exec<Resource>(
+                            this._compareResourcesComponents.map((component) => ({
+                                chain: [ component.getAction() ],
+                            })),
+                        );
+
+                    this._clientService.resources = children.filter(Boolean).map((resource) => Number(resource.id));
+                    // update item
+                    return await updateSettingsServiceByTargetRequestAction(
+                        this._bearer,
+                        this._clientId,
+                        this._clientService,
+                        this._targetService,
+                        this._logger,
+                    );
+                    // return item
+                }
+            }
+        } else {
+            if (this._isNoCreateNew()) {
+                // create item
+
+                const [ service ] = await new PromiseSplitter(1, 3)
+                    .exec([
+                        {
+                            chain: [
+                                () => this._promiseSplitter.exec<Resource>(
+                                    this._compareResourcesComponents.map((component) => ({
+                                        chain: [ component.getAction() ],
+                                    })),
+                                ),
+                                async (resources: unknown) => {
+                                    if (isArray(resources)) {
+                                        return createSettingsServiceItemRequestAction(
+                                            this._bearer,
+                                            this._clientId,
+                                            {
+                                                ...this._targetService,
+                                                chain_details           : {
+                                                    comment                         : '',
+                                                    is_comment_managed_only_in_chain: false,
+                                                    is_price_managed_only_in_chain  : false,
+                                                    price_max                       : 0,
+                                                    price_min                       : 0,
+                                                },
+                                                delete_image            : false,
+                                                is_category             : false,
+                                                category_id             : Number(categoryId),
+                                                is_linked_to_composite  : this._targetService.is_linked_to_composite,
+                                                is_range_price_enabled  : this._targetService.price_min !== this._targetService.price_max,
+                                                kkm_settings_id         : 0,
+                                                salon_group_title       : '',
+                                                salon_group_service_link: '',
+                                                salon_service_id        : 0,
+                                                translations            : this._targetService.translations.filter((translation) => translation.translation),
+                                                resources               : (resources as Array<Resource>).filter(Boolean).map((resource) => Number(resource.id)), // CREATE TOO
+                                                staff                   : [],
+                                                image_group             : this._targetService.image_group,
+                                                image                   : this._targetService.image_group?.images?.basic?.path
+                                                                          ? await base64ImageLoad(this._targetService.image_group.images.basic.path)
+                                                                          : undefined,
+                                                id                      : 0,
+                                                vat_id                  : -1,
+                                                tax_variant             : -1,
+                                            },
+                                            this._fetcher,
+                                            this._logger,
+                                        );
+                                    }
+                                },
+                            ],
+                        },
+                    ]);
+
+                return service as SettingsServiceData;
+
+                // return item
+            }
         }
 
-        console.log(`CREATE NEW SERVICE "${ this._targetService.title }" FOR [${ categoryId }] :${ this._clientId }`);
-        return createSettingsServiceItemRequestAction(
-            this._bearer,
-            this._clientId,
-            {
-                ...this._targetService,
-                chain_details           : {
-                    comment                         : '',
-                    is_comment_managed_only_in_chain: false,
-                    is_price_managed_only_in_chain  : false,
-                    price_max                       : 0,
-                    price_min                       : 0,
-                },
-                delete_image            : false,
-                is_category             : false,
-                category_id             : Number(categoryId),
-                is_linked_to_composite  : this._targetService.is_linked_to_composite,
-                is_range_price_enabled  : this._targetService.price_min !== this._targetService.price_max,
-                kkm_settings_id         : 0,
-                salon_group_service_link: '',
-                salon_group_title       : '',
-                salon_service_id        : 0,
-                translations            : this._targetService.translations.filter((translation) => translation.translation),
-                resources               : [], // CREATE TOO
-                staff                   : [],
-                image_group             : this._targetService.image_group,
-                image                   : this._targetService.image_group?.images?.basic?.path
-                                          ? await base64ImageLoad(this._targetService.image_group.images.basic.path)
-                                          : undefined,
-                id                      : 0,
-                vat_id                  : -1,
-                tax_variant             : -1,
-            },
-            this._fetcher,
-            this._logger,
-        );
-    }
 
-    private async _childrenAction () {
-        // ресурсы?
-    }
-
-    private _onBeforeAction () {
-        this._header?.setProcessType(CompareProcess.IDLE);
-    }
-
-    private _onStartAction () {
-        this._header?.setProcessType(CompareProcess.PROCESS);
-    }
-
-    private _onSuccessAction () {
-        this._header?.setProcessType(CompareProcess.SUCCESS);
-    }
-
-    private _onErrorAction () {
-        this._header?.setProcessType(CompareProcess.ERROR);
+        return null;
     }
 }

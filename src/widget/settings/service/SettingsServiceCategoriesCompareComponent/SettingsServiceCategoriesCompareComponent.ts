@@ -9,7 +9,6 @@ import {
     SettingsServiceCategoryCompareComponent,
 } from '@/widget/settings/service/SettingsServiceCategoryCompareComponent/SettingsServiceCategoryCompareComponent.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
-import { Button } from '@/shared/buttons/Button/Button.ts';
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import { ICompareComponent } from '@/entity/compare/Compare.types.ts';
@@ -33,13 +32,14 @@ export type SettingsServiceCategoriesCompareComponentProps =
     };
 
 export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDivElement> implements ICompareComponent {
-    private _clientId: string;
-    private _clientData: SettingsServiceCopyData;
-    private _targetData: SettingsServiceCopyData;
-    private _bearer: string;
-    private _fetcher?: IFetcher;
-    private _logger?: ILogger;
-    private _enabled: boolean = true;
+    private readonly _clientId: string;
+    private readonly _clientData: SettingsServiceCopyData;
+    private readonly _targetData: SettingsServiceCopyData;
+    private readonly _bearer: string;
+    private readonly _fetcher?: IFetcher;
+    private readonly _logger?: ILogger;
+    private _compareComponents: Array<SettingsServiceCategoryCompareComponent> = [];
+    private _enabled: boolean                                                  = true;
 
     constructor (props: SettingsServiceCategoriesCompareComponentProps) {
         const {
@@ -73,27 +73,26 @@ export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDiv
         this._enabled = status;
     }
 
+    getActions () {
+        return this._compareComponents.map((component) => component.getAction());
+    }
+
     private _render () {
         this.element.innerHTML = ``;
 
-        const rows = this._targetData.tree.map((category) => (
-            new SettingsServiceCategoryCompareComponent({
-                targetCategory: category,
-                clientId      : this._clientId,
-                clientData    : this._clientData,
-                bearer        : this._bearer,
-                fetcher       : this._fetcher,
-                logger        : this._logger,
-            })
-        ));
-
-        new Col({ rows }).insert(this.element, 'beforeend');
-        new Button({
-            textContent: 'Получить',
-            onclick    : () => {
-                const actions = rows.map((row) => row.getAction());
-                Promise.all(actions.map((action) => action()));
-            },
-        }).insert(this.element, 'beforeend');
+        new Col({
+            rows: this._compareComponents = this._targetData.tree.map((category) => (
+                new SettingsServiceCategoryCompareComponent({
+                    targetCategory : category,
+                    clientId       : this._clientId,
+                    clientData     : this._clientData,
+                    targetResources: this._targetData.resources,
+                    bearer         : this._bearer,
+                    fetcher        : this._fetcher,
+                    logger         : this._logger,
+                })
+            )),
+        })
+            .insert(this.element, 'afterbegin');
     }
 }

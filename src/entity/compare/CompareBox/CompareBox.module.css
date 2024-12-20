@@ -24,7 +24,7 @@
         user-select : none;
         background  : repeating-linear-gradient(45deg, transparent, transparent 20px, var(--color-dark-black-opacity-hard) 20px, var(--color-dark-black-opacity-hard) 25px);
 
-        button, select, input, label, [data-is-input="true"] {
+        button, select, input, label, textarea, [data-is-input="true"] {
             pointer-events : none;
         }
 

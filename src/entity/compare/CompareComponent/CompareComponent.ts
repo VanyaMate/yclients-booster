@@ -1,4 +1,5 @@
 import {
+    CompareProcess,
     CompareResult,
     CompareType,
     ICompareComponent,
@@ -28,7 +29,7 @@ export type CompareComponentProps =
  * 5. logger?
  * 6. fetcher?
  */
-export abstract class CompareComponent extends Component<HTMLDivElement> implements ICompareComponent {
+export abstract class CompareComponent<ActionResponseType> extends Component<HTMLDivElement> implements ICompareComponent {
     protected _header?: ICompareHeader;
     protected _compareRows: Array<ICompareComponent>     = [];
     protected _compareChildren: Array<ICompareComponent> = [];
@@ -76,6 +77,66 @@ export abstract class CompareComponent extends Component<HTMLDivElement> impleme
         return true;
     }
 
+    public getAction (data?: any): () => Promise<ActionResponseType | null> {
+        if (this._enabled) {
+            this._onBeforeAction();
+            return () => {
+                this._onStartAction();
+                return this._action(data)
+                    .then(this._onSuccessAction.bind(this))
+                    .catch((e) => {
+                        this._onErrorAction();
+                        throw e;
+                    });
+            };
+        }
+
+        return async () => null;
+    }
+
+    /**
+     *
+     *  Template:
+     *  ```typescript
+     *        if (this._clientService) {
+     *             if (this._itemIsValid()) {
+     *                 if (this._childrenIsValid()) {
+     *                     // return item
+     *                     return this._clientService;
+     *                 } else {
+     *                     // action children
+     *                     // return item
+     *                 }
+     *             } else {
+     *                 if (this._childrenIsValid()) {
+     *                     // update item
+     *                     // return item
+     *                 } else {
+     *                     // update item
+     *                     // action children
+     *                     // return item
+     *                 }
+     *             }
+     *         } else {
+     *             if (this._isNoCreateNew()) {
+     *                 // create item
+     *
+     *                 if (!this._childrenIsValid()) {
+     *                     // action children
+     *                 }
+     *
+     *                 // return item
+     *             }
+     *         }
+     *  ```
+     * @param data
+     * @returns {Promise}
+     * @protected
+     */
+    protected abstract _action (data?: any): Promise<ActionResponseType | null>;
+
+    protected abstract _render (): void;
+
     protected _isNoCreateNew () {
         return this._compareType === CompareType.NONE || this._compareType === CompareType.CHILDREN;
     }
@@ -116,6 +177,24 @@ export abstract class CompareComponent extends Component<HTMLDivElement> impleme
         return true;
     }
 
+    protected _onBeforeAction () {
+        this._header?.setProcessType(CompareProcess.IDLE);
+    }
+
+    protected _onStartAction () {
+        this._header?.setProcessType(CompareProcess.PROCESS);
+    }
+
+    protected _onSuccessAction (data: ActionResponseType | null) {
+        this._header?.setProcessType(CompareProcess.SUCCESS);
+        return data;
+    }
+
+    protected _onErrorAction () {
+        this._header?.setProcessType(CompareProcess.ERROR);
+    }
+
+
     protected _setCompareType (value: CompareType): void {
         this._compareType = value;
 
@@ -145,7 +224,6 @@ export abstract class CompareComponent extends Component<HTMLDivElement> impleme
         this.element.dispatchEvent(CompareEvent);
     }
 
-
     protected _revalidate (uniqueItem: unknown) {
         if (this._compareType === CompareType.NONE) {
             this._header?.setValidationType(CompareResult.VALID);
@@ -157,6 +235,4 @@ export abstract class CompareComponent extends Component<HTMLDivElement> impleme
             this._header?.setValidationType(CompareResult.VALID);
         }
     }
-
-    protected abstract _render (): void;
 }

@@ -29,7 +29,7 @@
     align-items    : start;
 
     &.processAction > .content {
-        button, select, input {
+        button, select, input, textarea, [data-is-input="true"] {
             pointer-events : none;
             opacity        : .6;
             cursor         : default;
