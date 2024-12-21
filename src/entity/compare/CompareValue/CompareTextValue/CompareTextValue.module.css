@@ -1,6 +1,8 @@
 .container {
     color       : var(--color-black);
     font-weight : bold;
+    white-space : wrap;
+    word-wrap   : anywhere;
 
     &.empty {
         color      : var(--color-gray);

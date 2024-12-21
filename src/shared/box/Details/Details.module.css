@@ -41,6 +41,10 @@
         }
     }
 
+    & > div {
+        display : none;
+    }
+
     &[open] {
         & > summary {
             margin-bottom : var(--offset-medium);
@@ -50,6 +54,10 @@
                 color     : var(--color-black);
                 transform : translateY(5px);
             }
+        }
+
+        & > div {
+            display : flex;
         }
     }
 

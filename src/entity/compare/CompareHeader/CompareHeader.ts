@@ -134,7 +134,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
                         list        : variants,
                         isModal     : true,
                         modalLabel  : `Выберите ${ label }`,
-                        showValue   : false,
+                        showValue   : true,
                         className   : css.headerSelect,
                         onChange    : onVariantChange,
                         withSearch  : true,

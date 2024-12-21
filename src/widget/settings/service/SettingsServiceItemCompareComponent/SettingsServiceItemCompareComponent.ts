@@ -72,6 +72,10 @@ import {
 import {
     validateDates,
 } from '@/entity/compare/CompareValue/CompareDateValue/lib/validateDates.ts';
+import {
+    CompareTextareaValue,
+} from '@/entity/compare/CompareValue/CompareTextareaValue/CompareTextareaValue.ts';
+import { Converter } from '@/converter/Converter.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -321,6 +325,89 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         clientValue: new CompareTextValue({
                             value: this._clientService?.id,
                         }),
+                        validate   : false,
+                    }),
+                    new CompareRow({
+                        label      : 'Id НДС',
+                        targetValue: new CompareTextValue({
+                            value: this._targetService.vat_id,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientService?.vat_id,
+                        }),
+                        validate   : false,
+                    }),
+                    new CompareRow({
+                        label      : 'Id системы налогообложения',
+                        targetValue: new CompareTextValue({
+                            value: this._targetService.tax_variant,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientService?.tax_variant,
+                        }),
+                        validate   : false,
+                    }),
+                    new CompareRow({
+                        label      : 'Сетевая услуга',
+                        targetValue: new CompareTextValue({
+                            value: this._targetService.is_chain,
+                            label: this._targetService.is_chain ? 'Да' : 'Нет',
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientService?.is_chain,
+                            label: this._clientService?.is_chain ? 'Да' : 'Нет',
+                        }),
+                        validate   : false,
+                    }),
+                    new CompareRow({
+                        label      : 'kkm_settings_id',
+                        targetValue: new CompareTextValue({
+                            value: this._targetService.kkm_settings_id,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientService?.kkm_settings_id,
+                        }),
+                        validate   : false,
+                    }),
+                    new CompareRow({
+                        label      : 'api_id',
+                        targetValue: new CompareTextValue({
+                            value: this._targetService.api_id,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientService?.api_id,
+                        }),
+                        validate   : false,
+                    }),
+                    new CompareRow({
+                        label      : 'api_service_id',
+                        targetValue: new CompareTextValue({
+                            value: this._targetService.api_service_id,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientService?.api_service_id,
+                        }),
+                        validate   : false,
+                    }),
+                    new CompareRow({
+                        label      : 'salon_service_id',
+                        targetValue: new CompareTextValue({
+                            value: this._targetService.salon_service_id,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientService?.salon_service_id,
+                        }),
+                        validate   : false,
+                    }),
+                    new CompareRow({
+                        label      : 'salon_group_service_link',
+                        targetValue: new CompareTextValue({
+                            value: this._targetService.salon_group_service_link,
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientService?.salon_group_service_link,
+                        }),
+                        validate   : false,
                     }),
                 ],
             }),
@@ -330,23 +417,29 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                 components: [
                     new CompareRow({
                         targetValue: new CompareTextInputValue({
-                            type : 'number',
-                            value: this._targetService.price_min.toString(),
+                            type       : 'number',
+                            value      : this._targetService.price_min.toString(),
+                            placeholder: 'Пусто',
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientService?.price_min.toString(),
                         }),
                         label      : 'Минимальная цена',
+                        disable    : this._clientService
+                                     ? this._clientService.is_chain : false,
                     }),
                     new CompareRow({
                         targetValue: new CompareTextInputValue({
-                            type : 'number',
-                            value: this._targetService.price_max.toString(),
+                            type       : 'number',
+                            value      : this._targetService.price_max.toString(),
+                            placeholder: 'Пусто',
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientService?.price_max.toString(),
                         }),
                         label      : 'Максимальная цена',
+                        disable    : this._clientService
+                                     ? this._clientService.is_chain : false,
                     }),
                     new CompareRow({
                         targetValue     : new CompareTimeSelectsValue({
@@ -356,9 +449,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             ],
                         }),
                         clientValue     : new CompareTextValue({
-                            value: this._clientService
-                                   ? `${ Math.floor(this._clientService.duration / 60 / 60).toString() }ч ${ Math.floor(this._clientService.duration / 60 % 60).toString() }м`
-                                   : undefined,
+                            value: Converter.Settings.Service.duration(this._clientService?.duration),
                         }),
                         label           : 'Длительность',
                         validationMethod: (targetValue, clientValue) => {
@@ -391,10 +482,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientService?.is_multi,
-                            label: this._clientService
-                                   ? this._clientService.is_multi ? 'Групповой'
-                                                                  : 'Индивидуальный'
-                                   : '',
+                            label: Converter.Settings.Service.type(this._clientService?.is_multi),
                         }),
                         label      : 'Тип',
                     }),
@@ -410,6 +498,33 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                     src: this._clientService?.image_group?.images?.basic.path,
                                 }),
                                 label      : 'Картинка',
+                            }),
+                            new CompareRow({
+                                targetValue: new CompareTextInputValue({
+                                    type       : 'text',
+                                    value      : this._targetService.booking_title,
+                                    placeholder: 'Пусто',
+                                }),
+                                clientValue: new CompareTextValue({
+                                    value: this._clientService?.booking_title,
+                                }),
+                                label      : 'Название для онлайн записи',
+                                disable    : this._clientService
+                                             ? this._clientService.is_chain
+                                             : false,
+                            }),
+                            new CompareRow({
+                                targetValue: new CompareTextareaValue({
+                                    value      : this._targetService.comment,
+                                    placeholder: 'Пусто',
+                                }),
+                                clientValue: new CompareTextValue({
+                                    value: this._clientService?.comment,
+                                }),
+                                label      : 'Описание',
+                                disable    : this._clientService
+                                             ? this._clientService.is_chain
+                                             : false,
                             }),
                             enableOnlinePrepaid,
                             ...onlinePrepaidComponents,
@@ -598,6 +713,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                                 id                      : 0,
                                                 vat_id                  : -1,
                                                 tax_variant             : -1,
+                                                is_chain                : false,
                                             },
                                             this._fetcher,
                                             this._logger,

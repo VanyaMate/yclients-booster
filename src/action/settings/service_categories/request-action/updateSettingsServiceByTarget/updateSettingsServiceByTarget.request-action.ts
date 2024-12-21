@@ -32,6 +32,7 @@ export const updateSettingsServiceByTargetRequestAction = async function (bearer
         salon_group_title       : clientData.salon_group_title,
         api_id                  : clientData.api_id,
         api_service_id          : clientData.api_service_id,
+        is_chain                : false,
     };
 
     return fetch(`https://yclients.com/api/v1/company/${ clientId }/services/${ clientData.id }`, {

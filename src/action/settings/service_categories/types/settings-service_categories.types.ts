@@ -237,7 +237,7 @@ export type SettingsServiceData = {
     image_group: null | SettingsServiceImageGroup;
     // Автосписание с абонемента
     is_abonement_autopayment_enabled: number;
-    // [вроде] Отсносится к категории/не категории
+    // Отсносится к сети/не сети
     is_chain: boolean;
     is_comment_managed_only_in_chain: boolean;
     is_composite: boolean;

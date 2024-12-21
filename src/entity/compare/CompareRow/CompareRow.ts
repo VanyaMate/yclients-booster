@@ -21,6 +21,7 @@ export type CompareRowV4Props<TargetValue, ClientValue> =
         label: string;
         validationMethod?: CompareRowValidationMethod<Nullable<TargetValue>, Nullable<ClientValue>>;
         validate?: boolean;
+        disable?: boolean;
     };
 
 export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivElement> implements ICompareComponent {
@@ -37,6 +38,7 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
                   label,
                   validationMethod,
                   validate = true,
+                  disable  = false,
                   ...other
               } = props;
         super('div', other, [
@@ -51,6 +53,7 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
         this._validationMethod = validationMethod;
         this.element.classList.add(css.container);
         this.element.addEventListener(CompareEvent.type, this._validate.bind(this));
+        this.enable(!disable);
         this._validate();
     }
 
