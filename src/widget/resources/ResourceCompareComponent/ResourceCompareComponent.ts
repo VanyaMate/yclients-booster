@@ -77,7 +77,7 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
               } = props;
         super(other);
         this._clientId        = clientId;
-        this._targetResource  = targetResource;
+        this._targetResource  = { ...targetResource };
         this._clientResources = clientResources;
         this._logger          = logger;
         this._fetcher         = fetcher;

@@ -58,7 +58,7 @@ export class ResourceInstanceCompareComponent extends CompareComponent<ResourceI
         super(other);
         this._resourceId      = resourceId;
         this._clientInstances = clientInstances;
-        this._targetInstance  = targetInstance;
+        this._targetInstance  = { ...targetInstance };
         this._clientInstance  = this._clientInstances.find((instance) => instance.title === targetInstance.title);
         this._promiseSplitter = new PromiseSplitter(1, 3);
         this._logger          = logger;

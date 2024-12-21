@@ -86,7 +86,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
         this._clientId        = clientId;
         this._clientData      = clientData;
         this._targetResources = targetResources;
-        this._targetCategory  = targetCategory;
+        this._targetCategory  = { ...targetCategory };
         this._bearer          = bearer;
         this._fetcher         = fetcher;
         this._logger          = logger;

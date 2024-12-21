@@ -128,7 +128,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
 
         this._clientId           = clientId;
         this._clientServices     = clientServices;
-        this._targetService      = targetService;
+        this._targetService      = { ...targetService };
         this._bearer             = bearer;
         this._fetcher            = fetcher;
         this._logger             = logger;
