@@ -425,8 +425,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.price_min.toString(),
                         }),
                         label      : 'Минимальная цена',
-                        disable    : this._clientService
-                                     ? this._clientService.is_chain : false,
+                        disable    : this._clientService?.is_chain,
                     }),
                     new CompareRow({
                         targetValue: new CompareTextInputValue({
@@ -438,8 +437,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.price_max.toString(),
                         }),
                         label      : 'Максимальная цена',
-                        disable    : this._clientService
-                                     ? this._clientService.is_chain : false,
+                        disable    : this._clientService?.is_chain,
                     }),
                     new CompareRow({
                         targetValue     : new CompareTimeSelectsValue({
@@ -509,9 +507,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                     value: this._clientService?.booking_title,
                                 }),
                                 label      : 'Название для онлайн записи',
-                                disable    : this._clientService
-                                             ? this._clientService.is_chain
-                                             : false,
+                                disable    : this._clientService?.is_chain,
                             }),
                             new CompareRow({
                                 targetValue: new CompareTextareaValue({
@@ -522,9 +518,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                     value: this._clientService?.comment,
                                 }),
                                 label      : 'Описание',
-                                disable    : this._clientService
-                                             ? this._clientService.is_chain
-                                             : false,
+                                disable    : this._clientService?.is_chain,
                             }),
                             enableOnlinePrepaid,
                             ...onlinePrepaidComponents,
@@ -668,7 +662,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                 }
             }
         } else {
-            if (this._isNoCreateNew()) {
+            if (!this._isNoCreateNew()) {
                 // create item
 
                 const [ service ] = await new PromiseSplitter(1, 3)

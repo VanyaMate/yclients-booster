@@ -9,6 +9,7 @@ import {
 import {
     SettingsServiceCategoriesCreateForm,
 } from '@/widget/settings/service/SettingsServiceCategoriesCreateForm/SettingsServiceCategoriesCreateForm.ts';
+import { ModalButton } from '@/shared/buttons/ModalButton/ModalButton.ts';
 
 
 export const isSettingsServicePage = function (pathname: Array<string>) {
@@ -25,9 +26,16 @@ export const settingsServicePageHandler = function (pathname: Array<string>) {
         if (container) {
             new Col({
                 rows: [
-                    new SettingsServiceCategoriesCreateForm({
-                        clientId,
-                        bearer,
+                    new ModalButton({
+                        textContent: 'Копировать сюда',
+                        modalProps : {
+                            content    : new SettingsServiceCategoriesCreateForm({
+                                clientId,
+                                bearer,
+                            }),
+                            preferWidth: 1000,
+                            label      : 'Копирование услуг',
+                        },
                     }),
                     new SettingsServiceMassiveUpdatePriceButton({
                         clientId,

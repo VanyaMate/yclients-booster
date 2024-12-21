@@ -118,7 +118,7 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
      *                 }
      *             }
      *         } else {
-     *             if (this._isNoCreateNew()) {
+     *             if (!this._isNoCreateNew()) {
      *                 // create item
      *
      *                 if (!this._childrenIsValid()) {

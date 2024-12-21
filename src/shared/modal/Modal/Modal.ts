@@ -13,6 +13,7 @@ export type ModalProps =
     & {
         content: Component<HTMLElement>;
         label?: string;
+        preferWidth?: number;
     };
 
 export type ModalOnChangeCallback = (state: boolean) => void;
@@ -21,12 +22,14 @@ export class Modal extends Component<HTMLDivElement> {
     private readonly _onChangeCallbacks: Array<ModalOnChangeCallback> = [];
 
     constructor (props: ModalProps) {
-        const { content, label, ...other } = props;
+        const { content, label, preferWidth, ...other } = props;
         super('div', other);
 
         this.element.innerHTML = `
             <div class="${ css.back }"></div>
-            <div class="${ css.modal }">
+            <div class="${ css.modal }" style="${ preferWidth
+                                                  ? `width: ${ preferWidth }px`
+                                                  : `` }">
                 <header>
                     <h2>${ label }</h2>
                 </header>

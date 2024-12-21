@@ -134,24 +134,27 @@ export class ResourceInstanceCompareComponent extends CompareComponent<ResourceI
                     this._logger,
                 );
             }
-        }
-
-        const [ instance ] = await this._promiseSplitter.exec([
-            {
-                chain: [
-                    async () => createResourceInstanceRequestAction(resourceId, { title: this._targetInstance.title }, this._fetcher, this._logger),
-                    async () => uploadResourceInstancesRequestAction(resourceId, this._logger),
-                    async (instances: unknown) => {
-                        return await findLastResourceInstanceByTitleAction(instances as Array<ResourceInstance>, this._targetInstance.title, this._logger);
+        } else {
+            if (!this._isNoCreateNew()) {
+                const [ instance ] = await this._promiseSplitter.exec<ResourceInstance | null>([
+                    {
+                        chain: [
+                            async () => createResourceInstanceRequestAction(resourceId, { title: this._targetInstance.title }, this._fetcher, this._logger),
+                            async () => uploadResourceInstancesRequestAction(resourceId, this._logger),
+                            async (instances: unknown) => {
+                                return await findLastResourceInstanceByTitleAction(instances as Array<ResourceInstance>, this._targetInstance.title, this._logger);
+                            },
+                        ],
                     },
-                ],
-            },
-        ]);
+                ]);
 
-        if (instance) {
-            return instance as ResourceInstance;
+                if (instance) {
+                    return instance;
+                }
+
+                throw new Error('не удалось создать ресурс');
+            }
+            return null;
         }
-
-        throw new Error('не удалось создать ресурс');
     }
 }

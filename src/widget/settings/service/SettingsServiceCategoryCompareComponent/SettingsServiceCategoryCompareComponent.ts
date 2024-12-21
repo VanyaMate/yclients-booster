@@ -1,7 +1,7 @@
 import { ComponentPropsOptional } from '@/shared/component/Component.ts';
 import {
     SettingsServiceCategoryDataWithChildren,
-    SettingsServiceCopyData,
+    SettingsServiceCopyData, SettingsServiceData,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 import {
     SettingsServiceItemCompareComponent,
@@ -29,6 +29,13 @@ import {
 import {
     CompareTextInputValue,
 } from '@/entity/compare/CompareValue/CompareTextInputValue/CompareTextInputValue.ts';
+import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
+import {
+    updateSettingsServiceCategoryByTargetRequestAction,
+} from '@/action/settings/service_categories/request-action/updateSettingsServiceCategoryByTarget/updateSettingsServiceCategoryByTarget.request-action.ts';
+import {
+    createSettingsServiceCategoryRequestAction,
+} from '@/action/settings/service_categories/request-action/createSettingsServiceCategory/createSettingsServiceCategory.request-action.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -97,7 +104,110 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
     }
 
     protected async _action (): Promise<SettingsServiceCategoryDataWithChildren | null> {
-        this._serviceComponents.forEach((service) => service.getAction()());
+        if (this._clientCategory) {
+            const clientCategoryId = this._clientCategory.id;
+            if (this._itemIsValid()) {
+                if (this._childrenIsValid()) {
+                    // return item
+                    return this._clientCategory;
+                } else {
+                    // action children
+                    const services = await new PromiseSplitter(1, 3)
+                        .exec<SettingsServiceData | null>(
+                            this._serviceComponents.map(
+                                (service) => ({
+                                    chain: [ service.getAction(clientCategoryId) ],
+                                }),
+                            ),
+                        );
+
+                    this._clientCategory.children = services.filter((service) => !!service);
+                    return this._clientCategory;
+                    // return item
+                }
+            } else {
+                if (this._childrenIsValid()) {
+                    // update item
+                    return await updateSettingsServiceCategoryByTargetRequestAction(
+                        this._bearer,
+                        this._clientId,
+                        this._clientCategory.id.toString(),
+                        this._clientCategory,
+                        this._targetCategory,
+                        this._fetcher,
+                        this._logger,
+                    ) as SettingsServiceCategoryDataWithChildren;
+                    // return item
+                } else {
+                    // action children
+                    const services = await new PromiseSplitter(1, 3)
+                        .exec<SettingsServiceData | null>(
+                            this._serviceComponents.map(
+                                (service) => ({
+                                    chain: [ service.getAction(clientCategoryId) ],
+                                }),
+                            ),
+                        );
+
+                    this._clientCategory.children = services.filter((service) => !!service);
+
+                    // update item
+                    return await updateSettingsServiceCategoryByTargetRequestAction(
+                        this._bearer,
+                        this._clientId,
+                        this._clientCategory.id.toString(),
+                        this._clientCategory,
+                        this._targetCategory,
+                        this._fetcher,
+                        this._logger,
+                    ) as SettingsServiceCategoryDataWithChildren;
+                    // return item
+                }
+            }
+        } else {
+            if (!this._isNoCreateNew()) {
+                // create item
+                const category: SettingsServiceCategoryDataWithChildren =
+                          {
+                              ...await createSettingsServiceCategoryRequestAction(
+                                  this._bearer,
+                                  this._clientId,
+                                  {
+                                      title        : this._targetCategory.title,
+                                      services     : [],
+                                      booking_title: this._targetCategory.booking_title ?? this._targetCategory.title,
+                                      service_count: 0,
+                                      api_id       : '0',
+                                      staff        : [],
+                                      translations : this._targetCategory.translations,
+                                  },
+                                  this._fetcher,
+                                  this._logger,
+                              ),
+                              children: [],
+                          };
+
+                console.log('Created category', category);
+
+                if (!this._childrenIsValid()) {
+                    // action children
+                    const services = await new PromiseSplitter(1, 3)
+                        .exec<SettingsServiceData | null>(
+                            this._serviceComponents.map(
+                                (service) => ({
+                                    chain: [ service.getAction(category.id) ],
+                                }),
+                            ),
+                        );
+
+                    category.children = services.filter((service) => !!service);
+                }
+
+                // return item
+                return category;
+            }
+        }
+
         return null;
     }
 

@@ -44,16 +44,16 @@ import {
 export type ResourceCompareComponentProps =
     CompareComponentProps
     & {
-    clientId: string,
-    targetResource: Resource,
-    clientResources: Array<Resource>,
-    logger?: ILogger,
-    fetcher?: IFetcher,
-    promiseSplitter?: {
-        limit?: number,
-        retry?: number,
-    },
-}
+        clientId: string,
+        targetResource: Resource,
+        clientResources: Array<Resource>,
+        logger?: ILogger,
+        fetcher?: IFetcher,
+        promiseSplitter?: {
+            limit?: number,
+            retry?: number,
+        },
+    }
 
 export class ResourceCompareComponent extends CompareComponent<Resource> {
     private readonly _logger?: ILogger;
@@ -93,10 +93,64 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
 
     protected async _action (): Promise<Resource | null> {
         if (this._clientResource) {
-            const resource = this._itemIsValid() ? this._clientResource!
-                                                 : await updateResourceRequestAction(
+            const resourceId = this._clientResource.id;
+            if (this._itemIsValid()) {
+                if (this._childrenIsValid()) {
+                    // return item
+                    return this._clientResource;
+                } else {
+                    // action children
+                    this._clientResource.instances = await this._promiseSplitter.exec<ResourceInstance>(
+                        this._resourceInstancesCompareComponents.map(
+                            (component) => ({ chain: [ component.getAction(resourceId) ] }),
+                        ),
+                    );
+                    return this._clientResource;
+                    // return item
+                }
+            } else {
+                if (this._childrenIsValid()) {
+                    // update item
+                    const resource     = await updateResourceRequestAction(
+                        this._clientId,
+                        this._clientResource!.id,
+                        {
+                            title      : this._targetResource.title,
+                            description: this._targetResource.description,
+                        },
+                        this._fetcher,
+                        this._logger,
+                    );
+                    resource.instances = this._clientResource.instances;
+                    return resource;
+                    // return item
+                } else {
+                    // update item
+                    const resource     = await updateResourceRequestAction(
+                        this._clientId,
+                        this._clientResource!.id,
+                        {
+                            title      : this._targetResource.title,
+                            description: this._targetResource.description,
+                        },
+                        this._fetcher,
+                        this._logger,
+                    );
+                    resource.instances = await this._promiseSplitter.exec<ResourceInstance>(
+                        this._resourceInstancesCompareComponents.map(
+                            (component) => ({ chain: [ component.getAction(resource.id) ] }),
+                        ),
+                    );
+                    return resource;
+                    // action children
+                    // return item
+                }
+            }
+        } else {
+            if (!this._isNoCreateNew()) {
+                // create item
+                await createResourceRequestAction(
                     this._clientId,
-                    this._clientResource!.id,
                     {
                         title      : this._targetResource.title,
                         description: this._targetResource.description,
@@ -105,47 +159,25 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
                     this._logger,
                 );
 
-            const instances: Array<unknown> = this._childrenIsValid()
-                                              ? this._clientResource!.instances
-                                              : await this._promiseSplitter.exec(
-                    this._resourceInstancesCompareComponents.map(
-                        (component) => ({ chain: [ component.getAction(resource!.id) ] }),
-                    ),
-                );
+                const resource = await uploadResourceByTitleRequestAction(this._clientId, this._targetResource.title, this._logger);
 
-            resource!.instances = instances.filter(Boolean) as Array<ResourceInstance>;
-            return resource;
-        } else {
-            if (this._isNoCreateNew()) {
-                return null;
+                if (resource.instances.length === 1) {
+                    await deleteResourceInstanceRequestAction(resource.id, resource.instances[0].id, this._logger);
+                }
+
+                if (!this._childrenIsValid()) {
+                    resource.instances = await this._promiseSplitter.exec(
+                        this._resourceInstancesCompareComponents.map(
+                            (component) => ({ chain: [ component.getAction(resource.id) ] }),
+                        ),
+                    );
+                }
+
+                // return item
+                return resource;
             }
 
-            await createResourceRequestAction(
-                this._clientId,
-                {
-                    title      : this._targetResource.title,
-                    description: this._targetResource.description,
-                },
-                this._fetcher,
-                this._logger,
-            );
-
-            const resource = await uploadResourceByTitleRequestAction(this._clientId, this._targetResource.title, this._logger);
-
-            if (resource.instances.length === 1) {
-                await deleteResourceInstanceRequestAction(resource.id, resource.instances[0].id, this._logger);
-            }
-
-            const instances: Array<unknown> = this._childrenIsValid()
-                                              ? []
-                                              : await this._promiseSplitter.exec(
-                    this._resourceInstancesCompareComponents.map(
-                        (component) => ({ chain: [ component.getAction(resource.id) ] }),
-                    ),
-                );
-
-            resource.instances = instances.filter(Boolean) as Array<ResourceInstance>;
-            return resource;
+            return null;
         }
     }
 
