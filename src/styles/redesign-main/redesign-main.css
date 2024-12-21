@@ -1,0 +1,47 @@
+:root body.booster-dark {
+    /* Bg main */
+
+    body, #page-wrapper, .white-bg, .erp-services-categories-service-header, .erp-services-categories-service, .super-panel {
+        background : var(--bg-main) !important;
+        color      : var(--text-color-main) !important;
+    }
+
+    /* Bg second */
+
+    .navbar-default, .sidebar-addon, #side-menu, li.nav-header, .erp-pos-panel-footer, #js-head-dropdown, .ibox-content, .btn-white, input {
+        background : var(--bg-second) !important;
+        color      : var(--text-color-main) !important;
+    }
+
+    /* Border none */
+
+    #page-wrapper, .new-sidebar-separator, .erp-pos-panel-footer-user, .erp-pos-panel-footer-toggle,
+    .erp-pos-panel-footer, .q-item, .ibox-content, .btn-white, input {
+        border-color : var(--border-color) !important;
+    }
+
+    /* Hover */
+
+    #side-menu.nav > li.nav-menu-category,
+    #side-menu.nav > li.nav-menu-item {
+        &:hover {
+            background : var(--bg-hover) !important;
+
+            & * {
+                color : var(--text-color-main) !important;
+            }
+        }
+    }
+
+    /* Links, buttons (MAIN) */
+
+    .nav-label, a, .header-title-text, .ui-datepicker-title {
+        color : var(--text-color-main) !important;
+    }
+
+    /* Titles */
+
+    .menu-group__title {
+        color : var(--text-color-second) !important;
+    }
+}

@@ -3,7 +3,7 @@
     flex-direction : column-reverse;
     gap            : var(--offset-extra-small);
     max-height     : 320px;
-    background     : var(--color-black);
+    background     : var(--bg-second);
     padding        : var(--offset-small);
     overflow       : auto;
     border-radius  : var(--offset-small);
@@ -33,10 +33,10 @@
     }
 
     .neutral {
-        color : var(--color-dark-gray);
+        color : var(--text-color-invisible);
     }
 
     .warning {
-        color : var(--color-orange);
+        color : var(--warning-text-color);
     }
 }

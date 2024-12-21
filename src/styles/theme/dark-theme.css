@@ -1,0 +1,20 @@
+:root body.booster-dark {
+    --bg-main              : var(--color-dark-black);
+    --bg-main-opacity      : var(--color-white-opacity);
+    --bg-inverse-opacity   : var(--color-dark-black-opacity);
+    --bg-second            : var(--color-black);
+    --bg-hover             : var(--color-light-black);
+    --border-color         : var(--color-light-black);
+    --primary-color        : var(--color-blue);
+    --on-primary-color     : var(--color-white);
+    --danger-color         : var(--color-red);
+    --on-danger-color      : var(--color-white);
+    --success-color        : var(--color-green);
+    --on-success-color     : var(--color-white);
+    --warning-color        : var(--color-yellow);
+    --warning-text-color   : var(--color-orange);
+    --on-warning-color     : var(--color-black);
+    --text-color-main      : var(--color-white);
+    --text-color-second    : var(--color-white);
+    --text-color-invisible : var(--color-light-black);
+}

@@ -1,7 +1,4 @@
-import './styles/palette.css';
-import './styles/offset.css';
-import './styles/light-theme.css';
-import './styles/transition.css';
+import './styles/styles.css';
 
 import { goodsPageHandler, isGoodsPage } from './pages/storage/goods';
 import {
@@ -30,6 +27,8 @@ import {
 } from '@/pages/settings/service';
 import { isResourcesPage, resourcesPageHandler } from '@/pages/resources';
 
+
+// document.body.classList.add('booster-dark');
 
 const pathParts = location.pathname.split('/');
 
