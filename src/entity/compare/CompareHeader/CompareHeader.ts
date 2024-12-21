@@ -33,6 +33,7 @@ export type CompareHeaderProps =
         onActivateOnlyItem?: () => void;
         onDeactivate?: () => void;
         onRename?: (name: string) => void;
+        disable?: boolean;
     };
 
 export class CompareHeader extends Component<HTMLDivElement> implements ICompareHeader,
@@ -42,7 +43,8 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
     private readonly _processButton: Component<HTMLDivElement>;
     private _currentTargetHeader: string;
     private _isValid: boolean;
-    private _enabled: boolean = true;
+    private _enabled: boolean       = true;
+    private _disableByProp: boolean = false;
 
     constructor (props: CompareHeaderProps) {
         const {
@@ -57,10 +59,12 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
                   onVariantChange,
                   onRename,
                   rows,
+                  disable = false,
                   ...other
               } = props;
         super('div', other);
         this.element.classList.add(css.container);
+        this._disableByProp       = disable;
         this._initialTargetHeader = this._currentTargetHeader = targetHeaderData;
         this._isValid             = this._initialTargetHeader === clientHeaderData;
 
@@ -151,6 +155,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
 
         content.insert(this.element, 'beforeend');
         this._updateValidation(clientHeaderData);
+        this.enable(true);
     }
 
     get isValid (): boolean {
@@ -164,7 +169,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
     enable (status: boolean): void {
         this._enabled = status;
 
-        if (status) {
+        if (status && !this._disableByProp) {
             this.element.classList.remove(css.disable);
         } else {
             this.element.classList.add(css.disable);

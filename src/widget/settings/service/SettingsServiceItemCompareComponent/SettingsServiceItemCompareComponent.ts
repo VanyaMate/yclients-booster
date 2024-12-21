@@ -191,8 +191,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                 value: this._clientService
                        ? this._clientService.abonement_restriction_value.toString()
                        : undefined,
-                label: this._clientService?.abonement_restriction_value
-                       ? 'Да' : 'Нет',
+                label: Converter.Settings.Service.yesOrNo(!!this._clientService?.abonement_restriction_value),
             }),
             label           : 'Запретить онлайн запись без абонемента',
             validationMethod: (targetValue, clientValue) => {
@@ -214,8 +213,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                 value: this._clientService
                        ? this._clientService.online_invoicing_status.toString()
                        : undefined,
-                label: this._clientService?.online_invoicing_status
-                       ? 'Да' : 'Нет',
+                label: Converter.Settings.Service.yesOrNo(!!this._clientService?.online_invoicing_status),
             }),
             label           : 'Онлайн запись',
             validationMethod: (targetValue, clientValue) => {
@@ -351,11 +349,11 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         label      : 'Сетевая услуга',
                         targetValue: new CompareTextValue({
                             value: this._targetService.is_chain,
-                            label: this._targetService.is_chain ? 'Да' : 'Нет',
+                            label: Converter.Settings.Service.yesOrNo(this._targetService.is_chain),
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientService?.is_chain,
-                            label: this._clientService?.is_chain ? 'Да' : 'Нет',
+                            label: Converter.Settings.Service.yesOrNo(this._clientService?.is_chain),
                         }),
                         validate   : false,
                     }),
@@ -597,6 +595,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
             onActivateOnlyItem    : () => this._setCompareType(CompareType.ITEM),
             onActivateOnlyChildren: () => this._setCompareType(CompareType.CHILDREN),
             onDeactivate          : () => this._setCompareType(CompareType.NONE),
+            disable               : this._clientService?.is_chain,
         });
 
         this._revalidate(this._clientService);

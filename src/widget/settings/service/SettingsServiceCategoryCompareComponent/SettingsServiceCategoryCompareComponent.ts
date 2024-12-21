@@ -36,6 +36,7 @@ import {
 import {
     createSettingsServiceCategoryRequestAction,
 } from '@/action/settings/service_categories/request-action/createSettingsServiceCategory/createSettingsServiceCategory.request-action.ts';
+import { Converter } from '@/converter/Converter.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -187,8 +188,6 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                               children: [],
                           };
 
-                console.log('Created category', category);
-
                 if (!this._childrenIsValid()) {
                     // action children
                     const services = await new PromiseSplitter(1, 3)
@@ -247,6 +246,18 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                         label      : 'Id',
                         validate   : false,
                     }),
+                    new CompareRow({
+                        targetValue: new CompareTextValue({
+                            value: this._targetCategory.id,
+                            label: Converter.Settings.Service.yesOrNo(this._targetCategory?.is_chain),
+                        }),
+                        clientValue: new CompareTextValue({
+                            value: this._clientCategory?.id,
+                            label: Converter.Settings.Service.yesOrNo(this._clientCategory?.is_chain),
+                        }),
+                        label      : 'Сетевая категория',
+                        validate   : false,
+                    }),
                 ],
             }),
             new CompareBox({
@@ -266,6 +277,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                             value: this._clientCategory?.booking_title,
                         }),
                         label      : 'Название для онлайн записи',
+                        disable    : this._clientCategory?.is_chain,
                     }),
                 ],
             }),
@@ -296,6 +308,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
             onActivateOnlyItem    : () => this._setCompareType(CompareType.ITEM),
             onActivateOnlyChildren: () => this._setCompareType(CompareType.CHILDREN),
             onDeactivate          : () => this._setCompareType(CompareType.NONE),
+            disable               : this._clientCategory?.is_chain,
         });
 
         this._revalidate(this._clientCategory);

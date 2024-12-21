@@ -16,4 +16,8 @@ export namespace ServiceConverter {
                ? `${ Math.floor(minutes / 60 / 60).toString() }ч ${ Math.floor(minutes / 60 % 60).toString() }м`
                : undefined;
     };
+
+    export const yesOrNo = function (value?: boolean) {
+        return value ? 'Да' : 'Нет';
+    };
 }

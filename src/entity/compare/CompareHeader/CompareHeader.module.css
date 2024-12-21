@@ -40,7 +40,7 @@
     &.disable > .content > summary > .data {
         & > input {
             pointer-events : none;
-            opacity        : .2;
+            opacity        : .4;
             cursor         : default;
         }
     }
