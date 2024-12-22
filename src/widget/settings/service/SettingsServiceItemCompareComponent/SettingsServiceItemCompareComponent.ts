@@ -70,12 +70,16 @@ import {
     getDatesBetween,
 } from '@/helper/lib/date/getDatesBetween/getDatesBetween.ts';
 import {
-    validateDates,
-} from '@/entity/compare/CompareValue/CompareDateValue/lib/validateDates.ts';
+    Validator,
+} from '@/validator/Validator.ts';
 import {
     CompareTextareaValue,
 } from '@/entity/compare/CompareValue/CompareTextareaValue/CompareTextareaValue.ts';
 import { Converter } from '@/converter/Converter.ts';
+import {
+    SettingsService,
+} from '@/action/settings/service_categories/const/settings-service.const.ts';
+import { Const } from '@/const/Const.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -147,45 +151,48 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
     protected _render () {
         this.element.innerHTML = ``;
 
-        const prepaidTargetPercents                                 = this._targetService.price_prepaid_amount === 0;
         const onlinePrepaidComponents: Array<ICompareComponent>     = [
             new CompareRow({
+                label           : 'Предоплата',
                 targetValue     : new ComparePriceWithSelectValue({
-                    value: [
-                        prepaidTargetPercents
-                        ? this._targetService.price_prepaid_percent.toString()
-                        : this._targetService.price_prepaid_amount.toString(),
-                        prepaidTargetPercents ? ComparePriceSelectType.PERCENTS
-                                              : ComparePriceSelectType.RUBLES,
-                    ],
+                    value   : Converter.Settings.Service.priceValue(
+                        this._targetService.price_prepaid_amount,
+                        this._targetService.price_prepaid_percent,
+                    ),
+                    onChange: ([ value, type ]) => {
+                        if (type === ComparePriceSelectType.RUBLES) {
+                            this._targetService.price_prepaid_percent = 0;
+                            this._targetService.price_prepaid_amount  = Number(value);
+                        } else {
+                            this._targetService.price_prepaid_amount  = 0;
+                            this._targetService.price_prepaid_percent = Number(value);
+                        }
+
+                        this._targetService.online_invoicing_status = Const.Settings.Service.ONLINE_INVOICING_STATUS_ON;
+                    },
                 }),
                 clientValue     : new CompareTextValue({
-                    value: this._clientService ?
-                           this._clientService.price_prepaid_amount
-                           ? `${ this._clientService.price_prepaid_amount } ₽`
-                           : `${ this._clientService.price_prepaid_percent } %`
-                                               : undefined,
+                    value: Converter.Settings.Service.priceLabel(
+                        this._clientService?.price_prepaid_amount,
+                        this._clientService?.price_prepaid_percent,
+                    ),
                 }),
-                label           : 'Предоплата',
-                validationMethod: (targetValue, clientValue) => {
-                    if (targetValue && clientValue) {
-                        return targetValue.join(' ') === clientValue;
-                    }
-
-                    return targetValue === clientValue;
-                },
+                validationMethod: Validator.Compare.arrayWithString(' '),
             }),
         ];
         const disableOnlineOrderWithoutAbonement: ICompareComponent = new CompareRow({
+            label           : 'Запретить онлайн запись без абонемента',
             targetValue     : new CompareToggleValue({
-                value                   : this._targetService.abonement_restriction_value === 1,
-                onChange                : (status) => {
-                    // Осуждаю
-                    requestAnimationFrame(() => {
-                        enableOnlinePrepaid.enable(!status);
-                    });
+                value   : this._targetService.abonement_restriction_value === Const.Settings.Service.ABONEMENT_RESTRICTION_VALUE_ON,
+                onChange: (status) => {
+                    enableOnlinePrepaid.enable(!status);
+
+                    if (status) {
+                        this._targetService.abonement_restriction_value = Const.Settings.Service.ABONEMENT_RESTRICTION_VALUE_ON;
+                    } else {
+                        this._targetService.abonement_restriction_value = Const.Settings.Service.ABONEMENT_RESTRICTION_VALUE_OFF;
+                    }
                 },
-                executeOnChangeAfterInit: true,
             }),
             clientValue     : new CompareTextValue({
                 value: this._clientService
@@ -193,19 +200,26 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                        : undefined,
                 label: Converter.Settings.Service.yesOrNo(!!this._clientService?.abonement_restriction_value),
             }),
-            label           : 'Запретить онлайн запись без абонемента',
             validationMethod: (targetValue, clientValue) => {
+                // Значение clientValue может быть undefined/1/0
                 return targetValue ? clientValue === '1'
                                    : clientValue === undefined || clientValue === '0';
             },
         });
 
         const enableOnlinePrepaid: ICompareComponent = new CompareRow({
+            label           : 'Онлайн запись',
             targetValue     : new CompareToggleValue({
                 value                   : !!this._targetService.online_invoicing_status,
                 onChange                : (status) => {
                     onlinePrepaidComponents.forEach((component) => component.enable(status));
                     disableOnlineOrderWithoutAbonement.enable(!status);
+
+                    if (status) {
+                        this._targetService.online_invoicing_status = SettingsService.onlineInvoicingStatus.ENABLED;
+                    } else {
+                        this._targetService.online_invoicing_status = SettingsService.onlineInvoicingStatus.DISABLED;
+                    }
                 },
                 executeOnChangeAfterInit: true,
             }),
@@ -215,16 +229,25 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                        : undefined,
                 label: Converter.Settings.Service.yesOrNo(!!this._clientService?.online_invoicing_status),
             }),
-            label           : 'Онлайн запись',
             validationMethod: (targetValue, clientValue) => {
                 return targetValue ? clientValue === '2'
                                    : clientValue === '0';
             },
         });
 
+        /**
+         * Нужно для деактивации онлайн записи, если запрещена онлайн-запись
+         * без абонемента
+         */
+        if (this._targetService.abonement_restriction_value === SettingsService.abonementRestrictionValue.ENABLED) {
+            enableOnlinePrepaid.enable(true);
+        }
+        // ***
+
         let bottomDatePicker: CompareDateValue;
         const timepickers: Array<ICompareComponent> = [
             new CompareRow({
+                label           : 'Диапазон дат',
                 targetValue     : new CompareDateValue({
                     value   : [ this._targetService.date_from, this._targetService.date_to ],
                     range   : true,
@@ -245,52 +268,38 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                     range  : true,
                     disable: true,
                 }),
-                label           : 'Диапазон дат',
-                validationMethod: validateDates,
+                validationMethod: Validator.Compare.dates,
             }),
             new CompareRow({
-                targetValue     : new CompareTimeRangeValue({
-                    value: [
-                        Math.floor(this._targetService.seance_search_start / 60 / 60),
-                        Math.floor(this._targetService.seance_search_start / 60 % 60),
-                    ],
-                }),
-                clientValue     : new CompareTextValue({
-                    value: this._clientService ?
-                           `${ Math.floor(this._clientService.seance_search_start / 60 / 60) }ч ${ Math.floor(this._clientService.seance_search_start / 60 % 60) }м`
-                                               : undefined,
-                }),
                 label           : 'Время записи с',
-                validationMethod: (targetValue, clientValue) => {
-                    if (targetValue && clientValue) {
-                        return `${ targetValue[0] }ч ${ targetValue[1] }м` === clientValue;
-                    }
-
-                    return targetValue === clientValue;
-                },
-            }),
-            new CompareRow({
                 targetValue     : new CompareTimeRangeValue({
-                    value: [
-                        Math.floor(this._targetService.seance_search_finish / 60 / 60),
-                        Math.floor(this._targetService.seance_search_finish / 60 % 60),
-                    ],
+                    value   : Converter.Settings.Service.timeRangeValue(this._targetService.seance_search_start),
+                    onChange: ([ hours, minutes ]) => {
+                        this._targetService.seance_search_start = hours * 60 * 60 + minutes * 60;
+                    },
                 }),
                 clientValue     : new CompareTextValue({
-                    value: this._clientService ?
-                           `${ Math.floor(this._clientService.seance_search_finish / 60 / 60) }ч ${ Math.floor(this._clientService.seance_search_finish / 60 % 60) }м`
-                                               : undefined,
+                    value: this._clientService?.seance_search_start,
+                    label: Converter.Settings.Service.timeRangeLabel(this._clientService?.seance_search_start),
                 }),
-                label           : 'Время записи до',
-                validationMethod: (targetValue, clientValue) => {
-                    if (targetValue && clientValue) {
-                        return `${ targetValue[0] }ч ${ targetValue[1] }м` === clientValue;
-                    }
-
-                    return targetValue === clientValue;
-                },
+                validationMethod: Validator.Compare.timeRangeWithNumber,
             }),
             new CompareRow({
+                label           : 'Время записи до',
+                targetValue     : new CompareTimeRangeValue({
+                    value   : Converter.Settings.Service.timeRangeValue(this._targetService.seance_search_finish),
+                    onChange: ([ hours, minutes ]) => {
+                        this._targetService.seance_search_finish = hours * 60 * 60 + minutes * 60;
+                    },
+                }),
+                clientValue     : new CompareTextValue({
+                    value: this._clientService?.seance_search_finish,
+                    label: Converter.Settings.Service.timeRangeLabel(this._clientService?.seance_search_finish),
+                }),
+                validationMethod: Validator.Compare.timeRangeWithNumber,
+            }),
+            new CompareRow({
+                label           : 'Выбор дат',
                 targetValue     : bottomDatePicker = new CompareDateValue({
                     value        : this._targetService.dates,
                     range        : false,
@@ -305,15 +314,14 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                     multipleDates: true,
                     disable      : true,
                 }),
-                label           : 'Выбор дат',
-                validationMethod: validateDates,
+                validationMethod: Validator.Compare.dates,
             }),
         ];
 
         this._compareRows = [
             new CompareBox({
-                level     : 3,
                 title     : 'Информация',
+                level     : 3,
                 components: [
                     new CompareRow({
                         label      : 'Id',
@@ -410,53 +418,52 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                 ],
             }),
             new CompareBox({
-                level     : 3,
                 title     : 'Основные настройки',
+                level     : 3,
                 components: [
                     new CompareRow({
+                        label      : 'Минимальная цена',
                         targetValue: new CompareTextInputValue({
                             type       : 'number',
                             value      : this._targetService.price_min.toString(),
                             placeholder: 'Пусто',
+                            onInput    : (price) => {
+                                this._targetService.price_min = Number(price);
+                            },
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientService?.price_min.toString(),
                         }),
-                        label      : 'Минимальная цена',
                         disable    : this._clientService?.is_chain,
                     }),
                     new CompareRow({
+                        label      : 'Максимальная цена',
                         targetValue: new CompareTextInputValue({
                             type       : 'number',
                             value      : this._targetService.price_max.toString(),
                             placeholder: 'Пусто',
+                            onInput    : (price) => {
+                                this._targetService.price_max = Number(price);
+                            },
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientService?.price_max.toString(),
                         }),
-                        label      : 'Максимальная цена',
                         disable    : this._clientService?.is_chain,
                     }),
                     new CompareRow({
+                        label           : 'Длительность',
                         targetValue     : new CompareTimeSelectsValue({
-                            value: [
-                                Math.floor(this._targetService.duration / 60 / 60).toString(),
-                                Math.floor(this._targetService.duration / 60 % 60).toString(),
-                            ],
+                            value: Converter.Settings.Service.timeRangeValue(this._targetService.duration),
                         }),
                         clientValue     : new CompareTextValue({
-                            value: Converter.Settings.Service.duration(this._clientService?.duration),
+                            value: this._clientService?.duration,
+                            label: Converter.Settings.Service.timeRangeLabel(this._clientService?.duration),
                         }),
-                        label           : 'Длительность',
-                        validationMethod: (targetValue, clientValue) => {
-                            if (targetValue !== null && clientValue !== null) {
-                                return `${ targetValue[0] }ч ${ targetValue[1] }м` === clientValue;
-                            }
-
-                            return targetValue === clientValue;
-                        },
+                        validationMethod: Validator.Compare.timeRangeWithNumber,
                     }),
                     new CompareRow({
+                        label      : 'Тип',
                         targetValue: new CompareSelectValue({
                             defaultLabel    : '',
                             defaultValue    : '',
@@ -475,53 +482,62 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             ],
                             showValue       : false,
                             variant         : SelectVariantType.MINIMAL,
+                            onChange        : (option) => {
+                                this._targetService.is_multi = option.value;
+                            },
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientService?.is_multi,
-                            label: Converter.Settings.Service.type(this._clientService?.is_multi),
+                            label: Converter.Settings.Service.multiType(this._clientService?.is_multi),
                         }),
-                        label      : 'Тип',
                     }),
                     new CompareBox({
                         title     : 'Онлайн запись',
                         level     : 3,
                         components: [
                             new CompareRow({
+                                label      : 'Картинка',
                                 targetValue: new CompareImageValue({
                                     src: this._targetService.image_group?.images?.basic.path,
                                 }),
                                 clientValue: new CompareImageValue({
                                     src: this._clientService?.image_group?.images?.basic.path,
                                 }),
-                                label      : 'Картинка',
                             }),
                             new CompareRow({
+                                label      : 'Название для онлайн записи',
                                 targetValue: new CompareTextInputValue({
                                     type       : 'text',
                                     value      : this._targetService.booking_title,
                                     placeholder: 'Пусто',
+                                    onInput    : (title) => {
+                                        this._targetService.booking_title = title;
+                                    },
                                 }),
                                 clientValue: new CompareTextValue({
                                     value: this._clientService?.booking_title,
                                 }),
-                                label      : 'Название для онлайн записи',
                                 disable    : this._clientService?.is_chain,
                             }),
                             new CompareRow({
+                                label      : 'Описание',
                                 targetValue: new CompareTextareaValue({
                                     value      : this._targetService.comment,
                                     placeholder: 'Пусто',
+                                    onInput    : (comment) => {
+                                        this._targetService.comment = comment;
+                                    },
                                 }),
                                 clientValue: new CompareTextValue({
                                     value: this._clientService?.comment,
                                 }),
-                                label      : 'Описание',
                                 disable    : this._clientService?.is_chain,
                             }),
                             enableOnlinePrepaid,
                             ...onlinePrepaidComponents,
                             disableOnlineOrderWithoutAbonement,
                             new CompareRow({
+                                label      : 'Услуга доступна ограниченное время',
                                 targetValue: new CompareToggleValue({
                                     value                   : !!this._targetService.dates.length || this._targetService.seance_search_start !== 0 || this._targetService.seance_search_finish !== 86400,
                                     onChange                : (status) => {
@@ -530,15 +546,17 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                     executeOnChangeAfterInit: true,
                                 }),
                                 clientValue: new CompareTextValue({
-                                    value: this._clientService
-                                           ? (!!this._clientService?.dates.length || this._clientService?.seance_search_start !== 0 || this._clientService?.seance_search_finish !== 86400)
-                                           : undefined,
-                                    label: this._clientService
-                                           ? (!!this._clientService?.dates.length || this._clientService?.seance_search_start !== 0 || this._clientService?.seance_search_finish !== 86400)
-                                             ? 'Да' : 'Нет'
-                                           : undefined,
+                                    value: Converter.Settings.Service.datesBorderEnabledValue(
+                                        this._clientService?.dates,
+                                        this._clientService?.seance_search_start,
+                                        this._clientService?.seance_search_finish,
+                                    ),
+                                    label: Converter.Settings.Service.datesBorderEnabledLabel(
+                                        this._clientService?.dates,
+                                        this._clientService?.seance_search_start,
+                                        this._clientService?.seance_search_finish,
+                                    ),
                                 }),
-                                label      : 'Услуга доступна ограниченное время',
                             }),
                             ...timepickers,
                         ],
@@ -570,9 +588,9 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
         ];
 
         this._header = new CompareHeader({
+            label                 : 'Сервис',
             targetHeaderData      : this._targetService.title,
             clientHeaderData      : this._clientService?.title,
-            label                 : 'Сервис',
             variants              : this._clientServices
                 .map((service) => ({
                     label   : service.title,

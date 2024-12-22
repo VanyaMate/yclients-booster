@@ -4,12 +4,12 @@ import {
 import { startHandler } from '@/shared/lib/startHandler.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
 import {
-    SettingsServiceMassiveUpdatePriceButton,
-} from '@/feature/SettingsServiceMassiveUpdatePriceButton/SettingsServiceMassiveUpdatePriceButton.ts';
-import {
     SettingsServiceCategoriesCreateForm,
 } from '@/widget/settings/service/SettingsServiceCategoriesCreateForm/SettingsServiceCategoriesCreateForm.ts';
 import { ModalButton } from '@/shared/buttons/ModalButton/ModalButton.ts';
+import {
+    SettingsServiceMassivePriceUpdate,
+} from '@/widget/settings/service/SettingsServiceMassivePriceUpdate/SettingsServiceMassivePriceUpdate.ts';
 
 
 export const isSettingsServicePage = function (pathname: Array<string>) {
@@ -37,10 +37,16 @@ export const settingsServicePageHandler = function (pathname: Array<string>) {
                             label      : 'Копирование услуг',
                         },
                     }),
-                    new SettingsServiceMassiveUpdatePriceButton({
-                        clientId,
-                        bearer,
+                    new ModalButton({
                         textContent: 'Обновить цены',
+                        modalProps : {
+                            content    : new SettingsServiceMassivePriceUpdate({
+                                clientId,
+                                bearer,
+                            }),
+                            preferWidth: 700,
+                            label      : 'Изменить цены',
+                        },
                     }),
                 ],
             })

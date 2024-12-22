@@ -1,6 +1,6 @@
 import {
     ServiceConverter,
-} from '@/converter/settings/service/ServiceConverter.ts';
+} from '@/entity/compare/converters/settings/service/ServiceConverter.ts';
 
 
 export namespace SettingsConverter {

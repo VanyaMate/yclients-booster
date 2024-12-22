@@ -36,6 +36,8 @@ export class ComparePriceWithSelectValue extends Component<HTMLDivElement> imple
             input = new TextInput({
                 type       : 'number',
                 value      : value[0],
+                max        : '100',
+                min        : '0',
                 placeholder: 'Пусто',
                 oninput    : () => {
                     this._currentValue[0] = input.getValue();

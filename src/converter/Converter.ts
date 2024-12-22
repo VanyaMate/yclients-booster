@@ -1,4 +1,4 @@
-import { SettingsConverter } from '@/converter/settings/SettingsConverter.ts';
+import { SettingsConverter } from '@/entity/compare/converters/settings/SettingsConverter.ts';
 
 
 export namespace Converter {

@@ -11,7 +11,7 @@ import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 import css from './CompareTimeSelectsValue.module.css';
 
 
-export type CompareTimeSelectsValueType = [ string, string ];
+export type CompareTimeSelectsValueType = [ number, number ];
 
 export type CompareTimeSelectsValueProps =
     ComponentPropsOptional<HTMLDivElement>
@@ -36,7 +36,7 @@ export class CompareTimeSelectsValue extends Component<HTMLDivElement> implement
                     return {
                         value   : hour.toString(),
                         label   : `${ hour } ч`,
-                        selected: value[0] === hour.toString(),
+                        selected: value[0] === hour,
                     };
                 }),
                 onChange    : (variant) => {
@@ -61,57 +61,57 @@ export class CompareTimeSelectsValue extends Component<HTMLDivElement> implement
                     {
                         label   : '5 м',
                         value   : '5',
-                        selected: value[1] === '5',
+                        selected: value[1] === 5,
                     },
                     {
                         label   : '10 м',
                         value   : '10',
-                        selected: value[1] === '10',
+                        selected: value[1] === 10,
                     },
                     {
                         label   : '15 м',
                         value   : '15',
-                        selected: value[1] === '15',
+                        selected: value[1] === 15,
                     },
                     {
                         label   : '20 м',
                         value   : '20',
-                        selected: value[1] === '20',
+                        selected: value[1] === 20,
                     },
                     {
                         label   : '25 м',
                         value   : '25',
-                        selected: value[1] === '25',
+                        selected: value[1] === 25,
                     },
                     {
                         label   : '30 м',
                         value   : '30',
-                        selected: value[1] === '30',
+                        selected: value[1] === 30,
                     },
                     {
                         label   : '35 м',
                         value   : '35',
-                        selected: value[1] === '35',
+                        selected: value[1] === 35,
                     },
                     {
                         label   : '40 м',
                         value   : '40',
-                        selected: value[1] === '40',
+                        selected: value[1] === 40,
                     },
                     {
                         label   : '45 м',
                         value   : '45',
-                        selected: value[1] === '45',
+                        selected: value[1] === 45,
                     },
                     {
                         label   : '50 м',
                         value   : '50',
-                        selected: value[1] === '50',
+                        selected: value[1] === 50,
                     },
                     {
                         label   : '55 м',
                         value   : '55',
-                        selected: value[1] === '55',
+                        selected: value[1] === 55,
                     },
                 ],
             }),
