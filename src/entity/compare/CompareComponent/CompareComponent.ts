@@ -96,6 +96,8 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
 
     /**
      *
+     *  Сделать так, что null возвращается специально, а undefined - если ошибка
+     *
      *  Template:
      *  ```typescript
      *        if (this._clientService) {
@@ -127,6 +129,8 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
      *
      *                 // return item
      *             }
+     *
+     *              return null;
      *         }
      *  ```
      * @param data
