@@ -26,11 +26,12 @@ export type ButtonProps =
         size?: ButtonSizeType;
         quad?: boolean;
         fullWidth?: boolean;
+        noWrap?: boolean;
     };
 
 export class Button extends Component<HTMLButtonElement> {
     constructor (props: ButtonProps) {
-        const { styleType, size, quad, fullWidth, ...other } = props;
+        const { styleType, size, quad, fullWidth, noWrap, ...other } = props;
         super('button', other);
 
         this.element.classList.add(css.container);
@@ -49,6 +50,10 @@ export class Button extends Component<HTMLButtonElement> {
 
         if (fullWidth) {
             this.element.classList.add(css.fullWidth);
+        }
+
+        if (noWrap) {
+            this.element.classList.add(css.noWrap);
         }
     }
 

@@ -58,6 +58,10 @@
         }
     }
 
+    &.noWrap {
+        white-space : nowrap;
+    }
+
     &.fullWidth {
         width : 100%;
     }

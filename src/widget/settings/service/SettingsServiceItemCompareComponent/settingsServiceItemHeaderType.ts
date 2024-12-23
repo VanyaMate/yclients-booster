@@ -1,1 +1,0 @@
-export const SETTINGS_SERVICE_ITEM_HEADER_TYPE = 'settings-service-item';

@@ -163,6 +163,17 @@ export class Select extends Component<HTMLDivElement> {
         return this._currentValue;
     }
 
+    setValue (value: any) {
+        for (let i = 0; i < this._list.length; i++) {
+            if (this._list[i].value === value) {
+                this._select(this._list[i]);
+                return;
+            }
+        }
+
+        this._selectDefaultValue();
+    }
+
     public setStyleType (styleType: ButtonStyleType) {
         this._selectButton.setStyleType(styleType);
     }
@@ -196,11 +207,7 @@ export class Select extends Component<HTMLDivElement> {
                                           : undefined,
                     disabled   : selected,
                     fullWidth  : true,
-                    onclick    : () => this._select({
-                        label    : this._defaultLabel,
-                        showLabel: this._defaultShowLabel,
-                        value    : this._defaultValue,
-                    }),
+                    onclick    : this._selectDefaultValue.bind(this),
                 }),
             );
         }
@@ -221,6 +228,14 @@ export class Select extends Component<HTMLDivElement> {
                     }),
                 );
             });
+    }
+
+    private _selectDefaultValue () {
+        this._select({
+            label    : this._defaultLabel,
+            showLabel: this._defaultShowLabel,
+            value    : this._defaultValue,
+        });
     }
 
     private _select (item: SelectOption) {

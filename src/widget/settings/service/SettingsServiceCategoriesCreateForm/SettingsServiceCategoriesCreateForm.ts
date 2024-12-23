@@ -14,11 +14,18 @@ import {
     getSalaryCriteriaListDataForCopyRequestAction,
 } from '@/action/salary_criteria/request-action/getSalaryCriteriaListDataForCopy/getSalaryCriteriaListDataForCopy.request-action.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
-import { CompareHeaderEvent } from '@/entity/compare/CompareHeaderEvent.ts';
 import {
-    SETTINGS_SERVICE_ITEM_HEADER_TYPE,
-} from '@/widget/settings/service/SettingsServiceItemCompareComponent/settingsServiceItemHeaderType.ts';
+    SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
+} from '@/widget/settings/service/settingsServiceHeaderTypes.ts';
 import { CompareType } from '@/entity/compare/Compare.types.ts';
+import {
+    ToggleCompareTypeButton,
+} from '@/entity/compare/CompareButton/ToggleCompareTypeButton/ToggleCompareTypeButton.ts';
+import { Dropdown } from '@/shared/dropdown/Dropdown/Dropdown.ts';
+import {
+    DropdownBoxItem,
+} from '@/shared/dropdown/Dropdown/DropdownBoxItem/DropdownBoxItem.ts';
+import { LabelDivider } from '@/shared/divider/LabelDivider/LabelDivider.ts';
 
 
 export type SettingsServiceCategoriesCreateFormProps =
@@ -83,6 +90,7 @@ export class SettingsServiceCategoriesCreateForm extends Component<HTMLDivElemen
             textContent: 'Преобразовать',
             onclick    : () => {
                 activateButton.setLoading(true);
+                headerActions.remove();
                 new PromiseSplitter(5, 2)
                     .exec(
                         form.getActions().map((action) => ({
@@ -119,19 +127,65 @@ export class SettingsServiceCategoriesCreateForm extends Component<HTMLDivElemen
             fetcher   : fetcher,
         });
 
-        content.add(activateButton);
-        content.add(new Button({
-            textContent: 'Отключить',
-            onclick    : () => {
-                const event = CompareHeaderEvent({
-                    headerType : SETTINGS_SERVICE_ITEM_HEADER_TYPE,
-                    compareType: CompareType.NONE,
-                    once       : true,
-                });
-                console.log('event', event);
-                content.element.dispatchEvent(event);
+        const headerActions = new Dropdown({
+            buttonProps: {
+                textContent: 'Действия с категориями',
             },
-        }));
+            content    : new Col({
+                rows: [
+                    new LabelDivider({
+                        textContent: 'Тип сравнения',
+                    }),
+                    new DropdownBoxItem({
+                        content: new ToggleCompareTypeButton({
+                            container  : this.element,
+                            headerType : SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
+                            compareType: CompareType.ALL,
+                            textContent: 'Полное сравнение',
+                            styleType  : ButtonStyleType.DEFAULT,
+                            noWrap     : true,
+                            fullWidth  : true,
+                        }),
+                    }),
+                    new DropdownBoxItem({
+                        content: new ToggleCompareTypeButton({
+                            container  : this.element,
+                            headerType : SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
+                            compareType: CompareType.ITEM,
+                            textContent: 'Только сами категории',
+                            styleType  : ButtonStyleType.WARNING,
+                            noWrap     : true,
+                            fullWidth  : true,
+                        }),
+                    }),
+                    new DropdownBoxItem({
+                        content: new ToggleCompareTypeButton({
+                            container  : this.element,
+                            headerType : SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
+                            compareType: CompareType.CHILDREN,
+                            textContent: 'Только дочерние',
+                            styleType  : ButtonStyleType.WARNING,
+                            noWrap     : true,
+                            fullWidth  : true,
+                        }),
+                    }),
+                    new DropdownBoxItem({
+                        content: new ToggleCompareTypeButton({
+                            container  : this.element,
+                            headerType : SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
+                            compareType: CompareType.NONE,
+                            textContent: 'Ничего не сравнивать',
+                            styleType  : ButtonStyleType.WARNING,
+                            noWrap     : true,
+                            fullWidth  : true,
+                        }),
+                    }),
+                ],
+            }),
+        });
+
+        content.add(activateButton);
+        content.add(headerActions);
         content.add(form);
     }
 }

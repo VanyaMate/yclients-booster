@@ -1,0 +1,41 @@
+.container {
+    position : relative;
+    display  : inline-flex;
+    width    : fit-content;
+
+    > button {
+        &:after {
+            content      : '▼';
+            padding-left : var(--offset-small);
+        }
+    }
+
+    .dropdown {
+        transition    : var(--transition-fast);
+        z-index       : 3;
+        position      : absolute;
+        top           : 100%;
+        left          : 0;
+        opacity       : 0;
+        visibility    : hidden;
+        transform     : translateY(10px);
+        padding       : var(--offset-small);
+        border-radius : var(--offset-small);
+        background    : var(--bg-main);
+        border        : 1px solid var(--border-color);
+    }
+
+    &.opened {
+        > button {
+            &:after {
+                content : '▲';
+            }
+        }
+
+        > .dropdown {
+            opacity    : 1;
+            visibility : visible;
+            transform  : translateY(5px);
+        }
+    }
+}

@@ -1,0 +1,7 @@
+.container {
+    margin         : var(--offset-small) 0 0;
+    color          : var(--text-color-invisible);
+    border-bottom  : 1px dashed var(--border-color);
+    padding-bottom : var(--offset-extra-small);
+    font-size      : 12px;
+}

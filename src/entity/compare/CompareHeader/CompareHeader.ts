@@ -17,6 +17,9 @@ import { Details } from '@/shared/box/Details/Details.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
 import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
+import {
+    CompareHeaderResponseOnSignalEvent, CompareHeaderSignalEvent,
+} from '@/entity/compare/CompareHeaderResponseOnSignalEvent.ts';
 
 
 export type CompareHeaderActivateHandler = () => void;
@@ -36,6 +39,7 @@ export type CompareHeaderProps =
         onDeactivate?: CompareHeaderActivateHandler;
         onRename?: (name: string) => void;
         disable?: boolean;
+        type?: string;
     };
 
 export class CompareHeader extends Component<HTMLDivElement> implements ICompareHeader,
@@ -48,6 +52,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
     private readonly _onActivateOnlyItem?: CompareHeaderActivateHandler;
     private readonly _onActivateOnlyChildren?: CompareHeaderActivateHandler;
     private readonly _onDeactivate?: CompareHeaderActivateHandler;
+    private readonly _type?: string;
     private _currentTargetHeader: string;
     private _isValid: boolean;
     private _enabled: boolean                = true;
@@ -66,6 +71,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
                   onRename,
                   rows,
                   disable = false,
+                  type,
                   ...other
               } = props;
         super('div', other);
@@ -77,6 +83,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
         this._disableByProp          = disable;
         this._initialTargetHeader    = this._currentTargetHeader = targetHeaderData;
         this._isValid                = this._initialTargetHeader === clientHeaderData;
+        this._type                   = type;
 
         this._selectButton = new Select({
             defaultValue    : CompareType.ALL,
@@ -99,7 +106,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
                     value    : CompareType.NONE,
                 },
             ],
-            onChange        : (data) => this.setCompareType(data.value),
+            onChange        : (data) => this._executeActivateHandlerByCompareType(data.value),
             isModal         : true,
             modalLabel      : `Варианты действия`,
             className       : css.select,
@@ -153,6 +160,8 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
         content.insert(this.element, 'beforeend');
         this._updateValidation(clientHeaderData);
         this.enable(true);
+
+        document.addEventListener(CompareHeaderSignalEvent.type, this._responseOnSignal.bind(this));
     }
 
     get isValid (): boolean {
@@ -224,6 +233,11 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
     }
 
     setCompareType (type: CompareType) {
+        console.log('type', type);
+        this._selectButton.setValue(type);
+    }
+
+    private _executeActivateHandlerByCompareType (type: CompareType) {
         switch (type as CompareType) {
             case CompareType.ALL:
                 return this._onActivateAll?.();
@@ -253,5 +267,16 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
             this._isValid = true;
         }
         this.element.dispatchEvent(CompareEvent);
+    }
+
+    private _responseOnSignal () {
+        if (this._type !== undefined) {
+            this.element.dispatchEvent(
+                CompareHeaderResponseOnSignalEvent({
+                    header: this,
+                    type  : this._type,
+                }),
+            );
+        }
     }
 }

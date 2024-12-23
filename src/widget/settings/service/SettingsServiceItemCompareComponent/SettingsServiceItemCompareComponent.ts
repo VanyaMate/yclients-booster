@@ -78,7 +78,7 @@ import {
 } from '@/action/settings/service_categories/request-action/createSettingsServiceItemByTarget/createSettingsServiceItemByTarget.request-action.ts';
 import {
     SETTINGS_SERVICE_ITEM_HEADER_TYPE,
-} from '@/widget/settings/service/SettingsServiceItemCompareComponent/settingsServiceItemHeaderType.ts';
+} from '@/widget/settings/service/settingsServiceHeaderTypes.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =

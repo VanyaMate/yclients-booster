@@ -37,6 +37,9 @@ import {
     createSettingsServiceCategoryRequestAction,
 } from '@/action/settings/service_categories/request-action/createSettingsServiceCategory/createSettingsServiceCategory.request-action.ts';
 import { Converter } from '@/converter/Converter.ts';
+import {
+    SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
+} from '@/widget/settings/service/settingsServiceHeaderTypes.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -309,6 +312,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
             onActivateOnlyChildren: () => this._setCompareType(CompareType.CHILDREN),
             onDeactivate          : () => this._setCompareType(CompareType.NONE),
             disable               : this._clientCategory?.is_chain,
+            type                  : SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
         });
 
         this._revalidate(this._clientCategory);
