@@ -19,6 +19,8 @@ import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 
 
+export type CompareHeaderActivateHandler = () => void;
+
 export type CompareHeaderProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
@@ -28,10 +30,10 @@ export type CompareHeaderProps =
         rows: Array<ICompareComponent>;
         variants: Array<SelectOption>;
         onVariantChange: (option: SelectOption) => void;
-        onActivateAll?: () => void;
-        onActivateOnlyChildren?: () => void;
-        onActivateOnlyItem?: () => void;
-        onDeactivate?: () => void;
+        onActivateAll?: CompareHeaderActivateHandler;
+        onActivateOnlyChildren?: CompareHeaderActivateHandler;
+        onActivateOnlyItem?: CompareHeaderActivateHandler;
+        onDeactivate?: CompareHeaderActivateHandler;
         onRename?: (name: string) => void;
         disable?: boolean;
     };
@@ -41,10 +43,14 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
     private readonly _initialTargetHeader: string;
     private readonly _selectButton: Select;
     private readonly _processButton: Component<HTMLDivElement>;
+    private readonly _disableByProp: boolean = false;
+    private readonly _onActivateAll?: CompareHeaderActivateHandler;
+    private readonly _onActivateOnlyItem?: CompareHeaderActivateHandler;
+    private readonly _onActivateOnlyChildren?: CompareHeaderActivateHandler;
+    private readonly _onDeactivate?: CompareHeaderActivateHandler;
     private _currentTargetHeader: string;
     private _isValid: boolean;
-    private _enabled: boolean       = true;
-    private _disableByProp: boolean = false;
+    private _enabled: boolean                = true;
 
     constructor (props: CompareHeaderProps) {
         const {
@@ -64,9 +70,13 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
               } = props;
         super('div', other);
         this.element.classList.add(css.container);
-        this._disableByProp       = disable;
-        this._initialTargetHeader = this._currentTargetHeader = targetHeaderData;
-        this._isValid             = this._initialTargetHeader === clientHeaderData;
+        this._onActivateAll          = onActivateAll;
+        this._onActivateOnlyItem     = onActivateOnlyItem;
+        this._onActivateOnlyChildren = onActivateOnlyChildren;
+        this._onDeactivate           = onDeactivate;
+        this._disableByProp          = disable;
+        this._initialTargetHeader    = this._currentTargetHeader = targetHeaderData;
+        this._isValid                = this._initialTargetHeader === clientHeaderData;
 
         this._selectButton = new Select({
             defaultValue    : CompareType.ALL,
@@ -89,20 +99,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
                     value    : CompareType.NONE,
                 },
             ],
-            onChange        : (data) => {
-                switch (data.value as CompareType) {
-                    case CompareType.ALL:
-                        return onActivateAll?.();
-                    case CompareType.ITEM:
-                        return onActivateOnlyItem?.();
-                    case CompareType.CHILDREN:
-                        return onActivateOnlyChildren?.();
-                    case CompareType.NONE:
-                        return onDeactivate?.();
-                    default:
-                        break;
-                }
-            },
+            onChange        : (data) => this.setCompareType(data.value),
             isModal         : true,
             modalLabel      : `Варианты действия`,
             className       : css.select,
@@ -221,6 +218,21 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
             case CompareResult.NO_EXIST:
                 this._selectButton.setStyleType(ButtonStyleType.DANGER);
                 break;
+            default:
+                break;
+        }
+    }
+
+    setCompareType (type: CompareType) {
+        switch (type as CompareType) {
+            case CompareType.ALL:
+                return this._onActivateAll?.();
+            case CompareType.ITEM:
+                return this._onActivateOnlyItem?.();
+            case CompareType.CHILDREN:
+                return this._onActivateOnlyChildren?.();
+            case CompareType.NONE:
+                return this._onDeactivate?.();
             default:
                 break;
         }

@@ -50,18 +50,11 @@ import {
 import {
     ResourceCompareComponent,
 } from '@/widget/resources/ResourceCompareComponent/ResourceCompareComponent.ts';
-import {
-    createSettingsServiceItemRequestAction,
-} from '@/action/settings/service_categories/request-action/createSettingsServiceItem/createSettingsServiceItem.request-action.ts';
-import {
-    base64ImageLoad,
-} from '@/action/common/base64-image-loader/base64-image-loader.request-action.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 import {
     PROMISE_SPLITTER_MAX_REQUESTS,
     PROMISE_SPLITTER_MAX_RETRY,
 } from '@/service/PromiseSplitter/const/const.ts';
-import { isArray } from '@vanyamate/types-kit';
 import {
     updateSettingsServiceByTargetRequestAction,
 } from '@/action/settings/service_categories/request-action/updateSettingsServiceByTarget/updateSettingsServiceByTarget.request-action.ts';
@@ -80,6 +73,12 @@ import {
     SettingsService,
 } from '@/action/settings/service_categories/const/settings-service.const.ts';
 import { Const } from '@/const/Const.ts';
+import {
+    createSettingsServiceItemByTargetRequestAction,
+} from '@/action/settings/service_categories/request-action/createSettingsServiceItemByTarget/createSettingsServiceItemByTarget.request-action.ts';
+import {
+    SETTINGS_SERVICE_ITEM_HEADER_TYPE,
+} from '@/widget/settings/service/SettingsServiceItemCompareComponent/settingsServiceItemHeaderType.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -109,8 +108,8 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
     private readonly _fetcher?: IFetcher;
     private readonly _logger?: ILogger;
     private readonly _promiseSplitter: PromiseSplitter;
+    private readonly _targetService: SettingsServiceData;
     private _clientServices: Array<SettingsServiceData>;
-    private _targetService: SettingsServiceData;
     private _clientService?: SettingsServiceData;
     private _targetResourceList: Array<Resource>;
     private _clientResourceList: Array<Resource>;
@@ -614,6 +613,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
             onActivateOnlyChildren: () => this._setCompareType(CompareType.CHILDREN),
             onDeactivate          : () => this._setCompareType(CompareType.NONE),
             disable               : this._clientService?.is_chain,
+            type                  : SETTINGS_SERVICE_ITEM_HEADER_TYPE,
         });
 
         this._revalidate(this._clientService);
@@ -642,6 +642,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         this._clientId,
                         this._clientService,
                         this._clientService,
+                        this._fetcher,
                         this._logger,
                     );
                     // return item
@@ -654,6 +655,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         this._clientId,
                         this._clientService,
                         this._targetService,
+                        this._fetcher,
                         this._logger,
                     );
                     // return item
@@ -673,6 +675,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         this._clientId,
                         this._clientService,
                         this._targetService,
+                        this._fetcher,
                         this._logger,
                     );
                     // return item
@@ -692,44 +695,24 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                     })),
                                 ),
                                 async (resources: unknown) => {
-                                    if (isArray(resources)) {
-                                        return createSettingsServiceItemRequestAction(
-                                            this._bearer,
-                                            this._clientId,
-                                            {
-                                                ...this._targetService,
-                                                chain_details           : {
-                                                    comment                         : '',
-                                                    is_comment_managed_only_in_chain: false,
-                                                    is_price_managed_only_in_chain  : false,
-                                                    price_max                       : 0,
-                                                    price_min                       : 0,
-                                                },
-                                                delete_image            : false,
-                                                is_category             : false,
-                                                category_id             : Number(categoryId),
-                                                is_linked_to_composite  : this._targetService.is_linked_to_composite,
-                                                is_range_price_enabled  : this._targetService.price_min !== this._targetService.price_max,
-                                                kkm_settings_id         : 0,
-                                                salon_group_title       : '',
-                                                salon_group_service_link: '',
-                                                salon_service_id        : 0,
-                                                translations            : this._targetService.translations.filter((translation) => translation.translation),
-                                                resources               : (resources as Array<Resource>).filter(Boolean).map((resource) => Number(resource.id)), // CREATE TOO
-                                                staff                   : [],
-                                                image_group             : this._targetService.image_group,
-                                                image                   : this._targetService.image_group?.images?.basic?.path
-                                                                          ? await base64ImageLoad(this._targetService.image_group.images.basic.path)
-                                                                          : undefined,
-                                                id                      : 0,
-                                                vat_id                  : -1,
-                                                tax_variant             : -1,
-                                                is_chain                : false,
-                                            },
-                                            this._fetcher,
-                                            this._logger,
-                                        );
-                                    }
+                                    const item = await createSettingsServiceItemByTargetRequestAction(
+                                        this._bearer,
+                                        this._clientId,
+                                        Number(categoryId),
+                                        this._targetService,
+                                        ((resources ?? []) as Array<Resource>).map((resource) => Number(resource.id)),
+                                        this._fetcher,
+                                        this._logger,
+                                    );
+
+                                    return await updateSettingsServiceByTargetRequestAction(
+                                        this._bearer,
+                                        this._clientId,
+                                        item,
+                                        this._targetService,
+                                        this._fetcher,
+                                        this._logger,
+                                    );
                                 },
                             ],
                         },

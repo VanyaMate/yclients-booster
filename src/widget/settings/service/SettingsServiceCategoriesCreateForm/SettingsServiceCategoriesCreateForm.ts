@@ -14,6 +14,11 @@ import {
     getSalaryCriteriaListDataForCopyRequestAction,
 } from '@/action/salary_criteria/request-action/getSalaryCriteriaListDataForCopy/getSalaryCriteriaListDataForCopy.request-action.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
+import { CompareHeaderEvent } from '@/entity/compare/CompareHeaderEvent.ts';
+import {
+    SETTINGS_SERVICE_ITEM_HEADER_TYPE,
+} from '@/widget/settings/service/SettingsServiceItemCompareComponent/settingsServiceItemHeaderType.ts';
+import { CompareType } from '@/entity/compare/Compare.types.ts';
 
 
 export type SettingsServiceCategoriesCreateFormProps =
@@ -48,7 +53,6 @@ export class SettingsServiceCategoriesCreateForm extends Component<HTMLDivElemen
             onclick    : () => {
                 const id = targetClientIdInput.getValue();
                 if (id) {
-
                     this._renderCompareForm(id);
                 }
             },
@@ -116,6 +120,18 @@ export class SettingsServiceCategoriesCreateForm extends Component<HTMLDivElemen
         });
 
         content.add(activateButton);
+        content.add(new Button({
+            textContent: 'Отключить',
+            onclick    : () => {
+                const event = CompareHeaderEvent({
+                    headerType : SETTINGS_SERVICE_ITEM_HEADER_TYPE,
+                    compareType: CompareType.NONE,
+                    once       : true,
+                });
+                console.log('event', event);
+                content.element.dispatchEvent(event);
+            },
+        }));
         content.add(form);
     }
 }

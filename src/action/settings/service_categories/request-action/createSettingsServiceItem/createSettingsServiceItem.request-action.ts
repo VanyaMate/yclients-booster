@@ -2,7 +2,7 @@ import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import { Fetch } from '@/service/Fetcher/implementations/Fetch.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import {
-    SettingsServiceItemApiResponse,
+    SettingsServiceData,
     SettingsServiceItemCreateData,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 
@@ -12,7 +12,7 @@ import {
  * то при MemoFetch будет лишь один запрос
  */
 
-export const createSettingsServiceItemRequestAction = async function (bearer: string, clientId: string, createData: SettingsServiceItemCreateData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<SettingsServiceItemApiResponse> {
+export const createSettingsServiceItemRequestAction = async function (bearer: string, clientId: string, createData: SettingsServiceItemCreateData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<SettingsServiceData> {
     logger?.log(`создание новой услуги "${ createData.title }" для "${ clientId }"`);
     return fetcher.fetch(`https://yclients.com/api/v1/company/${ clientId }/services?categoryId=${ createData.category_id }&title=${ createData.title }&booking_title=${ createData.booking_title }`, {
         method : 'POST',
