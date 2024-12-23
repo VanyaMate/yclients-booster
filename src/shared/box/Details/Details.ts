@@ -24,13 +24,23 @@ export class Details extends Component<HTMLDetailsElement> {
         const { header, details, type, ...other } = props;
         super('details', other, [
             new Component<HTMLDetailsElement>('summary', {}, [ header ]),
-            details,
         ]);
+
         this.element.classList.add(css.container);
         if (type === DetailsType.SECOND) {
             this.element.classList.add(css.second);
         } else if (type === DetailsType.MAIN) {
             this.element.classList.add(css.main);
+        }
+
+        this.element.addEventListener('toggle', this._onClickHandler.bind(this, details));
+    }
+
+    private _onClickHandler (details: IComponent<HTMLElement>): void {
+        if (this.element.open) {
+            details.insert(this.element, 'beforeend');
+        } else {
+            details.remove();
         }
     }
 }
