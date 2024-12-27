@@ -41,12 +41,6 @@
         }
     }
 
-    & > div {
-        visibility : hidden;
-        opacity    : 0;
-        transition : var(--transition-fast);
-    }
-
     &[open] {
         & > summary {
             margin-bottom : var(--offset-medium);
@@ -56,11 +50,6 @@
                 color     : var(--color-black);
                 transform : translateY(5px);
             }
-        }
-
-        & > div {
-            visibility : visible;
-            opacity    : 1;
         }
     }
 
