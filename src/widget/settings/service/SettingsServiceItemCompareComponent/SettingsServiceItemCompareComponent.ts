@@ -1,6 +1,6 @@
 import {
     CompareType,
-    ICompareComponent,
+    ICompareComponent, ICompareEntity,
 } from '@/entity/compare/Compare.types.ts';
 import { ComponentPropsOptional } from '@/shared/component/Component.ts';
 import {
@@ -102,7 +102,7 @@ export type SettingsServiceItemCompareComponentProps =
         clientResourceList?: Array<Resource>;
     };
 
-export class SettingsServiceItemCompareComponent extends CompareComponent<SettingsServiceData> implements ICompareComponent {
+export class SettingsServiceItemCompareComponent extends CompareComponent<SettingsServiceData> {
     private readonly _clientId: string;
     private readonly _bearer: string;
     private readonly _fetcher?: IFetcher;
@@ -113,7 +113,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
     private _clientService?: SettingsServiceData;
     private _targetResourceList: Array<Resource>;
     private _clientResourceList: Array<Resource>;
-    private _compareResourcesComponents: Array<ResourceCompareComponent> = [];
+    private _compareResourcesComponents: Array<ICompareEntity<Resource>> = [];
 
     constructor (props: SettingsServiceItemCompareComponentProps) {
         const {
@@ -636,6 +636,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         );
 
                     this._clientService.resources = children.filter(Boolean).map((resource) => Number(resource.id));
+
                     // update item
                     return await updateSettingsServiceByTargetRequestAction(
                         this._bearer,

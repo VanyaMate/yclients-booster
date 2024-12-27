@@ -14,15 +14,16 @@ import { Fetch } from '@/service/Fetcher/implementations/Fetch.ts';
 export const updateSettingsServiceByTargetRequestAction = async function (bearer: string, clientId: string, clientData: SettingsServiceData, targetData: SettingsServiceData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<SettingsServiceData> {
     logger?.log(`обновление услуги "${ clientData.id }" "${ clientData.title }" клиента "${ clientId }"`);
 
+    const image = targetData.image_group?.images?.basic?.path;
+
     const composeData: SettingsServiceItemUpdateData = {
         ...clientData,
         ...targetData,
         id                      : clientData.id,
         category_id             : clientData.category_id,
-        image_group             : targetData.image_group,
-        image                   : targetData.image_group?.images?.basic?.path
-                                  ? await base64ImageLoad(targetData.image_group.images.basic.path, logger)
-                                  : undefined,
+        image_group             : image ? null : targetData.image_group,
+        image                   : image ? await base64ImageLoad(image, logger)
+                                        : undefined,
         delete_image            : !!targetData.image_group?.images?.basic?.path,
         is_category             : false,
         is_range_price_enabled  : targetData.price_max > targetData.price_min,
@@ -34,7 +35,7 @@ export const updateSettingsServiceByTargetRequestAction = async function (bearer
         salon_group_title       : clientData.salon_group_title,
         api_id                  : clientData.api_id,
         api_service_id          : clientData.api_service_id,
-        is_chain                : false,
+        is_chain                : clientData.is_chain,
     };
 
     return fetcher.fetch(`https://yclients.com/api/v1/company/${ clientId }/services/${ clientData.id }`, {

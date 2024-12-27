@@ -10,6 +10,9 @@ import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 import {
     PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY,
 } from '@/service/PromiseSplitter/const/const.ts';
+import {
+    getResourceServiceIdsRequestAction,
+} from '@/action/resources/request-action/getResourceServiceIds/getResourceServiceIds.request-action.ts';
 
 
 export const uploadResourcesWithInstancesRequestAction = async function (
@@ -45,20 +48,32 @@ export const uploadResourcesWithInstancesRequestAction = async function (
                             title      : link.textContent!.trim(),
                             description: descriptionElement.textContent!.trim(),
                             instances  : [],
+                            serviceIds : [],
                         });
                     }
                 }
-                // await uploadResourceInstancesRequestAction(id, logger);
 
                 const promiseSplitter = new PromiseSplitter(limit, retry);
                 await promiseSplitter.exec(
-                    resources.map((row) => ({
+                    resources.map((resource) => ({
                         chain    : [
-                            () => uploadResourceInstancesRequestAction(row.id, logger),
+                            () => uploadResourceInstancesRequestAction(resource.id, logger),
                         ],
-                        onSuccess: (data: unknown) => {
-                            if (Array.isArray(data)) {
-                                row.instances = data;
+                        onSuccess: (instances: unknown) => {
+                            if (Array.isArray(instances)) {
+                                resource.instances = instances;
+                            }
+                        },
+                    })),
+                );
+                await promiseSplitter.exec(
+                    resources.map((resource) => ({
+                        chain    : [
+                            () => getResourceServiceIdsRequestAction(clientId, resource.id, logger),
+                        ],
+                        onSuccess: (ids: unknown) => {
+                            if (Array.isArray(ids)) {
+                                resource.serviceIds = ids;
                             }
                         },
                     })),

@@ -1,4 +1,7 @@
 import { IComponent } from '@/shared/component/Component.interface.ts';
+import {
+    ICompareHeader,
+} from '@/entity/compare/CompareHeader/CompareHeader.interface.ts';
 
 
 export enum CompareResult {
@@ -22,8 +25,22 @@ export enum CompareProcess {
     ERROR   = 'error'
 }
 
+/**
+ * Любой компонент который имеет возможность сравниваться
+ */
 export interface ICompareComponent extends IComponent<HTMLElement> {
     isValid: boolean;
 
     enable (status: boolean): void;
+}
+
+/**
+ * Компонент который может сравниваться, имеет header и дочерние элементы
+ */
+export interface ICompareEntity<Data> extends ICompareComponent {
+    getHeader (): ICompareHeader | null;
+
+    getChildren (): Array<ICompareComponent>;
+
+    getAction (data?: any): () => Promise<Data | null>;
 }

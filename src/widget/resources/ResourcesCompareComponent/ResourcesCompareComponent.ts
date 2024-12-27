@@ -12,21 +12,22 @@ import {
     ResourceCompareComponent,
 } from '@/widget/resources/ResourceCompareComponent/ResourceCompareComponent.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
+import { ICompareEntity } from '@/entity/compare/Compare.types.ts';
 
 
 export type ResourcesCompareComponentProps =
     CompareComponentProps
     & {
-    clientId: string;
-    clientData: Array<Resource>;
-    targetData: Array<Resource>;
-    logger?: ILogger;
-    fetcher?: IFetcher;
-    promiseSplitter?: {
-        limit?: number;
-        retry?: number;
+        clientId: string;
+        clientData: Array<Resource>;
+        targetData: Array<Resource>;
+        logger?: ILogger;
+        fetcher?: IFetcher;
+        promiseSplitter?: {
+            limit?: number;
+            retry?: number;
+        };
     };
-};
 
 export class ResourcesCompareComponent extends CompareComponent<Array<Resource>> {
     private readonly _clientId: string;
@@ -35,7 +36,7 @@ export class ResourcesCompareComponent extends CompareComponent<Array<Resource>>
     private readonly _logger?: ILogger;
     private readonly _fetcher?: IFetcher;
     private readonly _promiseSplitter: PromiseSplitter;
-    private _resourceCompareComponents: Array<ResourceCompareComponent> = [];
+    private _resourceCompareComponents: Array<ICompareEntity<Resource>> = [];
 
     constructor (props: ResourcesCompareComponentProps) {
         const {

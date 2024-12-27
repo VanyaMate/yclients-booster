@@ -11,7 +11,6 @@ import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import { SelectOption } from '@/shared/input/Select/Select.ts';
 import {
     CompareType,
-    ICompareComponent,
 } from '@/entity/compare/Compare.types.ts';
 import {
     CompareComponent,
@@ -61,7 +60,7 @@ export type SettingsServiceCategoryCompareComponentProps =
         logger?: ILogger;
     };
 
-export class SettingsServiceCategoryCompareComponent extends CompareComponent<SettingsServiceCategoryDataWithChildren> implements ICompareComponent {
+export class SettingsServiceCategoryCompareComponent extends CompareComponent<SettingsServiceCategoryDataWithChildren> {
     private readonly _clientId: string;
     private readonly _clientData: SettingsServiceCopyData;
     private readonly _targetResources: Array<Resource>;

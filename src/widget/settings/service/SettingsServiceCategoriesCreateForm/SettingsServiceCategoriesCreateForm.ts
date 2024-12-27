@@ -13,7 +13,6 @@ import {
 import {
     getSalaryCriteriaListDataForCopyRequestAction,
 } from '@/action/salary_criteria/request-action/getSalaryCriteriaListDataForCopy/getSalaryCriteriaListDataForCopy.request-action.ts';
-import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 import {
     SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
 } from '@/widget/settings/service/settingsServiceHeaderTypes.ts';
@@ -91,12 +90,7 @@ export class SettingsServiceCategoriesCreateForm extends Component<HTMLDivElemen
             onclick    : () => {
                 activateButton.setLoading(true);
                 headerActions.remove();
-                new PromiseSplitter(5, 2)
-                    .exec(
-                        form.getActions().map((action) => ({
-                            chain: [ action ],
-                        })),
-                    )
+                form.getAction()()
                     .finally(() => {
                         activateButton.remove();
                         logger.log(`завершено`);

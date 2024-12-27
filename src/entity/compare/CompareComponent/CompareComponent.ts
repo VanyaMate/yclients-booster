@@ -2,7 +2,7 @@ import {
     CompareProcess,
     CompareResult,
     CompareType,
-    ICompareComponent,
+    ICompareComponent, ICompareEntity,
 } from '../Compare.types.ts';
 import { CompareEvent } from '../CompareEvent.ts';
 import css from './CompareComponentV3.module.css';
@@ -29,8 +29,8 @@ export type CompareComponentProps =
  * 5. logger?
  * 6. fetcher?
  */
-export abstract class CompareComponent<ActionResponseType> extends Component<HTMLDivElement> implements ICompareComponent {
-    protected _header?: ICompareHeader;
+export abstract class CompareComponent<ActionResponseType> extends Component<HTMLDivElement> implements ICompareEntity<ActionResponseType> {
+    protected _header: ICompareHeader | null             = null;
     protected _compareRows: Array<ICompareComponent>     = [];
     protected _compareChildren: Array<ICompareComponent> = [];
     protected _compareType: CompareType                  = CompareType.ALL;
@@ -92,6 +92,14 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
         }
 
         return async () => null;
+    }
+
+    public getHeader (): ICompareHeader | null {
+        return this._header;
+    }
+
+    public getChildren (): Array<ICompareComponent> {
+        return this._compareChildren;
     }
 
     /**

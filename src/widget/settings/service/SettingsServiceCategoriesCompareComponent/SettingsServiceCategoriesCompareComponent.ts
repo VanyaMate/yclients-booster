@@ -1,8 +1,5 @@
 import {
-    Component,
-    ComponentPropsOptional,
-} from '@/shared/component/Component.ts';
-import {
+    SettingsServiceCategoryDataWithChildren,
     SettingsServiceCopyData,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 import {
@@ -11,11 +8,14 @@ import {
 import { Col } from '@/shared/box/Col/Col.ts';
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
-import { ICompareComponent } from '@/entity/compare/Compare.types.ts';
+import {
+    CompareComponent, CompareComponentProps,
+} from '@/entity/compare/CompareComponent/CompareComponent.ts';
+import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 
 
 export type SettingsServiceCategoriesCompareComponentProps =
-    ComponentPropsOptional<HTMLDivElement>
+    CompareComponentProps
     & {
         // Сохранить / Обновить для этого пользователя
         clientId: string;
@@ -31,7 +31,7 @@ export type SettingsServiceCategoriesCompareComponentProps =
         logger?: ILogger;
     };
 
-export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDivElement> implements ICompareComponent {
+export class SettingsServiceCategoriesCompareComponent extends CompareComponent<Array<SettingsServiceCategoryDataWithChildren>> {
     private readonly _clientId: string;
     private readonly _clientData: SettingsServiceCopyData;
     private readonly _targetData: SettingsServiceCopyData;
@@ -39,7 +39,6 @@ export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDiv
     private readonly _fetcher?: IFetcher;
     private readonly _logger?: ILogger;
     private _compareComponents: Array<SettingsServiceCategoryCompareComponent> = [];
-    private _enabled: boolean                                                  = true;
 
     constructor (props: SettingsServiceCategoriesCompareComponentProps) {
         const {
@@ -51,7 +50,7 @@ export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDiv
                   logger,
                   ...other
               } = props;
-        super('div', other);
+        super(other);
         this._clientId   = clientId;
         this._clientData = clientData;
         this._targetData = targetData;
@@ -73,11 +72,13 @@ export class SettingsServiceCategoriesCompareComponent extends Component<HTMLDiv
         this._enabled = status;
     }
 
-    getActions () {
-        return this._compareComponents.map((component) => component.getAction());
+    protected _action (): Promise<Array<SettingsServiceCategoryDataWithChildren> | null> {
+        return new PromiseSplitter(1, 5).exec(
+            this._compareComponents.map((component) => ({ chain: [ component.getAction() ] })),
+        );
     }
 
-    private _render () {
+    protected _render () {
         this.element.innerHTML = ``;
 
         new Col({

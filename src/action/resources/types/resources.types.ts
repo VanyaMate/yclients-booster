@@ -9,6 +9,7 @@ export type Resource = {
     title: string;
     description: string;
     instances: Array<ResourceInstance>;
+    serviceIds: Array<string>;
 }
 
 export type ResourceInstance = {
@@ -32,6 +33,7 @@ export type ResourceCreateData = {
 export type ResourceUpdateData = {
     title: string;
     description: string;
+    serviceIds: Array<string>;
 }
 
 export type ResourceMapper = Record<string, Resource>;

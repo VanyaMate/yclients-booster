@@ -31,7 +31,7 @@ import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import {
     updateResourceRequestAction,
 } from '@/action/resources/request-action/updateResource/updateResource.request-action.ts';
-import { CompareType } from '@/entity/compare/Compare.types.ts';
+import { CompareType, ICompareEntity } from '@/entity/compare/Compare.types.ts';
 import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 import {
     deleteResourceInstanceRequestAction,
@@ -63,7 +63,7 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
     private readonly _targetResource: Resource;
     private readonly _clientResources: Array<Resource>;
     private _clientResource?: Resource;
-    private _resourceInstancesCompareComponents: Array<ResourceInstanceCompareComponent> = [];
+    private _resourceInstancesCompareComponents: Array<ICompareEntity<ResourceInstance>> = [];
 
     constructor (props: ResourceCompareComponentProps) {
         const {
@@ -117,6 +117,7 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
                         {
                             title      : this._targetResource.title,
                             description: this._targetResource.description,
+                            serviceIds : this._clientResource.serviceIds,
                         },
                         this._fetcher,
                         this._logger,
@@ -132,6 +133,7 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
                         {
                             title      : this._targetResource.title,
                             description: this._targetResource.description,
+                            serviceIds : this._clientResource.serviceIds,
                         },
                         this._fetcher,
                         this._logger,

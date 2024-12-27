@@ -17,6 +17,10 @@ export const updateResourceRequestAction = async function (clientId: string, res
     formData.set('title', updateData.title);
     formData.set('description', updateData.description);
 
+    updateData.serviceIds.forEach((id) => {
+        formData.append('service_ids[]', id);
+    });
+
     return fetcher.fetch(`https://yclients.com/resources/save/${ clientId }/${ resourceId }`, {
         method: 'POST',
         body  : formData,
@@ -37,6 +41,7 @@ export const updateResourceRequestAction = async function (clientId: string, res
                     title      : updateData.title,
                     description: updateData.description,
                     instances  : [],
+                    serviceIds : [],
                 };
             }
 
