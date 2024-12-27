@@ -71,6 +71,10 @@ export class ResourcesCompareComponent extends CompareComponent<Array<Resource>>
         return true;
     }
 
+    public getChildren (): Array<ICompareEntity<Resource>> {
+        return this._resourceCompareComponents;
+    }
+
     protected async _action () {
         const resources: Array<unknown> = await this._promiseSplitter.exec(
             this._resourceCompareComponents.map(

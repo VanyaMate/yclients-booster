@@ -147,6 +147,10 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
         this._render();
     }
 
+    public getChildren (): Array<ICompareEntity<Resource>> {
+        return this._compareResourcesComponents;
+    }
+
     protected _render () {
         this.element.innerHTML = ``;
 

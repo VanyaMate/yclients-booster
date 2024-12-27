@@ -91,6 +91,10 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
         this._render();
     }
 
+    public getChildren (): Array<ICompareEntity<ResourceInstance>> {
+        return this._resourceInstancesCompareComponents;
+    }
+
     protected async _action (): Promise<Resource | null> {
         if (this._clientResource) {
             const resourceId = this._clientResource.id;

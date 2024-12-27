@@ -40,7 +40,7 @@ export interface ICompareComponent extends IComponent<HTMLElement> {
 export interface ICompareEntity<Data> extends ICompareComponent {
     getHeader (): ICompareHeader | null;
 
-    getChildren (): Array<ICompareComponent>;
+    getChildren (): Array<ICompareEntity<any>>;
 
     getAction (data?: any): () => Promise<Data | null>;
 }

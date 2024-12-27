@@ -12,6 +12,7 @@ import {
     CompareComponent, CompareComponentProps,
 } from '@/entity/compare/CompareComponent/CompareComponent.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
+import { ICompareEntity } from '@/entity/compare/Compare.types.ts';
 
 
 export type SettingsServiceCategoriesCompareComponentProps =
@@ -38,7 +39,7 @@ export class SettingsServiceCategoriesCompareComponent extends CompareComponent<
     private readonly _bearer: string;
     private readonly _fetcher?: IFetcher;
     private readonly _logger?: ILogger;
-    private _compareComponents: Array<SettingsServiceCategoryCompareComponent> = [];
+    private _compareComponents: Array<ICompareEntity<SettingsServiceCategoryDataWithChildren>> = [];
 
     constructor (props: SettingsServiceCategoriesCompareComponentProps) {
         const {
@@ -59,6 +60,10 @@ export class SettingsServiceCategoriesCompareComponent extends CompareComponent<
         this._logger     = logger;
 
         this._render();
+    }
+
+    public getChildren (): Array<ICompareEntity<SettingsServiceCategoryDataWithChildren>> {
+        return this._compareComponents;
     }
 
     get isValid () {

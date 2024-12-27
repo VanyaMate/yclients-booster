@@ -10,7 +10,7 @@ import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import { SelectOption } from '@/shared/input/Select/Select.ts';
 import {
-    CompareType,
+    CompareType, ICompareEntity,
 } from '@/entity/compare/Compare.types.ts';
 import {
     CompareComponent,
@@ -68,7 +68,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
     private readonly _bearer: string;
     private readonly _fetcher?: IFetcher;
     private readonly _logger?: ILogger;
-    private _serviceComponents: Array<SettingsServiceItemCompareComponent> = [];
+    private _serviceComponents: Array<ICompareEntity<SettingsServiceData>> = [];
     private _clientCategory?: SettingsServiceCategoryDataWithChildren;
     private _revalidateTrigger: boolean                                    = false;
 
@@ -106,7 +106,11 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
         this._render();
     }
 
-    protected async _action (): Promise<SettingsServiceCategoryDataWithChildren | null> {
+    public getChildren (): Array<ICompareEntity<SettingsServiceData>> {
+        return this._serviceComponents;
+    }
+
+    protected async _action () {
         if (this._clientCategory) {
             const clientCategoryId = this._clientCategory.id;
             if (this._itemIsValid()) {
@@ -131,7 +135,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
             } else {
                 if (this._childrenIsValid()) {
                     // update item
-                    return await updateSettingsServiceCategoryByTargetRequestAction(
+                    const updatedData = await updateSettingsServiceCategoryByTargetRequestAction(
                         this._bearer,
                         this._clientId,
                         this._clientCategory.id.toString(),
@@ -139,7 +143,12 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                         this._targetCategory,
                         this._fetcher,
                         this._logger,
-                    ) as SettingsServiceCategoryDataWithChildren;
+                    );
+
+                    return {
+                        ...this._clientCategory,
+                        ...updatedData,
+                    };
                     // return item
                 } else {
                     // action children
@@ -155,7 +164,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                     this._clientCategory.children = services.filter((service) => !!service);
 
                     // update item
-                    return await updateSettingsServiceCategoryByTargetRequestAction(
+                    const updateData = await updateSettingsServiceCategoryByTargetRequestAction(
                         this._bearer,
                         this._clientId,
                         this._clientCategory.id.toString(),
@@ -163,8 +172,13 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                         this._targetCategory,
                         this._fetcher,
                         this._logger,
-                    ) as SettingsServiceCategoryDataWithChildren;
+                    );
+
                     // return item
+                    return {
+                        ...this._clientCategory,
+                        ...updateData,
+                    };
                 }
             }
         } else {

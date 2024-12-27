@@ -98,8 +98,8 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
         return this._header;
     }
 
-    public getChildren (): Array<ICompareComponent> {
-        return this._compareChildren;
+    public getChildren (): Array<ICompareEntity<any>> {
+        return [];
     }
 
     /**
