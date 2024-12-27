@@ -11,4 +11,6 @@ export interface ICompareHeader extends ICompareComponent {
     setProcessType (type: CompareProcess): void;
 
     setCompareType (type: CompareType): void;
+
+    getType (): string;
 }

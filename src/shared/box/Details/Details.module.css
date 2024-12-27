@@ -42,7 +42,9 @@
     }
 
     & > div {
-        display : none;
+        visibility : hidden;
+        opacity    : 0;
+        transition : var(--transition-fast);
     }
 
     &[open] {
@@ -57,7 +59,8 @@
         }
 
         & > div {
-            display : flex;
+            visibility : visible;
+            opacity    : 1;
         }
     }
 

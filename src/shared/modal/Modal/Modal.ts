@@ -52,21 +52,25 @@ export class Modal extends Component<HTMLDivElement> {
     }
 
     show () {
-        this.insert(document.body, 'beforeend');
-        this._incrementModalCount();
-        this._onChangeHandler(true);
-        document.body.classList.add(css.scrollDisable);
-        document.documentElement.classList.add(css.scrollDisable);
+        if (this.element.parentElement === null) {
+            this.insert(document.body, 'beforeend');
+            this._incrementModalCount();
+            this._onChangeHandler(true);
+            document.body.classList.add(css.scrollDisable);
+            document.documentElement.classList.add(css.scrollDisable);
+        }
     }
 
     hide () {
-        this.remove();
-        const modalCount = this._decrementModalCount();
-        this._onChangeHandler(false);
+        if (this.element.parentElement !== null) {
+            this.remove();
+            const modalCount = this._decrementModalCount();
+            this._onChangeHandler(false);
 
-        if (!modalCount) {
-            document.body.classList.remove(css.scrollDisable);
-            document.documentElement.classList.remove(css.scrollDisable);
+            if (!modalCount) {
+                document.body.classList.remove(css.scrollDisable);
+                document.documentElement.classList.remove(css.scrollDisable);
+            }
         }
     }
 
