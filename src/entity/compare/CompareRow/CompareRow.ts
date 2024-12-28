@@ -25,6 +25,7 @@ export type CompareRowV4Props<TargetValue, ClientValue> =
         validationMethod?: CompareRowValidationMethod<Nullable<TargetValue>, Nullable<ClientValue>>;
         validate?: boolean;
         disable?: boolean;
+        alignTop?: boolean;
         parent?: ICompareEntity<any>;
     };
 
@@ -44,6 +45,7 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
                   validationMethod,
                   validate = true,
                   disable  = false,
+                  alignTop = false,
                   parent,
                   ...other
               } = props;
@@ -62,6 +64,10 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
         this.element.addEventListener(CompareEvent.type, this._validate.bind(this));
         this.enable(!disable);
         this._validate();
+
+        if (alignTop) {
+            this.element.classList.add(css.alignTop);
+        }
     }
 
     get isValid (): boolean {

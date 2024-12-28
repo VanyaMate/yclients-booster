@@ -1,0 +1,35 @@
+.container {
+    display        : inline-flex;
+    flex-direction : column;
+    width          : 100%;
+
+    .row {
+        align-items : center;
+
+        .label {
+            flex : 2;
+        }
+
+        .input {
+            flex : 4;
+        }
+
+        .button {
+            flex : 1;
+        }
+    }
+
+    gap            : var(--offset-small);
+
+    &.disable {
+        opacity : .8;
+
+        button {
+            display : none;
+        }
+
+        button, select, input, label, [data-is-input="true"] {
+            pointer-events : none;
+        }
+    }
+}

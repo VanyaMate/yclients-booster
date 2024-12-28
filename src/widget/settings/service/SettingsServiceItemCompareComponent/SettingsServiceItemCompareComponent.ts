@@ -87,6 +87,10 @@ import {
     ResourceInstanceDropdownActions,
 } from '@/widget/resources/ResourceInstanceDropdownActions/ResourceInstanceDropdownActions.ts';
 import { Row } from '@/shared/box/Row/Row.ts';
+import {
+    CompareListValue,
+} from '@/entity/compare/CompareValue/CompareListValue/CompareListValue.ts';
+import { LanguageMapper } from '@/widget/settings/LanguageMapper.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -594,6 +598,33 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                 parent     : this,
                             }),
                             ...timepickers,
+                        ],
+                    }),
+                    new CompareBox({
+                        title     : 'Языки',
+                        level     : 3,
+                        components: [
+                            new CompareRow({
+                                label      : 'Языки',
+                                targetValue: new CompareListValue({
+                                    list  : this._targetService.translations.map((translation) => ({
+                                        id   : translation.language_id.toString(),
+                                        value: translation.translation,
+                                    })),
+                                    mapper: LanguageMapper,
+                                }),
+                                clientValue: new CompareListValue({
+                                    list             : this._clientService?.translations.map((translation) => ({
+                                        id   : translation.language_id.toString(),
+                                        value: translation.translation,
+                                    })),
+                                    mapper           : LanguageMapper,
+                                    showAddMoreButton: false,
+                                    disable          : true,
+                                }),
+                                parent     : this,
+                                alignTop   : true,
+                            }),
                         ],
                     }),
                 ],
