@@ -4,6 +4,11 @@ import {
 } from '@/entity/compare/CompareHeader/CompareHeader.interface.ts';
 
 
+export enum CompareWith {
+    NONE,
+    CHILDREN,
+}
+
 export enum CompareResult {
     VALID,
     NO_VALID,
@@ -43,4 +48,8 @@ export interface ICompareEntity<Data> extends ICompareComponent {
     getChildren (): Array<ICompareEntity<any>>;
 
     getAction (data?: any): () => Promise<Data | null>;
+
+    revalidateWithParents (uniqueData?: any): void;
+
+    setUniqueData (uniqueData?: any): void;
 }

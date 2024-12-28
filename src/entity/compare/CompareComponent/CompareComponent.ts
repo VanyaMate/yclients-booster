@@ -18,7 +18,9 @@ import {
 
 export type CompareComponentProps =
     ComponentPropsOptional<HTMLDivElement>
-    & {};
+    & {
+        parent?: ICompareEntity<any>;
+    };
 
 /**
  * Для кастомных нужен:
@@ -28,17 +30,22 @@ export type CompareComponentProps =
  * 4. bearer?
  * 5. logger?
  * 6. fetcher?
+ * 7. parent? ICompareEntity<any>
  */
 export abstract class CompareComponent<ActionResponseType> extends Component<HTMLDivElement> implements ICompareEntity<ActionResponseType> {
+    private _revalidateTimer?: ReturnType<typeof setTimeout>;
     protected _header: ICompareHeader | null             = null;
     protected _compareRows: Array<ICompareComponent>     = [];
     protected _compareChildren: Array<ICompareComponent> = [];
     protected _compareType: CompareType                  = CompareType.ALL;
     protected _enabled: boolean                          = true;
+    protected _uniqueItem: any | null                    = null;
+    protected _parent?: ICompareEntity<any>;
 
     protected constructor (props: CompareComponentProps, children: Array<IComponent<HTMLElement>> = []) {
         super('div', props, children);
         this.element.classList.add(css.container);
+        this._parent = props.parent;
     }
 
     public enable (status: boolean): void {
@@ -100,6 +107,15 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
 
     public getChildren (): Array<ICompareEntity<any>> {
         return [];
+    }
+
+    public revalidateWithParents () {
+        this._revalidate(this._uniqueItem);
+        this._parent?.revalidateWithParents();
+    }
+
+    setUniqueData (uniqueData?: any): void {
+        this._uniqueItem = uniqueData;
     }
 
     /**
@@ -206,7 +222,6 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
         this._header?.setProcessType(CompareProcess.ERROR);
     }
 
-
     protected _setCompareType (value: CompareType): void {
         this._compareType = value;
 
@@ -236,15 +251,18 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
         this.element.dispatchEvent(CompareEvent);
     }
 
-    protected _revalidate (uniqueItem: unknown) {
-        if (this._compareType === CompareType.NONE) {
-            this._header?.setValidationType(CompareResult.VALID);
-        } else if (uniqueItem === undefined) {
-            this._header?.setValidationType(CompareResult.NO_EXIST);
-        } else if (!this.isValid) {
-            this._header?.setValidationType(CompareResult.NO_VALID);
-        } else {
-            this._header?.setValidationType(CompareResult.VALID);
-        }
+    protected _revalidate (uniqueItem?: unknown) {
+        clearTimeout(this._revalidateTimer);
+        this._revalidateTimer = setTimeout(() => {
+            if (this._compareType === CompareType.NONE) {
+                this._header?.setValidationType(CompareResult.VALID);
+            } else if (uniqueItem === undefined) {
+                this._header?.setValidationType(CompareResult.NO_EXIST);
+            } else if (!this.isValid) {
+                this._header?.setValidationType(CompareResult.NO_VALID);
+            } else {
+                this._header?.setValidationType(CompareResult.VALID);
+            }
+        });
     }
 }

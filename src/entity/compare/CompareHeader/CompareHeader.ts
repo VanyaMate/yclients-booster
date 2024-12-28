@@ -7,8 +7,8 @@ import {
 } from '@/shared/component/Component.ts';
 import {
     CompareProcess, CompareResult,
-    CompareType,
-    ICompareComponent,
+    CompareType, CompareWith,
+    ICompareComponent, ICompareEntity,
 } from '@/entity/compare/Compare.types.ts';
 import { Select, SelectOption } from '@/shared/input/Select/Select.ts';
 import css from './CompareHeader.module.css';
@@ -16,10 +16,6 @@ import { TextInput } from '@/shared/input/TextInput/TextInput.ts';
 import { Details } from '@/shared/box/Details/Details.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
 import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
-import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
-import {
-    CompareHeaderResponseOnSignalEvent, CompareHeaderSignalEvent,
-} from '@/entity/compare/CompareHeaderResponseOnSignalEvent.ts';
 
 
 export type CompareHeaderActivateHandler = () => void;
@@ -40,6 +36,7 @@ export type CompareHeaderProps =
         onRename?: (name: string) => void;
         disable?: boolean;
         type?: string;
+        parent?: ICompareEntity<any>;
     };
 
 export class CompareHeader extends Component<HTMLDivElement> implements ICompareHeader,
@@ -47,15 +44,18 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
     private readonly _initialTargetHeader: string;
     private readonly _selectButton: Select;
     private readonly _processButton: Component<HTMLDivElement>;
-    private readonly _disableByProp: boolean = false;
+    private readonly _disableByProp: boolean        = false;
     private readonly _onActivateAll?: CompareHeaderActivateHandler;
     private readonly _onActivateOnlyItem?: CompareHeaderActivateHandler;
     private readonly _onActivateOnlyChildren?: CompareHeaderActivateHandler;
     private readonly _onDeactivate?: CompareHeaderActivateHandler;
-    private readonly _type: string           = '';
+    private readonly _type: string                  = '';
+    private readonly _variants: Array<SelectOption> = [];
+    private readonly _variantSelect: Select;
     private _currentTargetHeader: string;
     private _isValid: boolean;
-    private _enabled: boolean                = true;
+    private _enabled: boolean                       = true;
+    private readonly _parent?: ICompareEntity<any>;
 
     constructor (props: CompareHeaderProps) {
         const {
@@ -72,6 +72,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
                   rows,
                   disable = false,
                   type,
+                  parent,
                   ...other
               } = props;
         super('div', other);
@@ -84,6 +85,8 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
         this._initialTargetHeader    = this._currentTargetHeader = targetHeaderData;
         this._isValid                = this._initialTargetHeader === clientHeaderData;
         this._type                   = type ?? '';
+        this._variants               = variants;
+        this._parent                 = parent;
 
         this._selectButton = new Select({
             defaultValue    : CompareType.ALL,
@@ -136,7 +139,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
                 }),
                 new Component<HTMLDivElement>('div', { textContent: label }),
                 new Component<HTMLDivElement>('div', {}, [
-                    new Select({
+                    this._variantSelect = new Select({
                         defaultValue: '0',
                         defaultLabel: 'Создать новый',
                         list        : variants,
@@ -161,8 +164,6 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
         content.insert(this.element, 'beforeend');
         this._updateValidation(clientHeaderData);
         this.enable(true);
-
-        document.addEventListener(CompareHeaderSignalEvent.type, this._responseOnSignal.bind(this));
     }
 
     public getType (): string {
@@ -185,6 +186,21 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
         } else {
             this.element.classList.add(css.disable);
         }
+    }
+
+    setCompareWith (type: CompareWith): void {
+        setTimeout(() => {
+            switch (type) {
+                case CompareWith.CHILDREN:
+                    this._variantSelect.setValue(this._variants.find((item) => item.label === this._initialTargetHeader)?.value);
+                    break;
+                case CompareWith.NONE:
+                    this._variantSelect.setValue(null);
+                    break;
+                default:
+                    break;
+            }
+        }, 0);
     }
 
     setProcessType (process: CompareProcess) {
@@ -238,7 +254,6 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
     }
 
     setCompareType (type: CompareType) {
-        console.log('type', type);
         this._selectButton.setValue(type);
     }
 
@@ -271,17 +286,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
             this.element.classList.remove(css.invalid);
             this._isValid = true;
         }
-        this.element.dispatchEvent(CompareEvent);
-    }
 
-    private _responseOnSignal () {
-        if (this._type !== undefined) {
-            this.element.dispatchEvent(
-                CompareHeaderResponseOnSignalEvent({
-                    header: this,
-                    type  : this._type,
-                }),
-            );
-        }
+        this._parent?.revalidateWithParents();
     }
 }

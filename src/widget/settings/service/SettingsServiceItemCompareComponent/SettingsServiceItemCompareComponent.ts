@@ -2,16 +2,14 @@ import {
     CompareType,
     ICompareComponent, ICompareEntity,
 } from '@/entity/compare/Compare.types.ts';
-import { ComponentPropsOptional } from '@/shared/component/Component.ts';
 import {
     SettingsServiceData,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import {
-    CompareComponent,
+    CompareComponent, CompareComponentProps,
 } from '@/entity/compare/CompareComponent/CompareComponent.ts';
-import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 import { CompareBox } from '@/entity/compare/CompareBox/CompareBox.ts';
 import { CompareRow } from '@/entity/compare/CompareRow/CompareRow.ts';
 import {
@@ -78,11 +76,11 @@ import {
 } from '@/action/settings/service_categories/request-action/createSettingsServiceItemByTarget/createSettingsServiceItemByTarget.request-action.ts';
 import {
     SETTINGS_SERVICE_ITEM_HEADER_TYPE,
-} from '@/widget/settings/service/settingsServiceHeaderTypes.ts';
+} from '@/widget/header-types.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
-    ComponentPropsOptional<HTMLDivElement>
+    CompareComponentProps
     & {
         // Сохранить / Обновить для этого пользователя
         clientId: string;
@@ -100,6 +98,7 @@ export type SettingsServiceItemCompareComponentProps =
         targetResourceList: Array<Resource>;
         // Список ресурсов клиента
         clientResourceList?: Array<Resource>;
+        // Родительский элемент для ревалидации
     };
 
 export class SettingsServiceItemCompareComponent extends CompareComponent<SettingsServiceData> {
@@ -143,7 +142,6 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
             PROMISE_SPLITTER_MAX_RETRY,
         );
 
-        this.element.addEventListener(CompareEvent.type, this._revalidate.bind(this, this._clientService));
         this._render();
     }
 
@@ -181,6 +179,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                     ),
                 }),
                 validationMethod: Validator.Compare.arrayWithString(' '),
+                parent          : this,
             }),
         ];
         const disableOnlineOrderWithoutAbonement: ICompareComponent = new CompareRow({
@@ -208,6 +207,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                 return targetValue ? clientValue === '1'
                                    : clientValue === undefined || clientValue === '0';
             },
+            parent          : this,
         });
 
         const enableOnlinePrepaid: ICompareComponent = new CompareRow({
@@ -236,6 +236,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                 return targetValue ? clientValue === '2'
                                    : clientValue === '0';
             },
+            parent          : this,
         });
 
         /**
@@ -272,6 +273,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                     disable: true,
                 }),
                 validationMethod: Validator.Compare.dates,
+                parent          : this,
             }),
             new CompareRow({
                 label           : 'Время записи с',
@@ -286,6 +288,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                     label: Converter.Settings.Service.timeRangeLabel(this._clientService?.seance_search_start),
                 }),
                 validationMethod: Validator.Compare.timeRangeWithNumber,
+                parent          : this,
             }),
             new CompareRow({
                 label           : 'Время записи до',
@@ -300,6 +303,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                     label: Converter.Settings.Service.timeRangeLabel(this._clientService?.seance_search_finish),
                 }),
                 validationMethod: Validator.Compare.timeRangeWithNumber,
+                parent          : this,
             }),
             new CompareRow({
                 label           : 'Выбор дат',
@@ -318,6 +322,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                     disable      : true,
                 }),
                 validationMethod: Validator.Compare.dates,
+                parent          : this,
             }),
         ];
 
@@ -335,6 +340,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.id,
                         }),
                         validate   : false,
+                        parent     : this,
                     }),
                     new CompareRow({
                         label      : 'Id НДС',
@@ -345,6 +351,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.vat_id,
                         }),
                         validate   : false,
+                        parent     : this,
                     }),
                     new CompareRow({
                         label      : 'Id системы налогообложения',
@@ -355,6 +362,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.tax_variant,
                         }),
                         validate   : false,
+                        parent     : this,
                     }),
                     new CompareRow({
                         label      : 'Сетевая услуга',
@@ -367,6 +375,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             label: Converter.Settings.Service.yesOrNo(this._clientService?.is_chain),
                         }),
                         validate   : false,
+                        parent     : this,
                     }),
                     new CompareRow({
                         label      : 'kkm_settings_id',
@@ -377,6 +386,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.kkm_settings_id,
                         }),
                         validate   : false,
+                        parent     : this,
                     }),
                     new CompareRow({
                         label      : 'api_id',
@@ -387,6 +397,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.api_id,
                         }),
                         validate   : false,
+                        parent     : this,
                     }),
                     new CompareRow({
                         label      : 'api_service_id',
@@ -397,6 +408,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.api_service_id,
                         }),
                         validate   : false,
+                        parent     : this,
                     }),
                     new CompareRow({
                         label      : 'salon_service_id',
@@ -407,6 +419,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.salon_service_id,
                         }),
                         validate   : false,
+                        parent     : this,
                     }),
                     new CompareRow({
                         label      : 'salon_group_service_link',
@@ -417,6 +430,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.salon_group_service_link,
                         }),
                         validate   : false,
+                        parent     : this,
                     }),
                 ],
             }),
@@ -438,6 +452,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.price_min.toString(),
                         }),
                         disable    : this._clientService?.is_chain,
+                        parent     : this,
                     }),
                     new CompareRow({
                         label      : 'Максимальная цена',
@@ -453,6 +468,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.price_max.toString(),
                         }),
                         disable    : this._clientService?.is_chain,
+                        parent     : this,
                     }),
                     new CompareRow({
                         label           : 'Длительность',
@@ -464,6 +480,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             label: Converter.Settings.Service.timeRangeLabel(this._clientService?.duration),
                         }),
                         validationMethod: Validator.Compare.timeRangeWithNumber,
+                        parent          : this,
                     }),
                     new CompareRow({
                         label      : 'Тип',
@@ -493,6 +510,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                             value: this._clientService?.is_multi,
                             label: Converter.Settings.Service.multiType(this._clientService?.is_multi),
                         }),
+                        parent     : this,
                     }),
                     new CompareBox({
                         title     : 'Онлайн запись',
@@ -506,6 +524,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                 clientValue: new CompareImageValue({
                                     src: this._clientService?.image_group?.images?.basic.path,
                                 }),
+                                parent     : this,
                             }),
                             new CompareRow({
                                 label      : 'Название для онлайн записи',
@@ -521,6 +540,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                     value: this._clientService?.booking_title,
                                 }),
                                 disable    : this._clientService?.is_chain,
+                                parent     : this,
                             }),
                             new CompareRow({
                                 label      : 'Описание',
@@ -535,6 +555,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                     value: this._clientService?.comment,
                                 }),
                                 disable    : this._clientService?.is_chain,
+                                parent     : this,
                             }),
                             enableOnlinePrepaid,
                             ...onlinePrepaidComponents,
@@ -560,6 +581,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                         this._clientService?.seance_search_finish,
                                     ),
                                 }),
+                                parent     : this,
                             }),
                             ...timepickers,
                         ],
@@ -583,6 +605,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                 clientResources: this._clientResourceList,
                                 logger         : this._logger,
                                 fetcher        : this._fetcher,
+                                parent         : this,
                             });
                         }
                     })
@@ -607,7 +630,8 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
             onVariantChange       : (e) => {
                 this._clientService = this._clientServices.find((service) => service.id.toString() === e.value);
                 this._render();
-                this.element.dispatchEvent(CompareEvent);
+                this._revalidate(this._clientService);
+                this._parent?.revalidateWithParents();
             },
             onRename              : (title: string) => {
                 this._targetService.title = title;
@@ -618,9 +642,11 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
             onDeactivate          : () => this._setCompareType(CompareType.NONE),
             disable               : this._clientService?.is_chain,
             type                  : SETTINGS_SERVICE_ITEM_HEADER_TYPE,
+            parent                : this,
         });
 
         this._revalidate(this._clientService);
+        this._parent?.revalidateWithParents();
         this._header.insert(this.element, 'beforeend');
     }
 

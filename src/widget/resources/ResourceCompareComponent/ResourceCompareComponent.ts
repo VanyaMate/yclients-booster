@@ -32,13 +32,13 @@ import {
     updateResourceRequestAction,
 } from '@/action/resources/request-action/updateResource/updateResource.request-action.ts';
 import { CompareType, ICompareEntity } from '@/entity/compare/Compare.types.ts';
-import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 import {
     deleteResourceInstanceRequestAction,
 } from '@/action/resources/request-action/deleteResourceInstance/deleteResourceInstance.request-action.ts';
 import {
     CompareTextareaValue,
 } from '@/entity/compare/CompareValue/CompareTextareaValue/CompareTextareaValue.ts';
+import { RESOURCE_HEADER_TYPE } from '@/widget/header-types.ts';
 
 
 export type ResourceCompareComponentProps =
@@ -87,7 +87,6 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
             promiseSplitter?.retry ?? PROMISE_SPLITTER_MAX_RETRY,
         );
 
-        this.element.addEventListener(CompareEvent.type, this._revalidate.bind(this, this._clientResource));
         this._render();
     }
 
@@ -204,6 +203,7 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
                         }),
                         label      : 'Id',
                         validate   : false,
+                        parent     : this,
                     }),
                 ],
             }),
@@ -223,6 +223,7 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
                         clientValue: new CompareTextValue({
                             value: this._clientResource?.description,
                         }),
+                        parent     : this,
                     }),
                 ],
             }),
@@ -235,6 +236,7 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
                 clientInstances: this._clientResource?.instances ?? [],
                 logger         : this._logger,
                 fetcher        : this._fetcher,
+                parent         : this,
             })
         ));
 
@@ -250,6 +252,7 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
             targetHeaderData      : this._targetResource.title,
             clientHeaderData      : this._clientResource?.title,
             label                 : 'Ресурс',
+            type                  : RESOURCE_HEADER_TYPE,
             variants              : this._clientResources.map((resource) => ({
                 label   : resource.title,
                 value   : resource.id,
@@ -258,7 +261,8 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
             onVariantChange       : (variant) => {
                 this._clientResource = this._clientResources.find((resource) => resource.id === variant.value);
                 this._render();
-                this.element.dispatchEvent(CompareEvent);
+                this._revalidate(this._clientResource);
+                this._parent?.revalidateWithParents();
             },
             rows                  : [
                 ...this._compareRows,
@@ -271,8 +275,11 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
             onRename              : (title) => {
                 this._targetResource.title = title;
             },
+            parent                : this,
         });
 
+        this._revalidate(this._clientResource);
+        this._parent?.revalidateWithParents();
         this._header.insert(this.element, 'afterbegin');
     }
 }

@@ -13,19 +13,20 @@ import {
 import {
     getSalaryCriteriaListDataForCopyRequestAction,
 } from '@/action/salary_criteria/request-action/getSalaryCriteriaListDataForCopy/getSalaryCriteriaListDataForCopy.request-action.ts';
-import {
-    SETTINGS_SERVICE_CATEGORY_HEADER_TYPE, SETTINGS_SERVICE_ITEM_HEADER_TYPE,
-} from '@/widget/settings/service/settingsServiceHeaderTypes.ts';
-import { CompareType } from '@/entity/compare/Compare.types.ts';
-import {
-    ToggleCompareTypeButton,
-} from '@/entity/compare/CompareButton/ToggleCompareTypeButton/ToggleCompareTypeButton.ts';
-import { Dropdown } from '@/shared/dropdown/Dropdown/Dropdown.ts';
-import {
-    DropdownBoxItem,
-} from '@/shared/dropdown/Dropdown/DropdownBoxItem/DropdownBoxItem.ts';
 import { LabelDivider } from '@/shared/divider/LabelDivider/LabelDivider.ts';
 import { Row } from '@/shared/box/Row/Row.ts';
+import {
+    SettingsServiceCategoryDropdownActions,
+} from '@/widget/settings/service/SettingsServiceCategoryDropdownActions/SettingsServiceCategoryDropdownActions.ts';
+import {
+    SettingsServiceDropdownActions,
+} from '@/widget/settings/service/SettingsServiceDropdownActions/SettingsServiceDropdownActions.ts';
+import {
+    ResourceDropdownActions,
+} from '@/widget/resources/ResourceDropdownActions/ResourceDropdownActions.ts';
+import {
+    ResourceInstanceDropdownActions,
+} from '@/widget/resources/ResourceInstanceDropdownActions/ResourceInstanceDropdownActions.ts';
 
 
 export type SettingsServiceCategoriesCreateFormProps =
@@ -132,118 +133,10 @@ export class SettingsServiceCategoriesCreateForm extends Component<HTMLDivElemen
                 }),
                 new Row({
                     cols: [
-                        new Dropdown({
-                            buttonProps: {
-                                textContent: 'Действия с категориями',
-                            },
-                            content    : new Col({
-                                rows: [
-                                    new LabelDivider({
-                                        textContent: 'Тип сравнения',
-                                    }),
-                                    new DropdownBoxItem({
-                                        content: new ToggleCompareTypeButton({
-                                            container  : form,
-                                            headerType : SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
-                                            compareType: CompareType.ALL,
-                                            textContent: 'Полное сравнение',
-                                            styleType  : ButtonStyleType.DEFAULT,
-                                            noWrap     : true,
-                                            fullWidth  : true,
-                                        }),
-                                    }),
-                                    new DropdownBoxItem({
-                                        content: new ToggleCompareTypeButton({
-                                            container  : form,
-                                            headerType : SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
-                                            compareType: CompareType.ITEM,
-                                            textContent: 'Только сами категории',
-                                            styleType  : ButtonStyleType.WARNING,
-                                            noWrap     : true,
-                                            fullWidth  : true,
-                                        }),
-                                    }),
-                                    new DropdownBoxItem({
-                                        content: new ToggleCompareTypeButton({
-                                            container  : form,
-                                            headerType : SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
-                                            compareType: CompareType.CHILDREN,
-                                            textContent: 'Только дочерние',
-                                            styleType  : ButtonStyleType.WARNING,
-                                            noWrap     : true,
-                                            fullWidth  : true,
-                                        }),
-                                    }),
-                                    new DropdownBoxItem({
-                                        content: new ToggleCompareTypeButton({
-                                            container  : form,
-                                            headerType : SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
-                                            compareType: CompareType.NONE,
-                                            textContent: 'Ничего не сравнивать',
-                                            styleType  : ButtonStyleType.WARNING,
-                                            noWrap     : true,
-                                            fullWidth  : true,
-                                        }),
-                                    }),
-                                ],
-                            }),
-                        }),
-                        new Dropdown({
-                            buttonProps: {
-                                textContent: 'Действия с услугами',
-                            },
-                            content    : new Col({
-                                rows: [
-                                    new LabelDivider({
-                                        textContent: 'Тип сравнения',
-                                    }),
-                                    new DropdownBoxItem({
-                                        content: new ToggleCompareTypeButton({
-                                            container  : form,
-                                            headerType : SETTINGS_SERVICE_ITEM_HEADER_TYPE,
-                                            compareType: CompareType.ALL,
-                                            textContent: 'Полное сравнение',
-                                            styleType  : ButtonStyleType.DEFAULT,
-                                            noWrap     : true,
-                                            fullWidth  : true,
-                                        }),
-                                    }),
-                                    new DropdownBoxItem({
-                                        content: new ToggleCompareTypeButton({
-                                            container  : form,
-                                            headerType : SETTINGS_SERVICE_ITEM_HEADER_TYPE,
-                                            compareType: CompareType.ITEM,
-                                            textContent: 'Только сами категории',
-                                            styleType  : ButtonStyleType.WARNING,
-                                            noWrap     : true,
-                                            fullWidth  : true,
-                                        }),
-                                    }),
-                                    new DropdownBoxItem({
-                                        content: new ToggleCompareTypeButton({
-                                            container  : form,
-                                            headerType : SETTINGS_SERVICE_ITEM_HEADER_TYPE,
-                                            compareType: CompareType.CHILDREN,
-                                            textContent: 'Только дочерние',
-                                            styleType  : ButtonStyleType.WARNING,
-                                            noWrap     : true,
-                                            fullWidth  : true,
-                                        }),
-                                    }),
-                                    new DropdownBoxItem({
-                                        content: new ToggleCompareTypeButton({
-                                            container  : form,
-                                            headerType : SETTINGS_SERVICE_ITEM_HEADER_TYPE,
-                                            compareType: CompareType.NONE,
-                                            textContent: 'Ничего не сравнивать',
-                                            styleType  : ButtonStyleType.WARNING,
-                                            noWrap     : true,
-                                            fullWidth  : true,
-                                        }),
-                                    }),
-                                ],
-                            }),
-                        }),
+                        new SettingsServiceCategoryDropdownActions({ compareEntity: form }),
+                        new SettingsServiceDropdownActions({ compareEntity: form }),
+                        new ResourceDropdownActions({ compareEntity: form }),
+                        new ResourceInstanceDropdownActions({ compareEntity: form }),
                     ],
                 }),
             ],

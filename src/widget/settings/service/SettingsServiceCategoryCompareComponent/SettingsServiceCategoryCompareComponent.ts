@@ -1,4 +1,3 @@
-import { ComponentPropsOptional } from '@/shared/component/Component.ts';
 import {
     SettingsServiceCategoryDataWithChildren,
     SettingsServiceCopyData, SettingsServiceData,
@@ -13,9 +12,8 @@ import {
     CompareType, ICompareEntity,
 } from '@/entity/compare/Compare.types.ts';
 import {
-    CompareComponent,
+    CompareComponent, CompareComponentProps,
 } from '@/entity/compare/CompareComponent/CompareComponent.ts';
-import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 import { CompareBox } from '@/entity/compare/CompareBox/CompareBox.ts';
 import { CompareHeader } from '@/entity/compare/CompareHeader/CompareHeader.ts';
 import {
@@ -38,11 +36,11 @@ import {
 import { Converter } from '@/converter/Converter.ts';
 import {
     SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
-} from '@/widget/settings/service/settingsServiceHeaderTypes.ts';
+} from '@/widget/header-types.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
-    ComponentPropsOptional<HTMLDivElement>
+    CompareComponentProps
     & {
         // Сохранить / Обновить для этого пользователя
         clientId: string;
@@ -70,7 +68,6 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
     private readonly _logger?: ILogger;
     private _serviceComponents: Array<ICompareEntity<SettingsServiceData>> = [];
     private _clientCategory?: SettingsServiceCategoryDataWithChildren;
-    private _revalidateTrigger: boolean                                    = false;
 
     constructor (props: SettingsServiceCategoryCompareComponentProps) {
         const {
@@ -94,15 +91,6 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
         this._logger          = logger;
         this._clientCategory  = this._clientData.tree.find((category) => category.title === this._targetCategory.title);
 
-        this.element.addEventListener(CompareEvent.type, () => {
-            if (!this._revalidateTrigger) {
-                this._revalidateTrigger = true;
-                setTimeout(() => {
-                    this._revalidate(this._clientCategory);
-                    this._revalidateTrigger = false;
-                });
-            }
-        });
         this._render();
     }
 
@@ -242,6 +230,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                         logger            : this._logger,
                         targetResourceList: this._targetResources,
                         clientResourceList: this._clientData.resources,
+                        parent            : this,
                     })
                 )),
             }),
@@ -261,6 +250,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                         }),
                         label      : 'Id',
                         validate   : false,
+                        parent     : this,
                     }),
                     new CompareRow({
                         targetValue: new CompareTextValue({
@@ -273,6 +263,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                         }),
                         label      : 'Сетевая категория',
                         validate   : false,
+                        parent     : this,
                     }),
                 ],
             }),
@@ -294,6 +285,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                         }),
                         label      : 'Название для онлайн записи',
                         disable    : this._clientCategory?.is_chain,
+                        parent     : this,
                     }),
                 ],
             }),
@@ -316,6 +308,8 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
             onVariantChange       : (e: SelectOption) => {
                 this._clientCategory = this._clientData.tree.find((category) => category.id.toString() === e.value);
                 this._render();
+                this._revalidate(this._clientCategory);
+                this._parent?.revalidateWithParents();
             },
             onRename              : (title: string) => {
                 this._targetCategory.title = title;
@@ -326,9 +320,11 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
             onDeactivate          : () => this._setCompareType(CompareType.NONE),
             disable               : this._clientCategory?.is_chain,
             type                  : SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
+            parent                : this,
         });
 
         this._revalidate(this._clientCategory);
+        this._parent?.revalidateWithParents();
         this._header.insert(this.element, 'beforeend');
     }
 }

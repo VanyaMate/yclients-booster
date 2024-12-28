@@ -19,12 +19,12 @@ import {
 } from '@/action/resources/request-action/updateResourceInstance/updateResourceInstance.request-action.ts';
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import { CompareType } from '@/entity/compare/Compare.types.ts';
-import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 import { CompareRow } from '@/entity/compare/CompareRow/CompareRow.ts';
 import { CompareBox } from '@/entity/compare/CompareBox/CompareBox.ts';
 import {
     CompareTextValue,
 } from '@/entity/compare/CompareValue/CompareTextValue/CompareTextValue.ts';
+import { RESOURCE_INSTANCE_HEADER_TYPE } from '@/widget/header-types.ts';
 
 
 export type ResourceInstanceCompareComponentProps =
@@ -64,7 +64,6 @@ export class ResourceInstanceCompareComponent extends CompareComponent<ResourceI
         this._logger          = logger;
         this._fetcher         = fetcher;
 
-        this.element.addEventListener(CompareEvent.type, this._revalidate.bind(this, this._clientInstance));
         this._render();
     }
 
@@ -89,6 +88,7 @@ export class ResourceInstanceCompareComponent extends CompareComponent<ResourceI
                         }),
                         label      : 'Id',
                         validate   : false,
+                        parent     : this,
                     }),
                 ],
             }),
@@ -98,6 +98,7 @@ export class ResourceInstanceCompareComponent extends CompareComponent<ResourceI
             targetHeaderData      : this._targetInstance.title,
             clientHeaderData      : this._clientInstance?.title,
             label                 : 'Экземпляр',
+            type                  : RESOURCE_INSTANCE_HEADER_TYPE,
             rows                  : this._compareRows,
             variants              : this._clientInstances.map((instance) => ({
                 label   : instance.title,
@@ -107,7 +108,8 @@ export class ResourceInstanceCompareComponent extends CompareComponent<ResourceI
             onVariantChange       : ((instanceVariant) => {
                 this._clientInstance = this._clientInstances.find((instance) => instance.id === instanceVariant.value);
                 this._render();
-                this.element.dispatchEvent(CompareEvent);
+                this._revalidate(this._clientInstance);
+                this._parent?.revalidateWithParents();
             }),
             onActivateAll         : () => this._setCompareType(CompareType.ALL),
             onActivateOnlyItem    : () => this._setCompareType(CompareType.ITEM),
@@ -116,8 +118,11 @@ export class ResourceInstanceCompareComponent extends CompareComponent<ResourceI
             onRename              : (title) => {
                 this._targetInstance.title = title.trim();
             },
+            parent                : this,
         });
 
+        this._revalidate(this._clientInstance);
+        this._parent?.revalidateWithParents();
         this._header.insert(this.element, 'afterbegin');
     }
 

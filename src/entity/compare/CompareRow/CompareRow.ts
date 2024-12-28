@@ -5,7 +5,10 @@ import {
 import {
     ICompareValue,
 } from '@/entity/compare/CompareValue/CompareValue.interface.ts';
-import { ICompareComponent } from '@/entity/compare/Compare.types.ts';
+import {
+    ICompareComponent,
+    ICompareEntity,
+} from '@/entity/compare/Compare.types.ts';
 import css from './CompareRow.module.css';
 import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 import { Nullable } from '@/types/Nullable.ts';
@@ -22,6 +25,7 @@ export type CompareRowV4Props<TargetValue, ClientValue> =
         validationMethod?: CompareRowValidationMethod<Nullable<TargetValue>, Nullable<ClientValue>>;
         validate?: boolean;
         disable?: boolean;
+        parent?: ICompareEntity<any>;
     };
 
 export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivElement> implements ICompareComponent {
@@ -30,6 +34,7 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
     private readonly _clientValue: ICompareValue<Nullable<ClientValue>>;
     private readonly _validating: boolean = true;
     private _enabled: boolean             = true;
+    private _parent?: ICompareEntity<any>;
 
     constructor (props: CompareRowV4Props<TargetValue, ClientValue>) {
         const {
@@ -39,6 +44,7 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
                   validationMethod,
                   validate = true,
                   disable  = false,
+                  parent,
                   ...other
               } = props;
         super('div', other, [
@@ -47,6 +53,7 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
             new Component<HTMLDivElement>('div', {}, [ clientValue ]),
         ]);
 
+        this._parent           = parent;
         this._validating       = validate;
         this._targetValue      = targetValue;
         this._clientValue      = clientValue;
@@ -85,5 +92,7 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
         } else {
             this.element.classList.add(css.invalid);
         }
+
+        this._parent?.revalidateWithParents();
     }
 }
