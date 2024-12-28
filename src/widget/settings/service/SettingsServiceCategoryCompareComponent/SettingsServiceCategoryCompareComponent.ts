@@ -37,6 +37,19 @@ import { Converter } from '@/converter/Converter.ts';
 import {
     SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
 } from '@/widget/header-types.ts';
+import {
+    CompareBoxWithoutValidation,
+} from '@/entity/compare/CompareWithoutValidation/CompareBoxWithoutValidation.ts';
+import {
+    SettingsServiceDropdownActions,
+} from '@/widget/settings/service/SettingsServiceDropdownActions/SettingsServiceDropdownActions.ts';
+import {
+    ResourceDropdownActions,
+} from '@/widget/resources/ResourceDropdownActions/ResourceDropdownActions.ts';
+import {
+    ResourceInstanceDropdownActions,
+} from '@/widget/resources/ResourceInstanceDropdownActions/ResourceInstanceDropdownActions.ts';
+import { Row } from '@/shared/box/Row/Row.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -217,6 +230,19 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
     protected _render () {
         this.element.innerHTML = ``;
         this._compareChildren  = [
+            new CompareBoxWithoutValidation({
+                title     : 'Массовые действия',
+                level     : 3,
+                components: [
+                    new Row({
+                        cols: [
+                            new SettingsServiceDropdownActions({ compareEntity: this }),
+                            new ResourceDropdownActions({ compareEntity: this }),
+                            new ResourceInstanceDropdownActions({ compareEntity: this }),
+                        ],
+                    }),
+                ],
+            }),
             new CompareBox({
                 title     : 'Сервисы',
                 level     : 3,

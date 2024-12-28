@@ -77,6 +77,16 @@ import {
 import {
     SETTINGS_SERVICE_ITEM_HEADER_TYPE,
 } from '@/widget/header-types.ts';
+import {
+    CompareBoxWithoutValidation,
+} from '@/entity/compare/CompareWithoutValidation/CompareBoxWithoutValidation.ts';
+import {
+    ResourceDropdownActions,
+} from '@/widget/resources/ResourceDropdownActions/ResourceDropdownActions.ts';
+import {
+    ResourceInstanceDropdownActions,
+} from '@/widget/resources/ResourceInstanceDropdownActions/ResourceInstanceDropdownActions.ts';
+import { Row } from '@/shared/box/Row/Row.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -591,6 +601,18 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
         ];
 
         this._compareChildren = [
+            new CompareBoxWithoutValidation({
+                title     : 'Массовые действия',
+                level     : 3,
+                components: [
+                    new Row({
+                        cols: [
+                            new ResourceDropdownActions({ compareEntity: this }),
+                            new ResourceInstanceDropdownActions({ compareEntity: this }),
+                        ],
+                    }),
+                ],
+            }),
             new CompareBox({
                 level     : 4,
                 title     : 'Ресурсы',

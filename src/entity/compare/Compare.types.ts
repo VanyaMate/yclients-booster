@@ -50,6 +50,4 @@ export interface ICompareEntity<Data> extends ICompareComponent {
     getAction (data?: any): () => Promise<Data | null>;
 
     revalidateWithParents (uniqueData?: any): void;
-
-    setUniqueData (uniqueData?: any): void;
 }

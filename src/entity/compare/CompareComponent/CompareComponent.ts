@@ -4,7 +4,6 @@ import {
     CompareType,
     ICompareComponent, ICompareEntity,
 } from '../Compare.types.ts';
-import { CompareEvent } from '../CompareEvent.ts';
 import css from './CompareComponentV3.module.css';
 import { IComponent } from '@/shared/component/Component.interface.ts';
 import {
@@ -39,7 +38,7 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
     protected _compareChildren: Array<ICompareComponent> = [];
     protected _compareType: CompareType                  = CompareType.ALL;
     protected _enabled: boolean                          = true;
-    protected _uniqueItem: any | null                    = null;
+    protected _uniqueItem?: any;
     protected _parent?: ICompareEntity<any>;
 
     protected constructor (props: CompareComponentProps, children: Array<IComponent<HTMLElement>> = []) {
@@ -112,10 +111,6 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
     public revalidateWithParents () {
         this._revalidate(this._uniqueItem);
         this._parent?.revalidateWithParents();
-    }
-
-    setUniqueData (uniqueData?: any): void {
-        this._uniqueItem = uniqueData;
     }
 
     /**
@@ -248,10 +243,11 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
                 break;
         }
 
-        this.element.dispatchEvent(CompareEvent);
+        this.revalidateWithParents();
     }
 
     protected _revalidate (uniqueItem?: unknown) {
+        this._uniqueItem = uniqueItem;
         clearTimeout(this._revalidateTimer);
         this._revalidateTimer = setTimeout(() => {
             if (this._compareType === CompareType.NONE) {

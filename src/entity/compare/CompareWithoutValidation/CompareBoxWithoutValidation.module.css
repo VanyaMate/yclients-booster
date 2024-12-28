@@ -1,0 +1,29 @@
+.container {
+    display        : flex;
+    flex-direction : column;
+    gap            : var(--offset-small);
+    transition     : var(--transition-fast);
+
+    .title {
+        font-size      : 12px;
+        color          : var(--color-dark-gray);
+        font-weight    : normal;
+        margin         : 0;
+        padding-bottom : var(--offset-small);
+        border-bottom  : 1px dashed var(--border-color);
+    }
+
+    &.disabled {
+        cursor      : default;
+        user-select : none;
+        background  : repeating-linear-gradient(45deg, transparent, transparent 20px, var(--color-dark-black-opacity-hard) 20px, var(--color-dark-black-opacity-hard) 25px);
+
+        button, select, input, label, textarea, [data-is-input="true"] {
+            pointer-events : none;
+        }
+
+        & > * {
+            opacity : .6;
+        }
+    }
+}
