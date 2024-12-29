@@ -50,6 +50,10 @@ import {
     ResourceInstanceDropdownActions,
 } from '@/widget/resources/ResourceInstanceDropdownActions/ResourceInstanceDropdownActions.ts';
 import { Row } from '@/shared/box/Row/Row.ts';
+import {
+    CompareTranslationsValue,
+} from '@/entity/compare/CompareValue/CompareTranslationsValue/CompareTranslationsValue.ts';
+import { LanguageMapper } from '@/widget/settings/LanguageMapper.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -268,17 +272,18 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                 level     : 2,
                 components: [
                     new CompareRow({
+                        label      : 'Id',
                         targetValue: new CompareTextValue({
                             value: this._targetCategory.id,
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientCategory?.id,
                         }),
-                        label      : 'Id',
                         validate   : false,
                         parent     : this,
                     }),
                     new CompareRow({
+                        label      : 'Сетевая категория',
                         targetValue: new CompareTextValue({
                             value: this._targetCategory.id,
                             label: Converter.Settings.Service.yesOrNo(this._targetCategory?.is_chain),
@@ -287,7 +292,6 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                             value: this._clientCategory?.id,
                             label: Converter.Settings.Service.yesOrNo(this._clientCategory?.is_chain),
                         }),
-                        label      : 'Сетевая категория',
                         validate   : false,
                         parent     : this,
                     }),
@@ -298,6 +302,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                 level     : 2,
                 components: [
                     new CompareRow({
+                        label      : 'Название для онлайн записи',
                         targetValue: new CompareTextInputValue({
                             value      : this._targetCategory.booking_title,
                             type       : 'text',
@@ -309,9 +314,56 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                         clientValue: new CompareTextValue({
                             value: this._clientCategory?.booking_title,
                         }),
-                        label      : 'Название для онлайн записи',
                         disable    : this._clientCategory?.is_chain,
                         parent     : this,
+                    }),
+                ],
+            }),
+            new CompareBox({
+                title     : 'Языки',
+                level     : 2,
+                components: [
+                    new CompareRow({
+                        label           : 'Языки',
+                        targetValue     : new CompareTranslationsValue({
+                            list    : this._targetCategory.translations.map((translation) => ({
+                                id   : translation.language_id.toString(),
+                                value: translation.translation,
+                            })),
+                            mapper  : LanguageMapper,
+                            onChange: (item) => {
+                                for (let i = 0; i < this._targetCategory.translations.length; i++) {
+                                    if (this._targetCategory.translations[i].language_id.toString() === item.id) {
+                                        this._targetCategory.translations[i].translation = item.value;
+                                        break;
+                                    }
+                                }
+                            },
+                        }),
+                        clientValue     : new CompareTranslationsValue({
+                            list             : this._clientCategory?.translations.map((translation) => ({
+                                id   : translation.language_id.toString(),
+                                value: translation.translation,
+                            })),
+                            mapper           : LanguageMapper,
+                            showAddMoreButton: false,
+                            disable          : true,
+                        }),
+                        parent          : this,
+                        alignTop        : true,
+                        validationMethod: (targetValue, clientValue) => {
+                            if (targetValue && clientValue) {
+                                if (targetValue.length === clientValue.length) {
+                                    return targetValue.every(
+                                        (targetItem, index) => targetItem.id === clientValue[index].id && targetItem.value === clientValue[index].value,
+                                    );
+                                }
+
+                                return false;
+                            }
+
+                            return targetValue === clientValue;
+                        },
                     }),
                 ],
             }),

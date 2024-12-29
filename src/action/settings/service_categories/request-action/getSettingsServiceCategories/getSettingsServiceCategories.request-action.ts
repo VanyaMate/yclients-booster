@@ -6,10 +6,11 @@ import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 export const getSettingsServiceCategoriesRequestAction = async function (bearer: string, clientId: string, logger?: ILogger): Promise<SettingsServiceCategoriesApiResponse> {
     logger?.log(`получение списка категорий услуг для клиента "${ clientId }"`);
-    return fetch(`https://yclients.com/api/v1/company/${ clientId }/service_categories?include=services_count&include[]=translations`, {
+    return fetch(`https://yclients.com/api/v1/company/${ clientId }/service_categories?include[]=translations`, {
         method : 'GET',
         headers: {
             'Authorization': `Bearer ${ bearer }`,
+            'Content-Type' : 'application/json',
         },
     })
         .then((response) => {

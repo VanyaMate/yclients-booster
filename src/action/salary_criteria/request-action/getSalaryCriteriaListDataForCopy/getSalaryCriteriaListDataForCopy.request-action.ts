@@ -17,6 +17,7 @@ import {
     getSettingsServicesByCategoryRequestAction,
 } from '@/action/settings/service_categories/request-action/getSettingsServicesByCategory/getSettingsServicesByCategory.request-action.ts';
 import {
+    SettingsServiceCategoryData,
     SettingsServiceCategoryDataWithChildren,
     SettingsServiceItemApiResponse,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
@@ -24,6 +25,9 @@ import { Is } from '@/types/Is.ts';
 import {
     uploadResourcesWithInstancesRequestAction,
 } from '@/action/resources/request-action/uploadResourcesWithInstances/upload-resources-with-instances-request.action.ts';
+import {
+    getSettingsServiceCategoryRequestAction,
+} from '@/action/settings/service_categories/request-action/getSettingsServiceCategory/getSettingsServiceCategory.request-action.ts';
 
 
 export const getSalaryCriteriaListDataForCopyRequestAction = async function (bearer: string, clientId: string, forceUploadServices: boolean, maxSplit: number, maxRetry: number, logger?: ILogger): Promise<SalaryCriteriaListDataForCopy> {
@@ -57,6 +61,18 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
     if (hasServices || forceUploadServices) {
         const serviceCategories                = await getSettingsServiceCategoriesRequestAction(bearer, clientId, logger);
         dataForCopy.settingsCopyData.resources = await uploadResourcesWithInstancesRequestAction(clientId, maxSplit, maxRetry, logger);
+        await splitter.exec(
+            serviceCategories.data.map((category, index) => ({
+                chain: [
+                    () => getSettingsServiceCategoryRequestAction(bearer, clientId, category.id.toString(), logger),
+                    async (data: unknown) => {
+                        if (Is<SettingsServiceCategoryData>(data)) {
+                            serviceCategories.data[index] = data;
+                        }
+                    },
+                ],
+            })),
+        );
 
         await splitter.exec(
             serviceCategories.data.map((category) => {
