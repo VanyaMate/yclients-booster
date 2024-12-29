@@ -90,8 +90,8 @@ import {
 } from '@/widget/resources/ResourceInstanceDropdownActions/ResourceInstanceDropdownActions.ts';
 import { Row } from '@/shared/box/Row/Row.ts';
 import {
-    CompareListValue,
-} from '@/entity/compare/CompareValue/CompareListValue/CompareListValue.ts';
+    CompareTranslationsValue,
+} from '@/entity/compare/CompareValue/CompareTranslationsValue/CompareTranslationsValue.ts';
 import { LanguageMapper } from '@/widget/settings/LanguageMapper.ts';
 import {
     linkSettingsServiceItemsRequestAction,
@@ -716,7 +716,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         components: [
                             new CompareRow({
                                 label           : 'Языки',
-                                targetValue     : new CompareListValue({
+                                targetValue     : new CompareTranslationsValue({
                                     list    : this._targetService.translations.map((translation) => ({
                                         id   : translation.language_id.toString(),
                                         value: translation.translation,
@@ -731,7 +731,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                         }
                                     },
                                 }),
-                                clientValue     : new CompareListValue({
+                                clientValue     : new CompareTranslationsValue({
                                     list             : this._clientService?.translations.map((translation) => ({
                                         id   : translation.language_id.toString(),
                                         value: translation.translation,

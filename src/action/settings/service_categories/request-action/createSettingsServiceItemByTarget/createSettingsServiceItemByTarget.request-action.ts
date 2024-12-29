@@ -13,41 +13,40 @@ import {
 
 
 export const createSettingsServiceItemByTargetRequestAction = async function (bearer: string, clientId: string, categoryId: number, targetData: SettingsServiceData, resources: Array<number>, fetcher: IFetcher = new Fetch(), logger ?: ILogger): Promise<SettingsServiceData> {
-           const image = targetData.image_group?.images?.basic?.path;
+    const image = targetData.image_group?.images?.basic?.path;
 
-           return createSettingsServiceItemRequestAction(
-               bearer,
-               clientId,
-               {
-                   ...targetData,
-                   chain_details           : {
-                       comment                         : '',
-                       is_comment_managed_only_in_chain: false,
-                       is_price_managed_only_in_chain  : false,
-                       price_max                       : 0,
-                       price_min                       : 0,
-                   },
-                   delete_image            : !!image,
-                   is_category             : false,
-                   category_id             : categoryId,
-                   is_linked_to_composite  : targetData.is_linked_to_composite,
-                   is_range_price_enabled  : targetData.price_min !== targetData.price_max,
-                   kkm_settings_id         : 0,
-                   salon_group_title       : '',
-                   salon_group_service_link: '',
-                   salon_service_id        : 0,
-                   translations            : targetData.translations.filter((translation) => translation.translation),
-                   resources               : resources, // CREATE TOO
-                   staff                   : [],
-                   image_group             : image ? null : targetData.image_group,
-                   image                   : image
-                                             ? await base64ImageLoad(image, logger)
-                                             : undefined,
-                   id                      : 0,
-                   is_chain                : false,
-               },
-               fetcher,
-               logger,
-           );
-       }
-;
+    return createSettingsServiceItemRequestAction(
+        bearer,
+        clientId,
+        {
+            ...targetData,
+            chain_details           : {
+                comment                         : '',
+                is_comment_managed_only_in_chain: false,
+                is_price_managed_only_in_chain  : false,
+                price_max                       : 0,
+                price_min                       : 0,
+            },
+            delete_image            : !!image,
+            is_category             : false,
+            category_id             : categoryId,
+            is_linked_to_composite  : targetData.is_linked_to_composite,
+            is_range_price_enabled  : targetData.price_min !== targetData.price_max,
+            kkm_settings_id         : 0,
+            salon_group_title       : '',
+            salon_group_service_link: '',
+            salon_service_id        : 0,
+            translations            : targetData.translations.filter((translation) => translation.translation),
+            resources               : resources, // CREATE TOO
+            staff                   : [],
+            image_group             : image ? null : targetData.image_group,
+            image                   : image
+                                      ? await base64ImageLoad(image, logger)
+                                      : undefined,
+            id                      : 0,
+            is_chain                : false,
+        },
+        fetcher,
+        logger,
+    );
+};

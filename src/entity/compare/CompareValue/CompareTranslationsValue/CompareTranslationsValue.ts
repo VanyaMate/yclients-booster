@@ -9,36 +9,36 @@ import { Nullable } from '@/types/Nullable';
 import { Row } from '@/shared/box/Row/Row.ts';
 import { TextInput } from '@/shared/input/TextInput/TextInput.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
-import css from './CompareListValue.module.css';
+import css from './CompareTranslationsValue.module.css';
 import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 
 
-export type ListItemType = {
+export type TranslationItemType = {
     id: string;
     value: string;
 }
 
-export type ListMapper = Record<string, string>;
+export type TranslationsMapper = Record<string, string>;
 
-export type CompareListValueOnChangeHandler = (item: ListItemType) => void;
+export type CompareTranslationValueOnChangeHandler = (item: TranslationItemType) => void;
 
-export type CompareListValueProps =
+export type CompareTranslationValueProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        list?: Array<ListItemType>;
-        mapper: ListMapper;
+        list?: Array<TranslationItemType>;
+        mapper: TranslationsMapper;
         showAddMoreButton?: boolean;
         disable?: boolean;
-        onChange?: CompareListValueOnChangeHandler;
+        onChange?: CompareTranslationValueOnChangeHandler;
     };
 
-export class CompareListValue extends Component<HTMLDivElement> implements ICompareValue<Array<ListItemType>> {
-    private readonly _mapper: ListMapper                = {};
-    private readonly _currentList?: Array<ListItemType> = [];
+export class CompareTranslationsValue extends Component<HTMLDivElement> implements ICompareValue<Array<TranslationItemType>> {
+    private readonly _mapper: TranslationsMapper               = {};
+    private readonly _currentList?: Array<TranslationItemType> = [];
     private readonly _content: Col;
-    private readonly _onChange?: CompareListValueOnChangeHandler;
+    private readonly _onChange?: CompareTranslationValueOnChangeHandler;
 
-    constructor (props: CompareListValueProps) {
+    constructor (props: CompareTranslationValueProps) {
         const {
                   list,
                   mapper,
@@ -64,7 +64,7 @@ export class CompareListValue extends Component<HTMLDivElement> implements IComp
         this._content.insert(this.element, 'afterbegin');
     }
 
-    getValue (): Nullable<Array<ListItemType>> {
+    getValue (): Nullable<Array<TranslationItemType>> {
         if (this._currentList) {
             return this._currentList
                 .filter((item) => item.value)
@@ -78,7 +78,7 @@ export class CompareListValue extends Component<HTMLDivElement> implements IComp
         return this._currentList?.map(this._getListItem.bind(this)) ?? [];
     }
 
-    private _getListItem (listItem: ListItemType) {
+    private _getListItem (listItem: TranslationItemType) {
         return new Row({
             cols     : [
                 new Component<HTMLDivElement>('div', {
