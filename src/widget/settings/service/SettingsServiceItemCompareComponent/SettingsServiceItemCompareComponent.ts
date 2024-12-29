@@ -35,7 +35,9 @@ import {
     ComparePriceSelectType,
     ComparePriceWithSelectValue,
 } from '@/entity/compare/CompareValue/ComparePriceWithSelectValue/ComparePriceWithSelectValue.ts';
-import { SelectVariantType } from '@/shared/input/Select/Select.ts';
+import {
+    SelectVariantType,
+} from '@/shared/input/Select/Select.ts';
 import {
     CompareDateValue,
 } from '@/entity/compare/CompareValue/CompareDateValue/CompareDateValue.ts';
@@ -91,6 +93,9 @@ import {
     CompareListValue,
 } from '@/entity/compare/CompareValue/CompareListValue/CompareListValue.ts';
 import { LanguageMapper } from '@/widget/settings/LanguageMapper.ts';
+import {
+    linkSettingsServiceItemsRequestAction,
+} from '@/action/settings/service_categories/request-action/linkSettingsServiceItems/linkSettingsServiceItems.request-action.ts';
 
 
 export type SettingsServiceItemCompareComponentProps =
@@ -340,6 +345,22 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
             }),
         ];
 
+        const autopaymentBeforeVisitTimeCompareRow = new CompareRow({
+            label      : `За сколько часов (до 48) до визита можно отменить визит`,
+            targetValue: new CompareTextInputValue({
+                value      : this._targetService.autopayment_before_visit_time?.toString(),
+                type       : 'number',
+                placeholder: 'Пусто',
+                onInput    : (value) => {
+                    this._targetService.autopayment_before_visit_time = Number(value);
+                },
+            }),
+            clientValue: new CompareTextValue({
+                value: this._clientService?.autopayment_before_visit_time?.toString(),
+            }),
+            parent     : this,
+        });
+
         this._compareRows = [
             new CompareBox({
                 title     : 'Информация',
@@ -357,28 +378,6 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         parent     : this,
                     }),
                     new CompareRow({
-                        label      : 'Id НДС',
-                        targetValue: new CompareTextValue({
-                            value: this._targetService.vat_id,
-                        }),
-                        clientValue: new CompareTextValue({
-                            value: this._clientService?.vat_id,
-                        }),
-                        validate   : false,
-                        parent     : this,
-                    }),
-                    new CompareRow({
-                        label      : 'Id системы налогообложения',
-                        targetValue: new CompareTextValue({
-                            value: this._targetService.tax_variant,
-                        }),
-                        clientValue: new CompareTextValue({
-                            value: this._clientService?.tax_variant,
-                        }),
-                        validate   : false,
-                        parent     : this,
-                    }),
-                    new CompareRow({
                         label      : 'Сетевая услуга',
                         targetValue: new CompareTextValue({
                             value: this._targetService.is_chain,
@@ -387,61 +386,6 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         clientValue: new CompareTextValue({
                             value: this._clientService?.is_chain,
                             label: Converter.Settings.Service.yesOrNo(this._clientService?.is_chain),
-                        }),
-                        validate   : false,
-                        parent     : this,
-                    }),
-                    new CompareRow({
-                        label      : 'kkm_settings_id',
-                        targetValue: new CompareTextValue({
-                            value: this._targetService.kkm_settings_id,
-                        }),
-                        clientValue: new CompareTextValue({
-                            value: this._clientService?.kkm_settings_id,
-                        }),
-                        validate   : false,
-                        parent     : this,
-                    }),
-                    new CompareRow({
-                        label      : 'api_id',
-                        targetValue: new CompareTextValue({
-                            value: this._targetService.api_id,
-                        }),
-                        clientValue: new CompareTextValue({
-                            value: this._clientService?.api_id,
-                        }),
-                        validate   : false,
-                        parent     : this,
-                    }),
-                    new CompareRow({
-                        label      : 'api_service_id',
-                        targetValue: new CompareTextValue({
-                            value: this._targetService.api_service_id,
-                        }),
-                        clientValue: new CompareTextValue({
-                            value: this._clientService?.api_service_id,
-                        }),
-                        validate   : false,
-                        parent     : this,
-                    }),
-                    new CompareRow({
-                        label      : 'salon_service_id',
-                        targetValue: new CompareTextValue({
-                            value: this._targetService.salon_service_id,
-                        }),
-                        clientValue: new CompareTextValue({
-                            value: this._clientService?.salon_service_id,
-                        }),
-                        validate   : false,
-                        parent     : this,
-                    }),
-                    new CompareRow({
-                        label      : 'salon_group_service_link',
-                        targetValue: new CompareTextValue({
-                            value: this._targetService.salon_group_service_link,
-                        }),
-                        clientValue: new CompareTextValue({
-                            value: this._clientService?.salon_group_service_link,
                         }),
                         validate   : false,
                         parent     : this,
@@ -498,9 +442,9 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                     }),
                     new CompareRow({
                         label      : 'Тип',
-                        targetValue: new CompareSelectValue({
+                        targetValue: new CompareSelectValue<boolean>({
                             defaultLabel    : '',
-                            defaultValue    : '',
+                            defaultValue    : false,
                             showDefaultLabel: false,
                             list            : [
                                 {
@@ -601,19 +545,193 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         ],
                     }),
                     new CompareBox({
+                        title     : 'Расширенные настройки',
+                        level     : 3,
+                        components: [
+                            new CompareRow({
+                                label      : 'Запись в чеке',
+                                targetValue: new CompareTextInputValue({
+                                    value      : this._targetService.print_title,
+                                    type       : 'text',
+                                    placeholder: 'Пусто',
+                                }),
+                                clientValue: new CompareTextValue({
+                                    value: this._clientService?.print_title,
+                                }),
+                                parent     : this,
+                            }),
+                            new CompareRow({
+                                label           : 'Система налогообложения',
+                                targetValue     : new CompareSelectValue({
+                                    defaultLabel    : '',
+                                    defaultValue    : -1,
+                                    showDefaultLabel: false,
+                                    list            : [
+                                        {
+                                            value   : -1,
+                                            label   : Converter.Settings.Service.taxVariant(-1),
+                                            selected: this._targetService.tax_variant === -1 || this._targetService.tax_variant === null,
+                                        },
+                                        {
+                                            value   : 0,
+                                            label   : Converter.Settings.Service.taxVariant(0),
+                                            selected: this._targetService.tax_variant === 0,
+                                        },
+                                        {
+                                            value   : 1,
+                                            label   : Converter.Settings.Service.taxVariant(1),
+                                            selected: this._targetService.tax_variant === 1,
+                                        },
+                                        {
+                                            value   : 2,
+                                            label   : Converter.Settings.Service.taxVariant(2),
+                                            selected: this._targetService.tax_variant === 2,
+                                        },
+                                        {
+                                            value   : 3,
+                                            label   : Converter.Settings.Service.taxVariant(3),
+                                            selected: this._targetService.tax_variant === 3,
+                                        },
+                                        {
+                                            value   : 4,
+                                            label   : Converter.Settings.Service.taxVariant(4),
+                                            selected: this._targetService.tax_variant === 4,
+                                        },
+                                        {
+                                            value   : 5,
+                                            label   : Converter.Settings.Service.taxVariant(5),
+                                            selected: this._targetService.tax_variant === 5,
+                                        },
+                                    ],
+                                    showValue       : false,
+                                    variant         : SelectVariantType.MINIMAL,
+                                    onChange        : (option) => {
+                                        this._targetService.tax_variant = option.value;
+                                    },
+                                }),
+                                clientValue     : new CompareTextValue({
+                                    value: this._clientService?.tax_variant,
+                                    label: Converter.Settings.Service.taxVariant(this._clientService?.tax_variant),
+                                }),
+                                parent          : this,
+                                validationMethod: (targetValue, clientValue) => {
+                                    if (targetValue === -1 || targetValue === null) {
+                                        return clientValue === -1 || clientValue === null;
+                                    }
+
+                                    return targetValue === clientValue;
+                                },
+                            }),
+                            new CompareRow({
+                                label           : 'НДС',
+                                targetValue     : new CompareSelectValue({
+                                    defaultLabel    : '',
+                                    defaultValue    : -1,
+                                    showDefaultLabel: false,
+                                    list            : [
+                                        {
+                                            value   : -1,
+                                            label   : Converter.Settings.Service.vatId(-1),
+                                            selected: this._targetService.vat_id === -1 || this._targetService.vat_id === null,
+                                        },
+                                        {
+                                            value   : 1,
+                                            label   : Converter.Settings.Service.vatId(1),
+                                            selected: this._targetService.vat_id === 1,
+                                        },
+                                        {
+                                            value   : 2,
+                                            label   : Converter.Settings.Service.vatId(2),
+                                            selected: this._targetService.vat_id === 2,
+                                        },
+                                        {
+                                            value   : 3,
+                                            label   : Converter.Settings.Service.vatId(3),
+                                            selected: this._targetService.vat_id === 3,
+                                        },
+                                        {
+                                            value   : 4,
+                                            label   : Converter.Settings.Service.vatId(4),
+                                            selected: this._targetService.vat_id === 4,
+                                        },
+                                    ],
+                                    showValue       : false,
+                                    variant         : SelectVariantType.MINIMAL,
+                                    onChange        : (option) => {
+                                        this._targetService.vat_id = option.value;
+                                    },
+                                }),
+                                clientValue     : new CompareTextValue({
+                                    value: this._clientService?.vat_id,
+                                    label: Converter.Settings.Service.vatId(this._clientService?.vat_id),
+                                }),
+                                parent          : this,
+                                validationMethod: (targetValue, clientValue) => {
+                                    if (targetValue === -1 || targetValue === null) {
+                                        return clientValue === -1 || clientValue === null;
+                                    }
+
+                                    return targetValue === clientValue;
+                                },
+                            }),
+                            new CompareRow({
+                                label      : 'Уведомление о повторном визите',
+                                targetValue: new CompareTextInputValue({
+                                    value      : this._targetService.repeat_visit_days_step?.toString(),
+                                    type       : 'number',
+                                    placeholder: 'Пусто',
+                                    onInput    : (value) => {
+                                        this._targetService.repeat_visit_days_step = Number(value);
+                                    },
+                                }),
+                                clientValue: new CompareTextValue({
+                                    value: this._clientService?.repeat_visit_days_step?.toString() ?? '',
+                                }),
+                                parent     : this,
+                            }),
+                            new CompareRow({
+                                label      : 'Автоматическое списание с абонементов',
+                                targetValue: new CompareToggleValue({
+                                    value                   : !!this._targetService.is_abonement_autopayment_enabled,
+                                    onChange                : (status) => {
+                                        autopaymentBeforeVisitTimeCompareRow.enable(status);
+                                        this._targetService.is_abonement_autopayment_enabled = status
+                                                                                               ? 1
+                                                                                               : 0;
+                                    },
+                                    executeOnChangeAfterInit: true,
+                                }),
+                                clientValue: new CompareTextValue({
+                                    value: !!this._clientService?.is_abonement_autopayment_enabled,
+                                    label: Converter.Settings.Service.yesOrNo(!!this._clientService?.is_abonement_autopayment_enabled),
+                                }),
+                                parent     : this,
+                            }),
+                            autopaymentBeforeVisitTimeCompareRow,
+                        ],
+                    }),
+                    new CompareBox({
                         title     : 'Языки',
                         level     : 3,
                         components: [
                             new CompareRow({
-                                label      : 'Языки',
-                                targetValue: new CompareListValue({
-                                    list  : this._targetService.translations.map((translation) => ({
+                                label           : 'Языки',
+                                targetValue     : new CompareListValue({
+                                    list    : this._targetService.translations.map((translation) => ({
                                         id   : translation.language_id.toString(),
                                         value: translation.translation,
                                     })),
-                                    mapper: LanguageMapper,
+                                    mapper  : LanguageMapper,
+                                    onChange: (item) => {
+                                        for (let i = 0; i < this._targetService.translations.length; i++) {
+                                            if (this._targetService.translations[i].language_id.toString() === item.id) {
+                                                this._targetService.translations[i].translation = item.value;
+                                                break;
+                                            }
+                                        }
+                                    },
                                 }),
-                                clientValue: new CompareListValue({
+                                clientValue     : new CompareListValue({
                                     list             : this._clientService?.translations.map((translation) => ({
                                         id   : translation.language_id.toString(),
                                         value: translation.translation,
@@ -622,8 +740,21 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                     showAddMoreButton: false,
                                     disable          : true,
                                 }),
-                                parent     : this,
-                                alignTop   : true,
+                                parent          : this,
+                                alignTop        : true,
+                                validationMethod: (targetValue, clientValue) => {
+                                    if (targetValue && clientValue) {
+                                        if (targetValue.length === clientValue.length) {
+                                            return targetValue.every(
+                                                (targetItem, index) => targetItem.id === clientValue[index].id && targetItem.value === clientValue[index].value,
+                                            );
+                                        }
+
+                                        return false;
+                                    }
+
+                                    return targetValue === clientValue;
+                                },
                             }),
                         ],
                     }),
@@ -719,7 +850,17 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         );
 
                     this._clientService.resources = children.filter(Boolean).map((resource) => Number(resource.id));
-
+                    await linkSettingsServiceItemsRequestAction(
+                        this._bearer,
+                        this._clientId,
+                        {
+                            master_settings: [],
+                            service_id     : this._clientService.id,
+                            resource_ids   : this._clientService.resources,
+                            translations   : this._targetService.translations,
+                        },
+                        this._logger,
+                    );
                     // update item
                     return await updateSettingsServiceByTargetRequestAction(
                         this._bearer,
@@ -734,6 +875,17 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
             } else {
                 if (this._childrenIsValid()) {
                     // update item
+                    await linkSettingsServiceItemsRequestAction(
+                        this._bearer,
+                        this._clientId,
+                        {
+                            master_settings: [],
+                            service_id     : this._clientService.id,
+                            resource_ids   : this._clientService.resources,
+                            translations   : this._targetService.translations,
+                        },
+                        this._logger,
+                    );
                     return await updateSettingsServiceByTargetRequestAction(
                         this._bearer,
                         this._clientId,
@@ -753,6 +905,17 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         );
 
                     this._clientService.resources = children.filter(Boolean).map((resource) => Number(resource.id));
+                    await linkSettingsServiceItemsRequestAction(
+                        this._bearer,
+                        this._clientId,
+                        {
+                            master_settings: [],
+                            service_id     : this._clientService.id,
+                            resource_ids   : this._clientService.resources,
+                            translations   : this._targetService.translations,
+                        },
+                        this._logger,
+                    );
                     // update item
                     return await updateSettingsServiceByTargetRequestAction(
                         this._bearer,
@@ -779,13 +942,29 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                     })),
                                 ),
                                 async (resources: unknown) => {
+                                    const resourcesIds = ((resources ?? []) as Array<Resource>).map((resource) => Number(resource.id));
+
                                     const item = await createSettingsServiceItemByTargetRequestAction(
                                         this._bearer,
                                         this._clientId,
                                         Number(categoryId),
                                         this._targetService,
-                                        ((resources ?? []) as Array<Resource>).map((resource) => Number(resource.id)),
+                                        resourcesIds,
                                         this._fetcher,
+                                        this._logger,
+                                    );
+
+                                    item.resources = resourcesIds;
+
+                                    await linkSettingsServiceItemsRequestAction(
+                                        this._bearer,
+                                        this._clientId,
+                                        {
+                                            master_settings: [],
+                                            service_id     : item.id,
+                                            resource_ids   : resourcesIds,
+                                            translations   : this._targetService.translations,
+                                        },
                                         this._logger,
                                     );
 

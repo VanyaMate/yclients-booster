@@ -8,9 +8,9 @@ import {
 import { Nullable } from '@/types/Nullable';
 import { Row } from '@/shared/box/Row/Row.ts';
 import { TextInput } from '@/shared/input/TextInput/TextInput.ts';
-import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
 import css from './CompareListValue.module.css';
+import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 
 
 export type ListItemType = {
@@ -20,6 +20,8 @@ export type ListItemType = {
 
 export type ListMapper = Record<string, string>;
 
+export type CompareListValueOnChangeHandler = (item: ListItemType) => void;
+
 export type CompareListValueProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
@@ -27,16 +29,22 @@ export type CompareListValueProps =
         mapper: ListMapper;
         showAddMoreButton?: boolean;
         disable?: boolean;
+        onChange?: CompareListValueOnChangeHandler;
     };
 
 export class CompareListValue extends Component<HTMLDivElement> implements ICompareValue<Array<ListItemType>> {
-    private readonly _mapper: ListMapper       = {};
-    private _currentList?: Array<ListItemType> = [];
-    private _content: Col;
+    private readonly _mapper: ListMapper                = {};
+    private readonly _currentList?: Array<ListItemType> = [];
+    private readonly _content: Col;
+    private readonly _onChange?: CompareListValueOnChangeHandler;
 
     constructor (props: CompareListValueProps) {
         const {
-                  list, mapper, showAddMoreButton = true, disable = false,
+                  list,
+                  mapper,
+                  showAddMoreButton = true,
+                  disable           = false,
+                  onChange,
                   ...other
               } = props;
         super('div', other);
@@ -45,7 +53,8 @@ export class CompareListValue extends Component<HTMLDivElement> implements IComp
             this.element.classList.add(css.disable);
         }
 
-        this._currentList = list ? [ ...list ] : undefined;
+        this._onChange    = onChange;
+        this._currentList = list;
         this._mapper      = mapper;
 
         this._content = new Col({
@@ -53,19 +62,6 @@ export class CompareListValue extends Component<HTMLDivElement> implements IComp
         });
 
         this._content.insert(this.element, 'afterbegin');
-
-        if (showAddMoreButton) {
-            new Button({
-                textContent: 'Добавить еще',
-                onclick    : () => {
-                    this._content.add(
-                        this._getListItem({
-                            id: '', value: 'Привет',
-                        }),
-                    );
-                },
-            }).insert(this.element, 'beforeend');
-        }
     }
 
     getValue (): Nullable<Array<ListItemType>> {
@@ -79,31 +75,29 @@ export class CompareListValue extends Component<HTMLDivElement> implements IComp
     }
 
     private _getListItems () {
-        return this.getValue()?.map((listItem) => this._getListItem(listItem)) ?? [];
+        return this._currentList?.map(this._getListItem.bind(this)) ?? [];
     }
 
     private _getListItem (listItem: ListItemType) {
-        const content = new Row({
+        return new Row({
             cols     : [
-                new Component<HTMLElement>('div', {
+                new Component<HTMLDivElement>('div', {
                     textContent: this._mapper[listItem.id],
                     className  : css.label,
                 }),
                 new TextInput({
-                    type     : 'text',
-                    value    : listItem.value,
-                    className: css.input,
-                }),
-                new Button({
-                    textContent: 'Удалить',
-                    styleType  : ButtonStyleType.DEFAULT,
-                    onclick    : () => content.remove(),
-                    className  : css.button,
+                    type       : 'text',
+                    value      : listItem.value,
+                    className  : css.input,
+                    placeholder: 'Значение',
+                    onInput    : (value) => {
+                        listItem.value = value;
+                        this._onChange?.({ id: listItem.id, value });
+                        this.element.dispatchEvent(CompareEvent);
+                    },
                 }),
             ],
             className: css.row,
         });
-
-        return content;
     }
 }

@@ -5,13 +5,14 @@
 
     .row {
         align-items : center;
+        min-height  : 30px;
 
         .label {
-            flex : 2;
+            flex : 3;
         }
 
         .input {
-            flex : 4;
+            flex : 5;
         }
 
         .button {

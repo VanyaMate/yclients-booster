@@ -9,9 +9,9 @@ import { Col } from '@/shared/box/Col/Col.ts';
 import { Modal } from '@/shared/modal/Modal/Modal.ts';
 
 
-export type SelectOption = {
+export type SelectOption<ValueType> = {
     selected?: boolean;
-    value: any;
+    value: ValueType;
     label: string;
     showLabel?: string;
 }
@@ -21,48 +21,48 @@ export enum SelectVariantType {
     MINIMAL
 }
 
-export type SelectOnChange = (data: SelectOption) => void;
+export type SelectOnChange<ValueType> = (data: SelectOption<ValueType>) => void;
 
-export type SelectProps =
+export type SelectProps<ValueType> =
     ComponentPropsOptional<HTMLDivElement>
     & {
-        defaultValue: string;
+        defaultValue: ValueType;
         defaultLabel: string;
         defaultShowLabel?: string;
         showDefaultLabel?: boolean;
-        list: Array<SelectOption>;
+        list: Array<SelectOption<ValueType>>;
         withSearch?: boolean;
         isModal?: boolean;
         modalLabel?: string;
         showValue?: boolean;
         styleType?: ButtonStyleType;
-        onChange?: SelectOnChange;
+        onChange?: SelectOnChange<ValueType>;
         variant?: SelectVariantType;
     }
 
-export class Select extends Component<HTMLDivElement> {
-    private readonly _defaultLabel: string                    = '';
+export class Select<ValueType> extends Component<HTMLDivElement> {
+    private readonly _defaultLabel: string                               = '';
     private readonly _defaultShowLabel?: string;
-    private readonly _defaultValue: string                    = '';
-    private readonly _defaultStyleType: ButtonStyleType       = ButtonStyleType.DEFAULT;
-    private readonly _showDefaultLabel: boolean               = true;
-    private readonly _onChangeHandler?: SelectOnChange;
-    private readonly _isModal: boolean                        = false;
-    private readonly _list: Array<SelectOption>               = [];
+    private readonly _defaultValue: ValueType;
+    private readonly _defaultStyleType: ButtonStyleType                  = ButtonStyleType.DEFAULT;
+    private readonly _showDefaultLabel: boolean                          = true;
+    private readonly _onChangeHandler?: SelectOnChange<ValueType>;
+    private readonly _isModal: boolean                                   = false;
+    private readonly _list: Array<SelectOption<ValueType>>               = [];
     private readonly _selectButton: Button;
     private readonly _dropdown: Col;
     private readonly _optionsBox: Col;
-    private readonly _modal: Modal | null                     = null;
-    private readonly _onChangeHandlers: Array<SelectOnChange> = [];
+    private readonly _modal: Modal | null                                = null;
+    private readonly _onChangeHandlers: Array<SelectOnChange<ValueType>> = [];
     private readonly _currentShowLabel?: string;
-    private readonly _showValue: boolean                      = true;
+    private readonly _showValue: boolean                                 = true;
     private readonly _hideOnDomClickHandler: (event: MouseEvent) => void;
-    private readonly _inited: boolean                         = false;
-    private _search: string                                   = '';
-    private _currentLabel: string                             = '';
-    private _currentValue: string                             = '';
+    private readonly _inited: boolean                                    = false;
+    private _search: string                                              = '';
+    private _currentLabel: string                                        = '';
+    private _currentValue: ValueType;
 
-    constructor (props: SelectProps) {
+    constructor (props: SelectProps<ValueType>) {
         const {
                   list,
                   withSearch,
@@ -192,7 +192,7 @@ export class Select extends Component<HTMLDivElement> {
         document.removeEventListener('click', this._hideOnDomClickHandler);
     }
 
-    public onChange (callback: SelectOnChange) {
+    public onChange (callback: SelectOnChange<ValueType>) {
         this._onChangeHandlers.push(callback);
     }
 
@@ -212,7 +212,9 @@ export class Select extends Component<HTMLDivElement> {
             );
         }
         this._list
-            .filter((item) => item.label.match(new RegExp(this._search, 'gi')) || item.value.match(this._search))
+            .filter((item) => item.label.match(new RegExp(this._search, 'gi')) || (typeof item.value === 'string'
+                                                                                   ? item.value.match(this._search)
+                                                                                   : item.value === this._search))
             .forEach((item) => {
                 selected = item.value === this._currentValue;
                 this._optionsBox.add(
@@ -238,7 +240,7 @@ export class Select extends Component<HTMLDivElement> {
         });
     }
 
-    private _select (item: SelectOption) {
+    private _select (item: SelectOption<ValueType>) {
         this._currentValue = item.value;
         this._currentLabel = item.showLabel ?? item.label;
 

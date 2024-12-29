@@ -13,6 +13,8 @@ import {
 
 
 export const createSettingsServiceItemByTargetRequestAction = async function (bearer: string, clientId: string, categoryId: number, targetData: SettingsServiceData, resources: Array<number>, fetcher: IFetcher = new Fetch(), logger ?: ILogger): Promise<SettingsServiceData> {
+           const image = targetData.image_group?.images?.basic?.path;
+
            return createSettingsServiceItemRequestAction(
                bearer,
                clientId,
@@ -25,7 +27,7 @@ export const createSettingsServiceItemByTargetRequestAction = async function (be
                        price_max                       : 0,
                        price_min                       : 0,
                    },
-                   delete_image            : false,
+                   delete_image            : !!image,
                    is_category             : false,
                    category_id             : categoryId,
                    is_linked_to_composite  : targetData.is_linked_to_composite,
@@ -37,13 +39,11 @@ export const createSettingsServiceItemByTargetRequestAction = async function (be
                    translations            : targetData.translations.filter((translation) => translation.translation),
                    resources               : resources, // CREATE TOO
                    staff                   : [],
-                   image_group             : targetData.image_group,
-                   image                   : targetData.image_group?.images?.basic?.path
-                                             ? await base64ImageLoad(targetData.image_group.images.basic.path, logger)
+                   image_group             : image ? null : targetData.image_group,
+                   image                   : image
+                                             ? await base64ImageLoad(image, logger)
                                              : undefined,
                    id                      : 0,
-                   vat_id                  : -1,
-                   tax_variant             : -1,
                    is_chain                : false,
                },
                fetcher,

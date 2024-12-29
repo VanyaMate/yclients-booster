@@ -40,7 +40,7 @@ export class CompareTimeSelectsValue extends Component<HTMLDivElement> implement
                     };
                 }),
                 onChange    : (variant) => {
-                    this._currentValue[0] = variant.value;
+                    this._currentValue[0] = Number(variant.value);
                     onChange?.(this._currentValue);
                     this.element.dispatchEvent(CompareEvent);
                 },
@@ -51,7 +51,7 @@ export class CompareTimeSelectsValue extends Component<HTMLDivElement> implement
                 defaultLabel: '0 м',
                 defaultValue: '0',
                 onChange    : (variant) => {
-                    this._currentValue[1] = variant.value;
+                    this._currentValue[1] = Number(variant.value);
                     onChange?.(this._currentValue);
                     this.element.dispatchEvent(CompareEvent);
                 },

@@ -36,6 +36,7 @@ export const updateSettingsServiceByTargetRequestAction = async function (bearer
         api_id                  : clientData.api_id,
         api_service_id          : clientData.api_service_id,
         is_chain                : clientData.is_chain,
+        translations            : targetData.translations.filter((translation) => translation.translation),
     };
 
     return fetcher.fetch(`https://yclients.com/api/v1/company/${ clientId }/services/${ clientData.id }`, {

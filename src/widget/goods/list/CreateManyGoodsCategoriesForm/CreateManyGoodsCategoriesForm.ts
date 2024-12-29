@@ -35,7 +35,7 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
     private readonly _clientId: string          = '';
     private readonly _progressBar: ProgressBar;
     private readonly _createButton: Button;
-    private readonly _selectCategories: Select;
+    private readonly _selectCategories: Select<string>;
     private readonly _splitter: PromiseSplitter = new PromiseSplitter(PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY);
 
     constructor (props: CreateManyGoodsCategoriesFormProps) {

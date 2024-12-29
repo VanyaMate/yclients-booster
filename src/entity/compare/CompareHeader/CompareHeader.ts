@@ -27,8 +27,8 @@ export type CompareHeaderProps =
         clientHeaderData?: string;
         label: string;
         rows: Array<ICompareComponent>;
-        variants: Array<SelectOption>;
-        onVariantChange: (option: SelectOption) => void;
+        variants: Array<SelectOption<string>>;
+        onVariantChange: (option: SelectOption<string>) => void;
         onActivateAll?: CompareHeaderActivateHandler;
         onActivateOnlyChildren?: CompareHeaderActivateHandler;
         onActivateOnlyItem?: CompareHeaderActivateHandler;
@@ -42,19 +42,19 @@ export type CompareHeaderProps =
 export class CompareHeader extends Component<HTMLDivElement> implements ICompareHeader,
                                                                         ICompareComponent {
     private readonly _initialTargetHeader: string;
-    private readonly _selectButton: Select;
+    private readonly _selectButton: Select<CompareType>;
     private readonly _processButton: Component<HTMLDivElement>;
-    private readonly _disableByProp: boolean        = false;
+    private readonly _disableByProp: boolean                = false;
     private readonly _onActivateAll?: CompareHeaderActivateHandler;
     private readonly _onActivateOnlyItem?: CompareHeaderActivateHandler;
     private readonly _onActivateOnlyChildren?: CompareHeaderActivateHandler;
     private readonly _onDeactivate?: CompareHeaderActivateHandler;
-    private readonly _type: string                  = '';
-    private readonly _variants: Array<SelectOption> = [];
-    private readonly _variantSelect: Select;
+    private readonly _type: string                          = '';
+    private readonly _variants: Array<SelectOption<string>> = [];
+    private readonly _variantSelect: Select<string>;
     private _currentTargetHeader: string;
     private _isValid: boolean;
-    private _enabled: boolean                       = true;
+    private _enabled: boolean                               = true;
     private readonly _parent?: ICompareEntity<any>;
 
     constructor (props: CompareHeaderProps) {

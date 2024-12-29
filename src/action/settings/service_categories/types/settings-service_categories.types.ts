@@ -16,6 +16,13 @@ export type SettingsServiceCategoriesApiResponse = {
     meta: SettingsServiceCategoryApiResponseMeta;
 }
 
+export type SettingsServiceLinksUpdateData = {
+    master_settings: Array<unknown>,
+    resource_ids: Array<number>,
+    service_id: number,
+    translations: Array<SettingsServiceTranslation>;
+}
+
 export type SettingsServiceCategoryData = {
     id: number
     category_id: number
@@ -235,7 +242,7 @@ export type SettingsServiceData = {
     duration: number;
     id: number;
     image_group: null | SettingsServiceImageGroup;
-    // Автосписание с абонемента
+    // Автосписание с абонемента (0 - нет, 1 - да)
     is_abonement_autopayment_enabled: number;
     // Отсносится к сети/не сети
     is_chain: boolean;
@@ -258,8 +265,12 @@ export type SettingsServiceData = {
     price_prepaid_amount: number;
     // Размер предоплаты в процентах (от минимальной стоимости услуги)
     price_prepaid_percent: number;
+    // запись в чеке
     print_title: string;
+    // Уведомление о повторном визите (дней) (0 не отправлять, использовать
+    // общие настройки)
     repeat_visit_days_step: number;
+    // ресурсы
     resources: Array<number>;
     salon_group_service_link: null | string;
     salon_group_title: null | string;
@@ -276,11 +287,24 @@ export type SettingsServiceData = {
     staff: Array<SettingsServiceCategoryServiceStuff>;
     step: number;
     // ID системы налогообложения (number)
+    // -1 - По умолчанию
+    // 0 - Общая ОСН
+    // 1 - Упрощенная УСН (Доход)
+    // 2 - Упрощенная УСН (Доход минус Расход)
+    // 3 - Единый налог на вмененный доход ЕНВД
+    // 4 - Единый сельскохозяйственный налог ЕСН
+    // 5 - Патентная система налогообложения
     tax_variant: number | null;
     // Название услуги
     title: string;
+    // переводы (языки)
     translations: Array<SettingsServiceTranslation>;
     // ID НДС
+    // 4 - Не облагается
+    // 3 - 20% НДС
+    // 2 - 10% НДС
+    // 1 - 0% НДС
+    // -1 - По умолчанию
     vat_id: number | null;
     // Вес услуги (используется для сортировки услуг при отображении)
     weight: number;

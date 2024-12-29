@@ -5,8 +5,8 @@ import {
 import { CompareEvent } from '@/entity/compare/CompareEvent.ts';
 
 
-export class CompareSelectValue extends Select implements ICompareValue<string> {
-    constructor (props: SelectProps) {
+export class CompareSelectValue<ValueType> extends Select<ValueType> implements ICompareValue<ValueType> {
+    constructor (props: SelectProps<ValueType>) {
         super(props);
 
         this.onChange(() => {
