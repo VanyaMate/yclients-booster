@@ -2,41 +2,45 @@ import { ICompareComponent } from '../Compare.types.ts';
 import css from './CompareBox.module.css';
 import {
     Component,
-    ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
+import { Details, DetailsProps } from '@/shared/box/Details/Details.ts';
+import { Col } from '@/shared/box/Col/Col.ts';
 
 
 export type CompareBoxProps =
-    ComponentPropsOptional<HTMLDivElement>
+    Omit<DetailsProps, 'header' | 'details'>
     & {
         title: string;
         level: number;
         components: Array<ICompareComponent>;
     };
 
-export class CompareBox extends Component<HTMLDivElement> implements ICompareComponent {
+export class CompareBox extends Details implements ICompareComponent {
     private _enabled: boolean                            = true;
     private _compareComponents: Array<ICompareComponent> = [];
 
     constructor (props: CompareBoxProps) {
-        const { title, components, level, ...other } = props;
-        super('div', other, components);
+        const { title, components, level, open = true, ...other } = props;
+        super({
+            ...other,
+            open   : open,
+            header : new Component<HTMLHeadingElement>(`h${ level }`, {
+                textContent: title,
+                className  : css.title,
+            }),
+            details: new Col({
+                rows: components.length
+                      ? components
+                      : [
+                        new Component<HTMLDivElement>('div', {
+                            textContent: 'Ничего нет',
+                            className  : css.empty,
+                        }),
+                    ],
+            }),
+        });
         this._compareComponents = components;
         this.element.classList.add(css.container);
-
-        new Component<HTMLHeadingElement>(`h${ level }`, {
-            textContent: title,
-            className  : css.title,
-        })
-            .insert(this.element, 'afterbegin');
-
-        if (this._compareComponents.length === 0) {
-            new Component<HTMLDivElement>('div', {
-                textContent: 'Ничего нет',
-                className  : css.empty,
-            })
-                .insert(this.element, 'beforeend');
-        }
     }
 
     get isValid () {

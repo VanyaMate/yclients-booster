@@ -322,6 +322,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
             new CompareBox({
                 title     : 'Языки',
                 level     : 2,
+                open      : false,
                 components: [
                     new CompareRow({
                         label           : 'Языки',

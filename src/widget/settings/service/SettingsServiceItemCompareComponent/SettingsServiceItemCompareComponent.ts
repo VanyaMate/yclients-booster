@@ -713,6 +713,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                     new CompareBox({
                         title     : 'Языки',
                         level     : 3,
+                        open      : false,
                         components: [
                             new CompareRow({
                                 label           : 'Языки',

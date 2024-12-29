@@ -7,10 +7,6 @@
 
     &.alignTop {
         align-items : start;
-
-        & > *:nth-child(2) {
-            align-self : center;
-        }
     }
 
     &.disabled {

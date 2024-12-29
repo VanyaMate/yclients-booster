@@ -11,12 +11,20 @@
         margin         : var(--offset-small) 0 0 0;
         padding-bottom : var(--offset-small);
         border-bottom  : 1px dashed var(--border-color);
+        transition     : var(--transition-fast);
     }
 
     .empty {
         color       : var(--color-gray);
         font-weight : normal;
         font-style  : italic;
+    }
+
+    &.invalid {
+        .title {
+            color         : var(--danger-color);
+            border-bottom : 1px dashed var(--danger-color);
+        }
     }
 
     &.disabled {
