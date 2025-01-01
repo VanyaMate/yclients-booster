@@ -53,7 +53,7 @@ import { Row } from '@/shared/box/Row/Row.ts';
 import {
     CompareTranslationsValue,
 } from '@/entity/compare/CompareValue/CompareTranslationsValue/CompareTranslationsValue.ts';
-import { LanguageMapper } from '@/widget/settings/LanguageMapper.ts';
+import { LanguageMapper } from '@/mapper/LanguageMapper.ts';
 
 
 export type SettingsServiceCategoryCompareComponentProps =
@@ -286,11 +286,11 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                         label      : 'Сетевая категория',
                         targetValue: new CompareTextValue({
                             value: this._targetCategory.id,
-                            label: Converter.Settings.Service.yesOrNo(this._targetCategory?.is_chain),
+                            label: Converter.yesOrNo(this._targetCategory?.is_chain),
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientCategory?.id,
-                            label: Converter.Settings.Service.yesOrNo(this._clientCategory?.is_chain),
+                            label: Converter.yesOrNo(this._clientCategory?.is_chain),
                         }),
                         validate   : false,
                         parent     : this,

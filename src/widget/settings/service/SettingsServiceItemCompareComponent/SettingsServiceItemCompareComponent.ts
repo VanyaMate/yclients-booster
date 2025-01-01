@@ -92,7 +92,7 @@ import { Row } from '@/shared/box/Row/Row.ts';
 import {
     CompareTranslationsValue,
 } from '@/entity/compare/CompareValue/CompareTranslationsValue/CompareTranslationsValue.ts';
-import { LanguageMapper } from '@/widget/settings/LanguageMapper.ts';
+import { LanguageMapper } from '@/mapper/LanguageMapper.ts';
 import {
     linkSettingsServiceItemsRequestAction,
 } from '@/action/settings/service_categories/request-action/linkSettingsServiceItems/linkSettingsServiceItems.request-action.ts';
@@ -219,7 +219,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                 value: this._clientService
                        ? this._clientService.abonement_restriction_value.toString()
                        : undefined,
-                label: Converter.Settings.Service.yesOrNo(!!this._clientService?.abonement_restriction_value),
+                label: Converter.yesOrNo(!!this._clientService?.abonement_restriction_value),
             }),
             validationMethod: (targetValue, clientValue) => {
                 // Значение clientValue может быть undefined/1/0
@@ -249,7 +249,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                 value: this._clientService
                        ? this._clientService.online_invoicing_status.toString()
                        : undefined,
-                label: Converter.Settings.Service.yesOrNo(!!this._clientService?.online_invoicing_status),
+                label: Converter.yesOrNo(!!this._clientService?.online_invoicing_status),
             }),
             validationMethod: (targetValue, clientValue) => {
                 return targetValue ? clientValue === '2'
@@ -381,11 +381,11 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                         label      : 'Сетевая услуга',
                         targetValue: new CompareTextValue({
                             value: this._targetService.is_chain,
-                            label: Converter.Settings.Service.yesOrNo(this._targetService.is_chain),
+                            label: Converter.yesOrNo(this._targetService.is_chain),
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientService?.is_chain,
-                            label: Converter.Settings.Service.yesOrNo(this._clientService?.is_chain),
+                            label: Converter.yesOrNo(this._clientService?.is_chain),
                         }),
                         validate   : false,
                         parent     : this,
@@ -569,37 +569,37 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                     list            : [
                                         {
                                             value   : -1,
-                                            label   : Converter.Settings.Service.taxVariant(-1),
+                                            label   : Converter.taxVariant(-1),
                                             selected: this._targetService.tax_variant === -1 || this._targetService.tax_variant === null,
                                         },
                                         {
                                             value   : 0,
-                                            label   : Converter.Settings.Service.taxVariant(0),
+                                            label   : Converter.taxVariant(0),
                                             selected: this._targetService.tax_variant === 0,
                                         },
                                         {
                                             value   : 1,
-                                            label   : Converter.Settings.Service.taxVariant(1),
+                                            label   : Converter.taxVariant(1),
                                             selected: this._targetService.tax_variant === 1,
                                         },
                                         {
                                             value   : 2,
-                                            label   : Converter.Settings.Service.taxVariant(2),
+                                            label   : Converter.taxVariant(2),
                                             selected: this._targetService.tax_variant === 2,
                                         },
                                         {
                                             value   : 3,
-                                            label   : Converter.Settings.Service.taxVariant(3),
+                                            label   : Converter.taxVariant(3),
                                             selected: this._targetService.tax_variant === 3,
                                         },
                                         {
                                             value   : 4,
-                                            label   : Converter.Settings.Service.taxVariant(4),
+                                            label   : Converter.taxVariant(4),
                                             selected: this._targetService.tax_variant === 4,
                                         },
                                         {
                                             value   : 5,
-                                            label   : Converter.Settings.Service.taxVariant(5),
+                                            label   : Converter.taxVariant(5),
                                             selected: this._targetService.tax_variant === 5,
                                         },
                                     ],
@@ -611,7 +611,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                 }),
                                 clientValue     : new CompareTextValue({
                                     value: this._clientService?.tax_variant,
-                                    label: Converter.Settings.Service.taxVariant(this._clientService?.tax_variant),
+                                    label: Converter.taxVariant(this._clientService?.tax_variant),
                                 }),
                                 parent          : this,
                                 validationMethod: (targetValue, clientValue) => {
@@ -631,27 +631,27 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                     list            : [
                                         {
                                             value   : -1,
-                                            label   : Converter.Settings.Service.vatId(-1),
+                                            label   : Converter.vatId(-1),
                                             selected: this._targetService.vat_id === -1 || this._targetService.vat_id === null,
                                         },
                                         {
                                             value   : 1,
-                                            label   : Converter.Settings.Service.vatId(1),
+                                            label   : Converter.vatId(1),
                                             selected: this._targetService.vat_id === 1,
                                         },
                                         {
                                             value   : 2,
-                                            label   : Converter.Settings.Service.vatId(2),
+                                            label   : Converter.vatId(2),
                                             selected: this._targetService.vat_id === 2,
                                         },
                                         {
                                             value   : 3,
-                                            label   : Converter.Settings.Service.vatId(3),
+                                            label   : Converter.vatId(3),
                                             selected: this._targetService.vat_id === 3,
                                         },
                                         {
                                             value   : 4,
-                                            label   : Converter.Settings.Service.vatId(4),
+                                            label   : Converter.vatId(4),
                                             selected: this._targetService.vat_id === 4,
                                         },
                                     ],
@@ -663,7 +663,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                 }),
                                 clientValue     : new CompareTextValue({
                                     value: this._clientService?.vat_id,
-                                    label: Converter.Settings.Service.vatId(this._clientService?.vat_id),
+                                    label: Converter.vatId(this._clientService?.vat_id),
                                 }),
                                 parent          : this,
                                 validationMethod: (targetValue, clientValue) => {
@@ -703,7 +703,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                                 }),
                                 clientValue: new CompareTextValue({
                                     value: !!this._clientService?.is_abonement_autopayment_enabled,
-                                    label: Converter.Settings.Service.yesOrNo(!!this._clientService?.is_abonement_autopayment_enabled),
+                                    label: Converter.yesOrNo(!!this._clientService?.is_abonement_autopayment_enabled),
                                 }),
                                 parent     : this,
                             }),
