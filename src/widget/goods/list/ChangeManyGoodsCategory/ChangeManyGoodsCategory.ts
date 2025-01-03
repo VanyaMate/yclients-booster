@@ -84,28 +84,27 @@ export class ChangeManyGoodsCategory extends Component<HTMLDivElement> {
                 if (select.getValue() !== '-1') {
                     button.setLoading(true);
                     const goods = await this._getSelectedGoods();
-                    new PromiseSplitter(5, 2)
-                        .exec(
-                            goods.map((good) => ({
-                                chain: [
-                                    () => getGoodRequestAction(this._clientId, good.categoryId, good.id, this._logger),
-                                    async (goodData: unknown) => {
-                                        if (Is<GoodData>(goodData)) {
-                                            return changeGoodCategoryRequestAction(
-                                                this._clientId,
-                                                goodData.category_id.toString(),
-                                                goodData.id,
-                                                {
-                                                    ...goodData,
-                                                    category_id: Number(select.getValue()),
-                                                },
-                                                this._logger,
-                                            );
-                                        }
-                                    },
-                                ],
-                            })),
-                        )
+                    new PromiseSplitter(5, 2).exec(
+                        goods.map((good) => ({
+                            chain: [
+                                () => getGoodRequestAction(this._clientId, good.categoryId, good.id, this._logger),
+                                async (goodData: unknown) => {
+                                    if (Is<GoodData>(goodData)) {
+                                        return changeGoodCategoryRequestAction(
+                                            this._clientId,
+                                            goodData.category_id.toString(),
+                                            goodData.id,
+                                            {
+                                                ...goodData,
+                                                category_id: Number(select.getValue()),
+                                            },
+                                            this._logger,
+                                        );
+                                    }
+                                },
+                            ],
+                        })),
+                    )
                         .finally(() => {
                             button.setLoading(false);
                             button.element.disabled    = true;

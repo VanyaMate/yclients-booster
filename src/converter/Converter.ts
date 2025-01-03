@@ -52,4 +52,15 @@ export namespace Converter {
     export const unitId = function (id: keyof typeof UnitMapper = '216779'): string {
         return UnitMapper[id];
     };
+
+    export const period = function (type?: number | null): string {
+        switch (type) {
+            case 0:
+                return 'Месяц';
+            case 1:
+                return 'День';
+            default:
+                return 'Неизвестно';
+        }
+    };
 }
