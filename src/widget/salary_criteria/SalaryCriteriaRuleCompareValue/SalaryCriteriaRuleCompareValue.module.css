@@ -1,0 +1,19 @@
+.container {
+    background    : var(--bg-second);
+    padding       : var(--offset-small);
+    border-radius : var(--offset-small);
+
+    .row {
+        min-height  : 30px;
+        align-items : center;
+
+        :nth-child(1) {
+            flex        : 3;
+            font-weight : normal;
+        }
+
+        :nth-child(2) {
+            flex : 4;
+        }
+    }
+}

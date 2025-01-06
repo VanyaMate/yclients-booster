@@ -14,6 +14,7 @@ export type SalaryCriteriaListCompareComponentProps =
     CompareComponentProps
     & {
         clientId: string;
+        bearer: string;
         targetCopyData: SalaryCriteriaListDataForCopy;
         clientCopyData: SalaryCriteriaListDataForCopy;
     };
@@ -22,14 +23,18 @@ export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<S
     private readonly _targetCopyData: SalaryCriteriaListDataForCopy;
     private readonly _clientCopyData: SalaryCriteriaListDataForCopy;
     private readonly _clientId: string;
+    private readonly _bearer: string;
 
     constructor (props: SalaryCriteriaListCompareComponentProps) {
-        const { clientId, targetCopyData, clientCopyData, ...other } = props;
+        const {
+                  clientId, targetCopyData, clientCopyData, bearer, ...other
+              } = props;
         super(other);
 
         this._targetCopyData = targetCopyData;
         this._clientCopyData = clientCopyData;
         this._clientId       = clientId;
+        this._bearer         = bearer;
 
         this._render();
     }
@@ -44,9 +49,11 @@ export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<S
         new Col({
             rows: this._compareChildren = this._targetCopyData.criteriaList.map((criteria) => (
                 new SalaryCriteriaCompareComponent({
-                    clientId      : this._clientId,
-                    targetCriteria: criteria,
-                    clientCopyData: this._clientCopyData,
+                    clientId          : this._clientId,
+                    bearer            : this._bearer,
+                    targetCriteria    : criteria,
+                    targetSettingsData: this._targetCopyData.settingsCopyData,
+                    clientCopyData    : this._clientCopyData,
                 })
             )),
         })

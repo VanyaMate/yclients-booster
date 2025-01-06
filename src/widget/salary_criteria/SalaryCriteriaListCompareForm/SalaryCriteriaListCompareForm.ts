@@ -75,6 +75,7 @@ export class SalaryCriteriaListCompareForm extends Component<HTMLDivElement> {
         this._content.add(
             new SalaryCriteriaListCompareComponent({
                 clientId      : this._clientId,
+                bearer        : this._bearer,
                 targetCopyData: targetCopyData,
                 clientCopyData: clientCopyData,
             }),
