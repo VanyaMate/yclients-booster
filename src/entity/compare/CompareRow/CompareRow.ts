@@ -109,10 +109,8 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
         this._isValid = this._revalidate();
 
         if (this._isValid) {
-            console.log('Revalidate to Invalid');
             this.element.classList.remove(css.invalid);
         } else {
-            console.log('Revalidate to Valid');
             this.element.classList.add(css.invalid);
         }
     }
