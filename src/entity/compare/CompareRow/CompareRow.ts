@@ -27,15 +27,18 @@ export type CompareRowV4Props<TargetValue, ClientValue> =
         disable?: boolean;
         alignTop?: boolean;
         parent?: ICompareEntity<any>;
+        revalidateOnCheck?: boolean;
     };
 
 export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivElement> implements ICompareComponent {
     private readonly _validationMethod?: CompareRowValidationMethod<Nullable<TargetValue>, Nullable<ClientValue>>;
     private readonly _targetValue: ICompareValue<Nullable<TargetValue>>;
     private readonly _clientValue: ICompareValue<Nullable<ClientValue>>;
-    private readonly _validating: boolean = true;
-    private _enabled: boolean             = true;
+    private readonly _validating: boolean        = true;
+    private readonly _revalidateOnCheck: boolean = false;
+    private _enabled: boolean                    = true;
     private _parent?: ICompareEntity<any>;
+    private _isValid: boolean                    = false;
 
     constructor (props: CompareRowV4Props<TargetValue, ClientValue>) {
         const {
@@ -43,9 +46,10 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
                   clientValue,
                   label,
                   validationMethod,
-                  validate = true,
-                  disable  = false,
-                  alignTop = false,
+                  validate          = true,
+                  disable           = false,
+                  alignTop          = false,
+                  revalidateOnCheck = false,
                   parent,
                   ...other
               } = props;
@@ -55,15 +59,16 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
             new Component<HTMLDivElement>('div', {}, [ clientValue ]),
         ]);
 
-        this._parent           = parent;
-        this._validating       = validate;
-        this._targetValue      = targetValue;
-        this._clientValue      = clientValue;
-        this._validationMethod = validationMethod;
+        this._revalidateOnCheck = revalidateOnCheck;
+        this._parent            = parent;
+        this._validating        = validate;
+        this._targetValue       = targetValue;
+        this._clientValue       = clientValue;
+        this._validationMethod  = validationMethod;
         this.element.classList.add(css.container);
-        this.element.addEventListener(CompareEvent.type, this._validate.bind(this));
+        this.element.addEventListener(CompareEvent.type, this._revalidateWithParents.bind(this));
         this.enable(!disable);
-        this._validate();
+        this._revalidateWithParents();
 
         if (alignTop) {
             this.element.classList.add(css.alignTop);
@@ -71,15 +76,11 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
     }
 
     get isValid (): boolean {
-        if (this._enabled && this._validating) {
-            if (this._validationMethod) {
-                return this._validationMethod(this._targetValue.getValue(), this._clientValue.getValue());
-            }
-
-            return this._targetValue.getValue() === this._clientValue.getValue();
+        if (this._revalidateOnCheck) {
+            this._validate();
         }
 
-        return true;
+        return this._isValid;
     }
 
     enable (status: boolean): void {
@@ -92,13 +93,32 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
         }
     }
 
-    private _validate () {
-        if (this.isValid) {
-            this.element.classList.remove(css.invalid);
-        } else {
-            this.element.classList.add(css.invalid);
+    private _revalidate (): boolean {
+        if (this._enabled && this._validating) {
+            if (this._validationMethod) {
+                return this._validationMethod(this._targetValue.getValue(), this._clientValue.getValue());
+            }
+
+            return this._targetValue.getValue() === this._clientValue.getValue();
         }
 
+        return true;
+    }
+
+    private _validate () {
+        this._isValid = this._revalidate();
+
+        if (this._isValid) {
+            console.log('Revalidate to Invalid');
+            this.element.classList.remove(css.invalid);
+        } else {
+            console.log('Revalidate to Valid');
+            this.element.classList.add(css.invalid);
+        }
+    }
+
+    private _revalidateWithParents () {
+        this._validate();
         this._parent?.revalidateWithParents();
     }
 }

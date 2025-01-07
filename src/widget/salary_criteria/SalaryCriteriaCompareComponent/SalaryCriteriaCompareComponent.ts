@@ -180,17 +180,18 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
 
                     return [
                         new CompareRow({
-                            label           : `Правило ${ index + 1 }`,
-                            targetValue     : new SalaryCriteriaRuleCompareValue({
+                            label            : `Правило ${ index + 1 }`,
+                            targetValue      : new SalaryCriteriaRuleCompareValue({
                                 value   : rule,
                                 editable: true,
                             }),
-                            clientValue     : new SalaryCriteriaRuleCompareValue({
+                            clientValue      : new SalaryCriteriaRuleCompareValue({
                                 value   : this._clientCriteria?.rules[index],
                                 editable: false,
                             }),
-                            validationMethod: SalaryCriteriaValidator.rules,
-                            parent          : this,
+                            validationMethod : SalaryCriteriaValidator.rules(categories),
+                            parent           : this,
+                            revalidateOnCheck: true,
                         }),
                         children,
                     ];
