@@ -95,7 +95,41 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
     }
 
     protected async _action (): Promise<SalaryCriteriaFullData | null> {
-        return null;
+        if (this._clientCriteria) {
+            if (this._itemIsValid()) {
+                if (this._childrenIsValid()) {
+                    // return item
+                    return this._clientCriteria;
+                } else {
+                    // action children
+                    // return item
+                }
+            } else {
+                if (this._childrenIsValid()) {
+                    // update item
+                    // return item
+                } else {
+                    // update item
+                    // action children
+                    // return item
+                }
+            }
+
+            // TEMP: Чтобы не было ошибки типизации
+            return null;
+        } else {
+            if (!this._isNoCreateNew()) {
+                // create item
+
+                if (!this._childrenIsValid()) {
+                    // action children
+                }
+
+                // return item
+            }
+
+            return null;
+        }
     }
 
     protected _render (): void {
@@ -103,8 +137,7 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
 
         this._compareChildren = [];
         this._ruleCategories  = [];
-
-        this._compareRows = [
+        this._compareRows     = [
             new CompareBox({
                 title     : 'Информация',
                 level     : 2,
@@ -198,8 +231,7 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                 }).flat(),
             }),
         ];
-
-        this._header = new CompareHeader({
+        this._header          = new CompareHeader({
             label                 : 'Критерий расчета ЗП',
             targetHeaderData      : this._targetCriteria.title,
             clientHeaderData      : this._clientCriteria?.title,

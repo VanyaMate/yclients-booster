@@ -21,6 +21,10 @@ export type SalaryCriteriaContext = {
     services?: {
         categories: Array<SalaryCriteriaContextCategory>,
         items: Array<SalaryCriteriaContextItem>,
+    },
+    goods?: {
+        categories: Array<SalaryCriteriaContextCategory>,
+        items: Array<SalaryCriteriaContextItem>,
     }
 }
 
