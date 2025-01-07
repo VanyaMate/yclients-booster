@@ -38,22 +38,8 @@ import {
 import {
     SALARY_CRITERIA_HEADER_TYPE,
 } from '@/widget/salary_criteria/salary-criteria.header-type.ts';
-import {
-    CompareBoxWithoutValidation,
-} from '@/entity/compare/CompareWithoutValidation/CompareBoxWithoutValidation.ts';
-import {
-    SettingsServiceCategoryDropdownActions,
-} from '@/widget/settings/service/SettingsServiceCategoryDropdownActions/SettingsServiceCategoryDropdownActions.ts';
-import {
-    SettingsServiceDropdownActions,
-} from '@/widget/settings/service/SettingsServiceDropdownActions/SettingsServiceDropdownActions.ts';
-import {
-    ResourceDropdownActions,
-} from '@/widget/resources/ResourceDropdownActions/ResourceDropdownActions.ts';
-import {
-    ResourceInstanceDropdownActions,
-} from '@/widget/resources/ResourceInstanceDropdownActions/ResourceInstanceDropdownActions.ts';
-import { Row } from '@/shared/box/Row/Row.ts';
+import { ILogger } from '@/action/_logger/Logger.interface.ts';
+import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 
 
 export type SalaryCriteriaCompareComponentProps =
@@ -64,6 +50,8 @@ export type SalaryCriteriaCompareComponentProps =
         clientCopyData: SalaryCriteriaListDataForCopy;
         clientId: string;
         bearer: string;
+        logger?: ILogger;
+        fetcher?: IFetcher;
     };
 
 export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCriteriaFullData> {
@@ -72,6 +60,8 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
     private readonly _clientCopyData: SalaryCriteriaListDataForCopy;
     private readonly _clientId: string;
     private readonly _bearer: string;
+    private readonly _logger?: ILogger;
+    private readonly _fetcher?: IFetcher;
     private _clientCriteria?: SalaryCriteriaFullData;
     private _ruleCategories: Array<ICompareEntity<SettingsServiceCategoryDataWithChildren>> = [];
 
@@ -82,6 +72,8 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                   clientId,
                   bearer,
                   targetSettingsData,
+                  logger,
+                  fetcher,
                   ...other
               } = props;
         super(other);
@@ -91,6 +83,8 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
         this._clientCopyData     = clientCopyData;
         this._clientId           = clientId;
         this._bearer             = bearer;
+        this._logger             = logger;
+        this._fetcher            = fetcher;
         this._clientCriteria     = this._clientCopyData.criteriaList.find((criteria) => criteria.title === this._targetCriteria.title);
 
         this._render();
@@ -106,6 +100,9 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
 
     protected _render (): void {
         this.element.innerHTML = ``;
+
+        this._compareChildren = [];
+        this._ruleCategories  = [];
 
         this._compareRows = [
             new CompareBox({
@@ -159,77 +156,45 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
             new CompareBox({
                 title     : 'Условия',
                 level     : 2,
-                components: this._targetCriteria.rules?.map((rule, index) => (
-                    new CompareRow({
-                        label           : `Правило ${ index + 1 }`,
-                        targetValue     : new SalaryCriteriaRuleCompareValue({
-                            value   : rule,
-                            editable: true,
-                        }),
-                        clientValue     : new SalaryCriteriaRuleCompareValue({
-                            value   : this._clientCriteria?.rules[index],
-                            editable: false,
-                        }),
-                        validationMethod: SalaryCriteriaValidator.rules,
-                        parent          : this,
-                    })
-                )),
-            }),
-        ];
+                components: this._targetCriteria.rules?.map((rule, index) => {
+                    const categories = rule.context.services?.categories.map((ruleCategory) => (
+                        new SettingsServiceCategoryCompareComponent({
+                            targetCategory : this._targetSettingsData.tree.find((category) => category.id.toString() === ruleCategory.categoryId.toString())!,
+                            targetResources: this._targetSettingsData.resources,
+                            clientId       : this._clientId,
+                            bearer         : this._bearer,
+                            clientData     : this._clientCopyData.settingsCopyData,
+                            parent         : this,
+                            logger         : this._logger,
+                            fetcher        : this._fetcher,
+                        })
+                    )) ?? [];
+                    const children   = new CompareBox({
+                        level     : 4,
+                        title     : 'Категории / Услуги',
+                        components: categories,
+                    });
 
-        const categoriesIds = this._targetCriteria.rules
-            .reduce((acc, rule) => {
-                rule.context.services?.categories.forEach((category) => acc.add(category.categoryId.toString()));
-                return acc;
-            }, new Set<string>());
+                    this._ruleCategories = this._ruleCategories.concat(categories);
+                    this._compareChildren.push(children);
 
-        this._compareChildren = [
-            new CompareBoxWithoutValidation({
-                title     : 'Массовые действия',
-                level     : 3,
-                components: [
-                    new Row({
-                        cols: [
-                            new SettingsServiceCategoryDropdownActions({ compareEntity: this }),
-                            new SettingsServiceDropdownActions({ compareEntity: this }),
-                            new ResourceDropdownActions({ compareEntity: this }),
-                            new ResourceInstanceDropdownActions({ compareEntity: this }),
-                        ],
-                    }),
-                ],
-            }),
-            new CompareBox({
-                title     : 'Категории услуг',
-                level     : 3,
-                components: this._ruleCategories = [ ...categoriesIds ].map((categoryId) => (
-                    new SettingsServiceCategoryCompareComponent({
-                        targetCategory : this._targetSettingsData.tree.find((category) => category.id.toString() === categoryId.toString())!,
-                        targetResources: this._targetSettingsData.resources,
-                        clientId       : this._clientId,
-                        bearer         : this._bearer,
-                        clientData     : this._clientCopyData.settingsCopyData,
-                        parent         : this,
-                    })
-                )),
-            }),
-            new CompareBoxWithoutValidation({
-                title     : 'Массовые действия',
-                level     : 3,
-                components: [
-                    new Row({
-                        cols: [
-                            new SettingsServiceCategoryDropdownActions({ compareEntity: this }),
-                            new SettingsServiceDropdownActions({ compareEntity: this }),
-                            new ResourceDropdownActions({ compareEntity: this }),
-                            new ResourceInstanceDropdownActions({ compareEntity: this }),
-                        ],
-                    }),
-                ],
-            }),
-            new CompareBox({
-                title     : 'Услуги',
-                level     : 3,
-                components: [],
+                    return [
+                        new CompareRow({
+                            label           : `Правило ${ index + 1 }`,
+                            targetValue     : new SalaryCriteriaRuleCompareValue({
+                                value   : rule,
+                                editable: true,
+                            }),
+                            clientValue     : new SalaryCriteriaRuleCompareValue({
+                                value   : this._clientCriteria?.rules[index],
+                                editable: false,
+                            }),
+                            validationMethod: SalaryCriteriaValidator.rules,
+                            parent          : this,
+                        }),
+                        children,
+                    ];
+                }).flat(),
             }),
         ];
 
@@ -255,10 +220,7 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
             onActivateOnlyItem    : () => this._setCompareType(CompareType.ITEM),
             onActivateOnlyChildren: () => this._setCompareType(CompareType.CHILDREN),
             onDeactivate          : () => this._setCompareType(CompareType.NONE),
-            rows                  : [
-                ...this._compareRows,
-                ...this._compareChildren,
-            ],
+            rows                  : this._compareRows,
             parent                : this,
             type                  : SALARY_CRITERIA_HEADER_TYPE,
             compareType           : this._compareType,
