@@ -6,9 +6,12 @@ import {
     ComponentPropsOptional,
 } from '@/shared/component/Component.ts';
 import {
-    CompareProcess, CompareResult,
-    CompareType, CompareWith,
-    ICompareComponent, ICompareEntity,
+    CompareProcess,
+    CompareResult,
+    CompareType,
+    CompareWith,
+    ICompareComponent,
+    ICompareEntity,
 } from '@/entity/compare/Compare.types.ts';
 import { Select, SelectOption } from '@/shared/input/Select/Select.ts';
 import css from './CompareHeader.module.css';
@@ -37,6 +40,7 @@ export type CompareHeaderProps =
         disable?: boolean;
         type?: string;
         parent?: ICompareEntity<any>;
+        compareType?: CompareType;
     };
 
 export class CompareHeader extends Component<HTMLDivElement> implements ICompareHeader,
@@ -73,6 +77,7 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
                   disable = false,
                   type,
                   parent,
+                  compareType,
                   ...other
               } = props;
         super('div', other);
@@ -97,16 +102,19 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
                     label    : 'Только это',
                     showLabel: '→',
                     value    : CompareType.ITEM,
+                    selected : compareType === CompareType.ITEM,
                 },
                 {
                     label    : 'Только дочерние',
                     showLabel: '↓',
                     value    : CompareType.CHILDREN,
+                    selected : compareType === CompareType.CHILDREN,
                 },
                 {
                     label    : 'Ничего не делать',
                     showLabel: '🗙',
                     value    : CompareType.NONE,
+                    selected : compareType === CompareType.NONE,
                 },
             ],
             onChange        : (data) => this._executeActivateHandlerByCompareType(data.value),
@@ -162,8 +170,8 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
         });
 
         content.insert(this.element, 'beforeend');
-        this._updateValidation(clientHeaderData);
         this.enable(true);
+        this._updateValidation(clientHeaderData);
     }
 
     public getType (): string {

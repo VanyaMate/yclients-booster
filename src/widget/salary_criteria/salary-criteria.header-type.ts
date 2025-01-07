@@ -1,0 +1,1 @@
+export const SALARY_CRITERIA_HEADER_TYPE = 'salary-criteria-header-type';

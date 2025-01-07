@@ -40,10 +40,10 @@ import {
 } from '@/entity/compare/CompareValue/CompareTextareaValue/CompareTextareaValue.ts';
 import { RESOURCE_HEADER_TYPE } from '@/widget/header-types.ts';
 import {
-    CompareBoxWithoutValidation
+    CompareBoxWithoutValidation,
 } from '@/entity/compare/CompareWithoutValidation/CompareBoxWithoutValidation.ts';
 import {
-    ResourceInstanceDropdownActions
+    ResourceInstanceDropdownActions,
 } from '@/widget/resources/ResourceInstanceDropdownActions/ResourceInstanceDropdownActions.ts';
 
 
@@ -289,6 +289,7 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
                 this._targetResource.title = title;
             },
             parent                : this,
+            compareType           : this._compareType,
         });
 
         this._revalidate(this._clientResource);

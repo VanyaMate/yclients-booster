@@ -248,7 +248,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                 ],
             }),
             new CompareBox({
-                title     : 'Сервисы',
+                title     : 'Услуги',
                 level     : 3,
                 components: this._serviceComponents = this._targetCategory.children.map((service) => (
                     new SettingsServiceItemCompareComponent({
@@ -400,6 +400,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
             disable               : this._clientCategory?.is_chain,
             type                  : SETTINGS_SERVICE_CATEGORY_HEADER_TYPE,
             parent                : this,
+            compareType           : this._compareType,
         });
 
         this._revalidate(this._clientCategory);

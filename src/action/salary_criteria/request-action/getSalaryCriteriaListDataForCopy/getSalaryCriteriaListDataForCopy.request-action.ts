@@ -31,7 +31,7 @@ import {
 
 
 export const getSalaryCriteriaListDataForCopyRequestAction = async function (bearer: string, clientId: string, forceUploadServices: boolean, maxSplit: number, maxRetry: number, logger?: ILogger): Promise<SalaryCriteriaListDataForCopy> {
-    logger?.log(`получение списка критериев расчета для клиента ${ clientId } с полной информацией`);
+    logger?.log(`получение списка критериев расчета для клиента "${ clientId }" с полной информацией`);
     const list                                       = await getSalaryCriteriaListRequestAction(clientId, logger);
     const splitter                                   = new PromiseSplitter(maxSplit, maxRetry);
     const dataForCopy: SalaryCriteriaListDataForCopy = {

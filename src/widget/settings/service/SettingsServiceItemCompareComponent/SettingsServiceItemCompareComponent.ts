@@ -828,6 +828,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
             disable               : this._clientService?.is_chain,
             type                  : SETTINGS_SERVICE_ITEM_HEADER_TYPE,
             parent                : this,
+            compareType           : this._compareType,
         });
 
         this._revalidate(this._clientService);

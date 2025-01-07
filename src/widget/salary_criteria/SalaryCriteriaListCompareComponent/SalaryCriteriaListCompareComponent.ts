@@ -8,6 +8,26 @@ import { Col } from '@/shared/box/Col/Col.ts';
 import {
     SalaryCriteriaCompareComponent,
 } from '@/widget/salary_criteria/SalaryCriteriaCompareComponent/SalaryCriteriaCompareComponent.ts';
+import {
+    CompareBoxWithoutValidation,
+} from '@/entity/compare/CompareWithoutValidation/CompareBoxWithoutValidation.ts';
+import {
+    SalaryCriteriaDropdownActions,
+} from '@/widget/salary_criteria/SalaryCriteriaDropdownActionts/SalaryCriteriaDropdownActionts.ts';
+import { ICompareEntity } from '@/entity/compare/Compare.types.ts';
+import {
+    SettingsServiceCategoryDropdownActions,
+} from '@/widget/settings/service/SettingsServiceCategoryDropdownActions/SettingsServiceCategoryDropdownActions.ts';
+import {
+    SettingsServiceDropdownActions,
+} from '@/widget/settings/service/SettingsServiceDropdownActions/SettingsServiceDropdownActions.ts';
+import {
+    ResourceDropdownActions,
+} from '@/widget/resources/ResourceDropdownActions/ResourceDropdownActions.ts';
+import {
+    ResourceInstanceDropdownActions,
+} from '@/widget/resources/ResourceInstanceDropdownActions/ResourceInstanceDropdownActions.ts';
+import { Row } from '@/shared/box/Row/Row.ts';
 
 
 export type SalaryCriteriaListCompareComponentProps =
@@ -24,6 +44,7 @@ export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<S
     private readonly _clientCopyData: SalaryCriteriaListDataForCopy;
     private readonly _clientId: string;
     private readonly _bearer: string;
+    private _criteriaComponent: Array<ICompareEntity<SalaryCriteriaFullData>> = [];
 
     constructor (props: SalaryCriteriaListCompareComponentProps) {
         const {
@@ -39,6 +60,10 @@ export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<S
         this._render();
     }
 
+    public getChildren (): Array<ICompareEntity<SalaryCriteriaFullData>> {
+        return this._criteriaComponent;
+    }
+
     protected async _action (): Promise<SalaryCriteriaFullData[] | null> {
         return null;
     }
@@ -47,15 +72,32 @@ export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<S
         this.element.innerHTML = ``;
 
         new Col({
-            rows: this._compareChildren = this._targetCopyData.criteriaList.map((criteria) => (
-                new SalaryCriteriaCompareComponent({
-                    clientId          : this._clientId,
-                    bearer            : this._bearer,
-                    targetCriteria    : criteria,
-                    targetSettingsData: this._targetCopyData.settingsCopyData,
-                    clientCopyData    : this._clientCopyData,
-                })
-            )),
+            rows: [
+                new CompareBoxWithoutValidation({
+                    title     : 'Массовые действия',
+                    level     : 2,
+                    components: [
+                        new Row({
+                            cols: [
+                                new SalaryCriteriaDropdownActions({ compareEntity: this }),
+                                new SettingsServiceCategoryDropdownActions({ compareEntity: this }),
+                                new SettingsServiceDropdownActions({ compareEntity: this }),
+                                new ResourceDropdownActions({ compareEntity: this }),
+                                new ResourceInstanceDropdownActions({ compareEntity: this }),
+                            ],
+                        }),
+                    ],
+                }),
+                ...this._criteriaComponent = this._targetCopyData.criteriaList.map((criteria) => (
+                    new SalaryCriteriaCompareComponent({
+                        clientId          : this._clientId,
+                        bearer            : this._bearer,
+                        targetCriteria    : criteria,
+                        targetSettingsData: this._targetCopyData.settingsCopyData,
+                        clientCopyData    : this._clientCopyData,
+                    })
+                )),
+            ],
         })
             .insert(this.element, 'afterbegin');
     }

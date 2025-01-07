@@ -119,6 +119,7 @@ export class ResourceInstanceCompareComponent extends CompareComponent<ResourceI
                 this._targetInstance.title = title.trim();
             },
             parent                : this,
+            compareType           : this._compareType,
         });
 
         this._revalidate(this._clientInstance);
