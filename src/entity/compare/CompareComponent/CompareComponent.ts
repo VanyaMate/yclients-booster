@@ -242,8 +242,10 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
         return new Promise((resolve) => {
             this._revalidateTimer = setTimeout(() => {
                 if (this._compareType === CompareType.NONE) {
+                    this._isValid = true;
                     this._header?.setValidationType(CompareResult.VALID);
                 } else if (uniqueItem === undefined) {
+                    this._isValid = false;
                     this._header?.setValidationType(CompareResult.NO_EXIST);
                 } else if (this._validate()) {
                     this._isValid = true;

@@ -16,7 +16,7 @@ import { Nullable } from '@/types/Nullable.ts';
 
 export type CompareRowValidationMethod<TargetValue, ClientValue> = (targetValue: TargetValue, clientValue: ClientValue) => boolean;
 
-export type CompareRowV4Props<TargetValue, ClientValue> =
+export type CompareRowProps<TargetValue, ClientValue> =
     ComponentPropsOptional<HTMLDivElement>
     & {
         targetValue: ICompareValue<Nullable<TargetValue>>;
@@ -40,7 +40,7 @@ export class CompareRow<TargetValue, ClientValue> extends Component<HTMLDivEleme
     private _parent?: ICompareEntity<any>;
     private _isValid: boolean                    = false;
 
-    constructor (props: CompareRowV4Props<TargetValue, ClientValue>) {
+    constructor (props: CompareRowProps<TargetValue, ClientValue>) {
         const {
                   targetValue,
                   clientValue,
