@@ -40,11 +40,13 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
     protected _enabled: boolean                          = true;
     protected _uniqueItem?: any;
     protected _parent?: ICompareEntity<any>;
+    private _isValid: boolean;
 
     protected constructor (props: CompareComponentProps, children: Array<IComponent<HTMLElement>> = []) {
         super('div', props, children);
         this.element.classList.add(css.container);
-        this._parent = props.parent;
+        this._parent  = props.parent;
+        this._isValid = this._validate();
     }
 
     public enable (status: boolean): void {
@@ -58,29 +60,7 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
     }
 
     public get isValid () {
-        if (this._enabled) {
-            switch (this._compareType) {
-                case CompareType.ALL:
-                    return (
-                        this._header!.isValid &&
-                        this._compareRows.every((row) => row.isValid) &&
-                        this._compareChildren.every((child) => child.isValid)
-                    );
-                case CompareType.ITEM:
-                    return (
-                        this._header!.isValid &&
-                        this._compareRows.every((row) => row.isValid)
-                    );
-                case CompareType.CHILDREN:
-                    return (
-                        this._compareChildren.every((child) => child.isValid)
-                    );
-                default:
-                    return true;
-            }
-        }
-
-        return true;
+        return this._isValid;
     }
 
     public getAction (data?: any): () => Promise<ActionResponseType | null> {
@@ -265,14 +245,42 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
                     this._header?.setValidationType(CompareResult.VALID);
                 } else if (uniqueItem === undefined) {
                     this._header?.setValidationType(CompareResult.NO_EXIST);
-                } else if (!this.isValid) {
-                    this._header?.setValidationType(CompareResult.NO_VALID);
-                } else {
+                } else if (this._validate()) {
+                    this._isValid = true;
                     this._header?.setValidationType(CompareResult.VALID);
+                } else {
+                    this._isValid = false;
+                    this._header?.setValidationType(CompareResult.NO_VALID);
                 }
 
                 resolve();
             });
         });
+    }
+
+    private _validate (): boolean {
+        if (this._enabled) {
+            switch (this._compareType) {
+                case CompareType.ALL:
+                    return (
+                        (this._header ? this._header.isValid : true) &&
+                        this._compareRows.every((row) => row.isValid) &&
+                        this._compareChildren.every((child) => child.isValid)
+                    );
+                case CompareType.ITEM:
+                    return (
+                        (this._header ? this._header.isValid : true) &&
+                        this._compareRows.every((row) => row.isValid)
+                    );
+                case CompareType.CHILDREN:
+                    return (
+                        this._compareChildren.every((child) => child.isValid)
+                    );
+                default:
+                    return true;
+            }
+        }
+
+        return true;
     }
 }
