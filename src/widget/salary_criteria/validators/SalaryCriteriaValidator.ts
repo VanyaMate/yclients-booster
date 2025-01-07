@@ -11,6 +11,10 @@ export namespace SalaryCriteriaValidator {
                 return false;
             }
 
+            if (targetRule.targetType !== clientRule.targetType) {
+                return false;
+            }
+
             if (targetRule.individualType !== clientRule.individualType) {
                 return false;
             }
