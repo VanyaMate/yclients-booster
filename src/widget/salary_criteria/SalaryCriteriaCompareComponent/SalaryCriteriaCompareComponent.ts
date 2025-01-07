@@ -211,8 +211,6 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
             onVariantChange       : (variant) => {
                 this._clientCriteria = this._clientCopyData.criteriaList.find((category) => category.id.toString() === variant.value);
                 this._render();
-                this._revalidate(this._clientCriteria);
-                this._parent?.revalidateWithParents();
             },
             onRename              : (title: string) => {
                 this._targetCriteria.title = title;

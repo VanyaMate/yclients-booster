@@ -108,8 +108,6 @@ export class ResourceInstanceCompareComponent extends CompareComponent<ResourceI
             onVariantChange       : ((instanceVariant) => {
                 this._clientInstance = this._clientInstances.find((instance) => instance.id === instanceVariant.value);
                 this._render();
-                this._revalidate(this._clientInstance);
-                this._parent?.revalidateWithParents();
             }),
             onActivateAll         : () => this._setCompareType(CompareType.ALL),
             onActivateOnlyItem    : () => this._setCompareType(CompareType.ITEM),

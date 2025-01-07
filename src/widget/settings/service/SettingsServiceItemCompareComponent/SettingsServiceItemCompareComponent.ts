@@ -815,8 +815,6 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
             onVariantChange       : (e) => {
                 this._clientService = this._clientServices.find((service) => service.id.toString() === e.value);
                 this._render();
-                this._revalidate(this._clientService);
-                this._parent?.revalidateWithParents();
             },
             onRename              : (title: string) => {
                 this._targetService.title = title;

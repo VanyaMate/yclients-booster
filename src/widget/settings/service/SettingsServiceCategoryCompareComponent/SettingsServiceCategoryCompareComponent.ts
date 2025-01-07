@@ -387,8 +387,6 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
             onVariantChange       : (e: SelectOption<string>) => {
                 this._clientCategory = this._clientData.tree.find((category) => category.id.toString() === e.value);
                 this._render();
-                this._revalidate(this._clientCategory);
-                this._parent?.revalidateWithParents();
             },
             onRename              : (title: string) => {
                 this._targetCategory.title = title;

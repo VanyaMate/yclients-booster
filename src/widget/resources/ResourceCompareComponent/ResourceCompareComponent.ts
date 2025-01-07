@@ -274,8 +274,6 @@ export class ResourceCompareComponent extends CompareComponent<Resource> {
             onVariantChange       : (variant) => {
                 this._clientResource = this._clientResources.find((resource) => resource.id === variant.value);
                 this._render();
-                this._revalidate(this._clientResource);
-                this._parent?.revalidateWithParents();
             },
             rows                  : [
                 ...this._compareRows,
