@@ -169,7 +169,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
     }
 
     protected _render () {
-        this.element.innerHTML = ``;
+        this._beforeRender();
 
         const onlinePrepaidComponents: Array<ICompareComponent>     = [
             new CompareRow({
@@ -829,9 +829,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
             compareType           : this._compareType,
         });
 
-        this._revalidate(this._clientService);
-        this._parent?.revalidateWithParents();
-        this._header.insert(this.element, 'beforeend');
+        this._beforeEndRender(this._clientService);
     }
 
     protected async _action (categoryId: string) {

@@ -108,9 +108,9 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
         return [];
     }
 
-    public revalidateWithParents () {
-        this._revalidate(this._uniqueItem);
-        this._parent?.revalidateWithParents();
+    public revalidateWithParents (uniqueItem?: unknown) {
+        this._revalidate(uniqueItem ?? this._uniqueItem)
+            .then(() => this._parent?.revalidateWithParents());
     }
 
     /**
@@ -159,6 +159,16 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
     protected abstract _action (data?: any): Promise<ActionResponseType | null>;
 
     protected abstract _render (): void;
+
+    protected _beforeRender () {
+        this.element.innerHTML = ``;
+    }
+
+    protected _beforeEndRender (uniqueItem?: unknown) {
+        this._uniqueItem = undefined;
+        this.revalidateWithParents(uniqueItem);
+        this._header?.insert(this.element, 'afterbegin');
+    }
 
     protected _isNoCreateNew () {
         return this._compareType === CompareType.NONE || this._compareType === CompareType.CHILDREN;
@@ -246,19 +256,23 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
         this.revalidateWithParents();
     }
 
-    protected _revalidate (uniqueItem?: unknown) {
+    protected _revalidate (uniqueItem?: unknown): Promise<void> {
         this._uniqueItem = uniqueItem;
         clearTimeout(this._revalidateTimer);
-        this._revalidateTimer = setTimeout(() => {
-            if (this._compareType === CompareType.NONE) {
-                this._header?.setValidationType(CompareResult.VALID);
-            } else if (uniqueItem === undefined) {
-                this._header?.setValidationType(CompareResult.NO_EXIST);
-            } else if (!this.isValid) {
-                this._header?.setValidationType(CompareResult.NO_VALID);
-            } else {
-                this._header?.setValidationType(CompareResult.VALID);
-            }
+        return new Promise((resolve) => {
+            this._revalidateTimer = setTimeout(() => {
+                if (this._compareType === CompareType.NONE) {
+                    this._header?.setValidationType(CompareResult.VALID);
+                } else if (uniqueItem === undefined) {
+                    this._header?.setValidationType(CompareResult.NO_EXIST);
+                } else if (!this.isValid) {
+                    this._header?.setValidationType(CompareResult.NO_VALID);
+                } else {
+                    this._header?.setValidationType(CompareResult.VALID);
+                }
+
+                resolve();
+            });
         });
     }
 }

@@ -232,8 +232,9 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
     }
 
     protected _render () {
-        this.element.innerHTML = ``;
-        this._compareChildren  = [
+        this._beforeRender();
+
+        this._compareChildren = [
             new CompareBoxWithoutValidation({
                 title     : 'Массовые действия',
                 level     : 3,
@@ -401,8 +402,6 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
             compareType           : this._compareType,
         });
 
-        this._revalidate(this._clientCategory);
-        this._parent?.revalidateWithParents();
-        this._header.insert(this.element, 'beforeend');
+        this._beforeEndRender(this._clientCategory);
     }
 }

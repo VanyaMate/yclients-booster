@@ -8,8 +8,6 @@ import { ICompareComponent } from '@/entity/compare/Compare.types.ts';
 export namespace SalaryCriteriaValidator {
     export const rules = function (children: Array<ICompareComponent>) {
         return function (targetRule: Nullable<SalaryCriteriaRuleData>, clientRule: Nullable<SalaryCriteriaRuleData>): boolean {
-            console.log('Criteria Validator', targetRule, clientRule);
-
             if (targetRule && clientRule) {
                 if (targetRule.amount !== clientRule.amount) {
                     return false;
@@ -63,7 +61,6 @@ export namespace SalaryCriteriaValidator {
                     }
                 }
 
-                console.log('Valid', children, children.every((child) => child.isValid));
                 return children.every((child) => child.isValid);
             }
 

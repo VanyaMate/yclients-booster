@@ -99,7 +99,7 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
     }
 
     protected _render (): void {
-        this.element.innerHTML = ``;
+        this._beforeRender();
 
         this._compareChildren = [];
         this._ruleCategories  = [];
@@ -225,8 +225,6 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
             compareType           : this._compareType,
         });
 
-        this._revalidate(this._clientCriteria);
-        this._parent?.revalidateWithParents();
-        this._header.insert(this.element, 'afterbegin');
+        this._beforeEndRender(this._clientCriteria);
     }
 }

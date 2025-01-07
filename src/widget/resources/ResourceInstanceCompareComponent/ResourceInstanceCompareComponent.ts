@@ -72,7 +72,7 @@ export class ResourceInstanceCompareComponent extends CompareComponent<ResourceI
     }
 
     protected _render (): void {
-        this.element.innerHTML = ``;
+        this._beforeRender();
 
         this._compareRows = [
             new CompareBox({
@@ -120,9 +120,7 @@ export class ResourceInstanceCompareComponent extends CompareComponent<ResourceI
             compareType           : this._compareType,
         });
 
-        this._revalidate(this._clientInstance);
-        this._parent?.revalidateWithParents();
-        this._header.insert(this.element, 'afterbegin');
+        this._beforeEndRender(this._clientInstance);
     }
 
     protected async _action (resourceId: string) {
