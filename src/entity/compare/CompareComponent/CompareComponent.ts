@@ -147,7 +147,15 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
     protected _beforeEndRender (uniqueItem?: unknown) {
         this._uniqueItem = undefined;
         this.revalidateWithParents(uniqueItem);
-        this._header?.insert(this.element, 'afterbegin');
+
+        if (this._header) {
+            this._header.onActivateAll(this._setCompareType.bind(this, CompareType.ALL));
+            this._header.onActivateOnlyItem(this._setCompareType.bind(this, CompareType.ITEM));
+            this._header.onActivateOnlyChildren(this._setCompareType.bind(this, CompareType.CHILDREN));
+            this._header.onDeactivate(this._setCompareType.bind(this, CompareType.NONE));
+            this._header.setParent(this);
+            this._header.insert(this.element, 'afterbegin');
+        }
     }
 
     protected _isNoCreateNew () {

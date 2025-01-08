@@ -47,6 +47,17 @@ export const goodsPageHandler = function () {
                 new CreateManyCategoriesButton(),
                 new GetCategoriesIdsButton({ clientId: clientId }),
                 new DeleteManyCategoriesButton(),
+                new ModalButton({
+                    textContent: 'Копировать категории',
+                    styleType  : ButtonStyleType.PRIMARY,
+                    modalProps : {
+                        label      : 'Копировать категории из',
+                        preferWidth: 800,
+                        content    : new Col({
+                            rows: [],
+                        }),
+                    },
+                }),
             ],
         }).insert(position, 'beforeend');
 

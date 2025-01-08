@@ -49,17 +49,17 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
     private readonly _selectButton: Select<CompareType>;
     private readonly _processButton: Component<HTMLDivElement>;
     private readonly _disableByProp: boolean                = false;
-    private readonly _onActivateAll?: CompareHeaderActivateHandler;
-    private readonly _onActivateOnlyItem?: CompareHeaderActivateHandler;
-    private readonly _onActivateOnlyChildren?: CompareHeaderActivateHandler;
-    private readonly _onDeactivate?: CompareHeaderActivateHandler;
+    private _onActivateAll?: CompareHeaderActivateHandler;
+    private _onActivateOnlyItem?: CompareHeaderActivateHandler;
+    private _onActivateOnlyChildren?: CompareHeaderActivateHandler;
+    private _onDeactivate?: CompareHeaderActivateHandler;
     private readonly _type: string                          = '';
     private readonly _variants: Array<SelectOption<string>> = [];
     private readonly _variantSelect: Select<string>;
     private _currentTargetHeader: string;
     private _isValid: boolean;
     private _enabled: boolean                               = true;
-    private readonly _parent?: ICompareEntity<any>;
+    private _parent?: ICompareEntity<any>;
 
     constructor (props: CompareHeaderProps) {
         const {
@@ -172,6 +172,26 @@ export class CompareHeader extends Component<HTMLDivElement> implements ICompare
         content.insert(this.element, 'beforeend');
         this.enable(true);
         this._updateValidation(clientHeaderData);
+    }
+
+    setParent (parent: ICompareEntity<any>): void {
+        this._parent = parent;
+    }
+
+    onActivateAll (handler: CompareHeaderActivateHandler): void {
+        this._onActivateAll = handler;
+    }
+
+    onActivateOnlyChildren (handler: CompareHeaderActivateHandler): void {
+        this._onActivateOnlyChildren = handler;
+    }
+
+    onActivateOnlyItem (handler: CompareHeaderActivateHandler): void {
+        this._onActivateOnlyItem = handler;
+    }
+
+    onDeactivate (handler: CompareHeaderActivateHandler): void {
+        this._onDeactivate = handler;
     }
 
     public getType (): string {

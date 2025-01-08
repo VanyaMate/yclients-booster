@@ -36,3 +36,7 @@ export type GoodsCategoryTreeFullData =
     & {
         children: Array<GoodsCategoryTreeFullData>;
     };
+
+export type GoodCategoriesCopyData = {
+    mapper: Record<string, GoodsCategoryTreeFullData>;
+}

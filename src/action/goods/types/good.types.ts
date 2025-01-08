@@ -1,5 +1,5 @@
 import {
-    GoodsCategoryTreeFullData,
+    GoodCategoriesCopyData,
 } from '@/action/goods/list/types/goods-category.types.ts';
 
 
@@ -44,9 +44,10 @@ export type GoodData = {
     comment: string;
 }
 
+
 export type GoodsCopyData = {
     goods: Array<GoodData>;
-    categoriesMapper: Record<string, GoodsCategoryTreeFullData>;
+    categories: GoodCategoriesCopyData;
 }
 
 export type GoodApiResponseItem = {
