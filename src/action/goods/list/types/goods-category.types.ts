@@ -23,10 +23,16 @@ export type GoodsCategoryFullData = {
     title: string;
     article: string;
     comment: string;
-    parent: GoodsCategoryShortData;
+    parent: GoodsCategoryShortData | null;
 }
 
 export type GoodIds = {
     id: string;
     categoryId: string;
 }
+
+export type GoodsCategoryTreeFullData =
+    GoodsCategoryFullData
+    & {
+        children: Array<GoodsCategoryTreeFullData>;
+    };

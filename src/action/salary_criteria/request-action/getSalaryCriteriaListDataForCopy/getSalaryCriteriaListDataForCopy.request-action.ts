@@ -28,9 +28,18 @@ import {
 import {
     getSettingsServiceCategoryRequestAction,
 } from '@/action/settings/service_categories/request-action/getSettingsServiceCategory/getSettingsServiceCategory.request-action.ts';
+import {
+    getGoodsCategoriesRequestAction,
+} from '@/action/goods/list/request-actions/getGoodsCategories.request-action.ts';
+import {
+    getGoodsCategoryRequestAction,
+} from '@/action/goods/list/request-actions/getGoodsCategory.request-action.ts';
+import {
+    GoodsCategoryFullData,
+} from '@/action/goods/list/types/goods-category.types.ts';
 
 
-export const getSalaryCriteriaListDataForCopyRequestAction = async function (bearer: string, clientId: string, forceUploadServices: boolean, maxSplit: number, maxRetry: number, logger?: ILogger): Promise<SalaryCriteriaListDataForCopy> {
+export const getSalaryCriteriaListDataForCopyRequestAction = async function (bearer: string, clientId: string, forceUploadServices: boolean, forceUploadGoods: boolean, maxSplit: number, maxRetry: number, logger?: ILogger): Promise<SalaryCriteriaListDataForCopy> {
     logger?.log(`получение списка критериев расчета для клиента "${ clientId }" с полной информацией`);
     const list                                       = await getSalaryCriteriaListRequestAction(clientId, logger);
     const splitter                                   = new PromiseSplitter(maxSplit, maxRetry);
@@ -41,6 +50,10 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
             categoriesMapper: {},
             servicesMapper  : {},
             resources       : [],
+        },
+        goodsCopyData   : {
+            goods           : [],
+            categoriesMapper: {},
         },
     };
 
@@ -56,7 +69,8 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
         })),
     );
 
-    const hasServices = dataForCopy.criteriaList.some((item) => item.rules.some((rule) => !!rule.context.services));
+    const hasServices = dataForCopy.criteriaList.some((criteria) => criteria.rules.some((rule) => !!rule.context.services));
+    const hasGoods    = dataForCopy.criteriaList.some((criteria) => criteria.rules.some((rule) => !!rule.context.goods));
 
     if (hasServices || forceUploadServices) {
         const serviceCategories                = await getSettingsServiceCategoriesRequestAction(bearer, clientId, logger);
@@ -100,6 +114,40 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
             }),
         );
     }
+
+    if (hasGoods || forceUploadGoods) {
+        const categoriesShort = await getGoodsCategoriesRequestAction(bearer, clientId, logger);
+        categoriesShort.forEach((category) => {
+            dataForCopy.goodsCopyData.categoriesMapper[category.id] = {
+                id             : category.id,
+                title          : category.title,
+                article        : '',
+                comment        : '',
+                isChainCategory: false,
+                parent         : null,
+                children       : [],
+            };
+        });
+        await splitter.exec(
+            categoriesShort.map((category) => ({
+                chain: [
+                    () => getGoodsCategoryRequestAction(clientId, category.id),
+                    async (category: GoodsCategoryFullData) => {
+                        const categoryData           = dataForCopy.goodsCopyData.categoriesMapper[category.id];
+                        categoryData.article         = category.article;
+                        categoryData.comment         = category.comment;
+                        categoryData.isChainCategory = category.isChainCategory;
+                        categoryData.parent          = category.parent;
+
+                        if (category.parent) {
+                            dataForCopy.goodsCopyData.categoriesMapper[category.parent.id].children.push(categoryData);
+                        }
+                    },
+                ],
+            })),
+        );
+    }
+
 
     return dataForCopy;
 };

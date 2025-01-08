@@ -10,7 +10,7 @@ export type PromiseSplitterExecInitItem = {
     onError?: () => void;
     onFinally?: () => void;
 }
-export type PromiseSplitterChain = Array<(data: unknown) => Promise<unknown>>;
+export type PromiseSplitterChain = Array<(data: any) => Promise<any>>;
 
 export class PromiseSplitter {
     private _chains: Array<PromiseSplitterExecInitItem> = [];

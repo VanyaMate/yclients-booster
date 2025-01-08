@@ -114,8 +114,8 @@ export class SettingsServiceCategoriesCreateForm extends Component<HTMLDivElemen
 
         content.insert(this.element, 'afterbegin');
 
-        const clientData = await getSalaryCriteriaListDataForCopyRequestAction(this._bearer, this._clientId, true, 5, 1, logger);
-        const targetData = await getSalaryCriteriaListDataForCopyRequestAction(this._bearer, targetClientId, true, 5, 1, logger);
+        const clientData = await getSalaryCriteriaListDataForCopyRequestAction(this._bearer, this._clientId, true, false, 5, 1, logger);
+        const targetData = await getSalaryCriteriaListDataForCopyRequestAction(this._bearer, targetClientId, true, false, 5, 1, logger);
 
         const form = new SettingsServiceCategoriesCompareComponent({
             clientId  : this._clientId,

@@ -1,6 +1,7 @@
 import {
     SettingsServiceCopyData,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
+import { GoodsCopyData } from '@/action/goods/types/good.types.ts';
 
 
 export type  SalaryCriteriaShortData = {
@@ -50,4 +51,5 @@ export type SalaryCriteriaList = Array<SalaryCriteriaFullData>;
 export type SalaryCriteriaListDataForCopy = {
     criteriaList: SalaryCriteriaList;
     settingsCopyData: SettingsServiceCopyData;
+    goodsCopyData: GoodsCopyData;
 }

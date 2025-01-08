@@ -15,7 +15,7 @@ import {
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 import {
     getGoodRequestAction,
-} from '@/action/goods/edit/getGood/getGood.request-action.ts';
+} from '@/action/goods/request-actions/getGood.request-action.ts';
 import { GoodData } from '@/action/goods/types/good.types.ts';
 import { Is } from '@/types/Is.ts';
 import {

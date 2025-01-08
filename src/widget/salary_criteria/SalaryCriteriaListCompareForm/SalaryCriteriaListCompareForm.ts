@@ -69,8 +69,8 @@ export class SalaryCriteriaListCompareForm extends Component<HTMLDivElement> {
     }
 
     private async _renderCompareForm (targetClientId: string) {
-        const clientCopyData = await getSalaryCriteriaListDataForCopyRequestAction(this._bearer, this._clientId, false, 5, 2, this._logger);
-        const targetCopyData = await getSalaryCriteriaListDataForCopyRequestAction(this._bearer, targetClientId, false, 5, 2, this._logger);
+        const clientCopyData = await getSalaryCriteriaListDataForCopyRequestAction(this._bearer, this._clientId, false, false, 5, 2, this._logger);
+        const targetCopyData = await getSalaryCriteriaListDataForCopyRequestAction(this._bearer, targetClientId, false, false, 5, 2, this._logger);
 
         this._content.add(
             new SalaryCriteriaListCompareComponent({
