@@ -20,6 +20,7 @@ import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import {
     GoodCategoriesCompareForm,
 } from '@/widget/goods/list/GoodCategoriesCompareForm/GoodCategoriesCompareForm.ts';
+import { LabelDivider } from '@/shared/divider/LabelDivider/LabelDivider.ts';
 
 
 const getCategoriesCreateButtonPlace = function () {
@@ -47,6 +48,7 @@ export const goodsPageHandler = function () {
 
         new Col({
             rows: [
+                new LabelDivider({ textContent: 'Действия с категориями' }),
                 new CreateManyCategoriesButton(),
                 new GetCategoriesIdsButton({ clientId: clientId }),
                 new DeleteManyCategoriesButton(),
@@ -62,11 +64,24 @@ export const goodsPageHandler = function () {
                         }),
                     },
                 }),
+                new ModalButton({
+                    textContent: 'Копировать категории с товарами',
+                    styleType  : ButtonStyleType.PRIMARY,
+                    modalProps : {
+                        label      : 'Копировать категории с товарами из',
+                        preferWidth: 1000,
+                        content    : new GoodCategoriesCompareForm({
+                            clientId: clientId,
+                            bearer  : bearer,
+                        }),
+                    },
+                }),
             ],
         }).insert(position, 'beforeend');
 
         new Col({
             rows: [
+                new LabelDivider({ textContent: 'Действия с товарами' }),
                 new ModalButton({
                     textContent: 'Перенести выбранные',
                     styleType  : ButtonStyleType.PRIMARY,
