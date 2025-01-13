@@ -15,6 +15,7 @@ import {
     PROMISE_SPLITTER_MAX_RETRY,
 } from '@/service/PromiseSplitter/const/const.ts';
 import { Col } from '@/shared/box/Col/Col.ts';
+import { ICompareEntity } from '@/entity/compare/Compare.types.ts';
 
 
 export type GoodCategoriesCompareComponentProps =
@@ -59,12 +60,16 @@ export class GoodCategoriesCompareComponent extends CompareComponent<Array<Goods
         this._render();
     }
 
+    public getChildren (): Array<ICompareEntity<any>> {
+        return this._categoriesComponents;
+    }
+
     protected _action (): Promise<GoodsCategoryFullData[] | null> {
         return new PromiseSplitter(PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY)
             .exec(
                 this._categoriesComponents.map(
                     (component) => ({
-                        chain: [ component.getAction() ],
+                        chain: [ component.getAction('0') ],
                     }),
                 ),
             );

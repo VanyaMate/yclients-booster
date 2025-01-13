@@ -111,15 +111,7 @@ export class CreateManyGoodsCategoriesForm extends Component<HTMLDivElement> {
                                     title  : category,
                                     pid    : parentCategoryId,
                                     comment: comment,
-                                })
-                                    .then((categoryId: string) => {
-                                        this._logger.success(`категория "${ category }" создана`);
-                                        return categoryId;
-                                    })
-                                    .catch((e) => {
-                                        this._logger.error(`категория "${ category }" не создана`);
-                                        throw e;
-                                    });
+                                });
                             },
                         ],
                         onSuccess: () => {

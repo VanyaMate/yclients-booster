@@ -2,9 +2,11 @@ import {
     GoodsCategoryUpdateData,
 } from '@/action/goods/list/types/goods-category.types.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
+import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
+import { Fetch } from '@/service/Fetcher/implementations/Fetch.ts';
 
 
-export const updateGoodCategoryRequestAction = async function (clientId: string, categoryId: string, updateData: GoodsCategoryUpdateData, logger?: ILogger): Promise<string> {
+export const updateGoodCategoryRequestAction = async function (clientId: string, categoryId: string, updateData: GoodsCategoryUpdateData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<string> {
     logger?.log(`обновление категории товаров "${ categoryId }" клиента "${ clientId }"`);
 
     const formData = new FormData();
@@ -15,7 +17,10 @@ export const updateGoodCategoryRequestAction = async function (clientId: string,
     formData.append('comment', updateData.comment);
     formData.append('confirm_delete', '');
 
-    return fetch(`https://yclients.com/goods/category_save/${ clientId }/${ categoryId }/`)
+    return fetcher.fetch(`https://yclients.com/goods/category_save/${ clientId }/${ categoryId }/?title=${ updateData.title }&pid=${ updateData.pid }`, {
+        method: 'POST',
+        body  : formData,
+    })
         .then((response) => {
             if (response.ok) {
                 return response.json();

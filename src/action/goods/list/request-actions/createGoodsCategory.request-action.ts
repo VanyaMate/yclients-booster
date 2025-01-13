@@ -5,9 +5,11 @@ import {
     ERROR_GOODS_CATEGORY_CREATION,
 } from '@/action/goods/list/errors/goods-category.errors.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
+import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
+import { Fetch } from '@/service/Fetcher/implementations/Fetch.ts';
 
 
-export const createGoodsCategoryRequestAction = async function (clientId: string, createData: GoodsCategoryCreateData, logger?: ILogger): Promise<string> {
+export const createGoodsCategoryRequestAction = async function (clientId: string, createData: GoodsCategoryCreateData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<string> {
     const parentId = createData.pid ?? '0';
 
     logger?.log(`создание категории товаров "${ createData.title }" для категории "${ parentId }" клиента "${ clientId }"`);
@@ -19,7 +21,7 @@ export const createGoodsCategoryRequestAction = async function (clientId: string
     formData.append('article', createData.article ?? '');
     formData.append('comment', createData.comment ?? '');
 
-    return fetch(`https://yclients.com/goods/category_save/${ clientId }/0/`, {
+    return fetcher.fetch(`https://yclients.com/goods/category_save/${ clientId }/0/?title=${ createData.title }&pid=${ parentId }`, {
         method: 'POST',
         body  : formData,
     })

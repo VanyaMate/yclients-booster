@@ -25,6 +25,15 @@ import {
 } from '@/widget/goods/list/GoodCategoryDropdownActions/GoodCategoryDropdownActions.ts';
 import { ICompareEntity } from '@/entity/compare/Compare.types.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
+import {
+    updateGoodCategoryRequestAction,
+} from '@/action/goods/list/request-actions/updateGoodCategory.request-action.ts';
+import {
+    createGoodsCategoryRequestAction,
+} from '@/action/goods/list/request-actions/createGoodsCategory.request-action.ts';
+import {
+    getGoodsCategoryRequestAction,
+} from '@/action/goods/list/request-actions/getGoodsCategory.request-action.ts';
 
 
 export type GoodCategoryCompareComponentProps =
@@ -89,29 +98,91 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
             } else {
                 if (this._childrenIsValid()) {
                     // update item
+                    await updateGoodCategoryRequestAction(
+                        this._clientId,
+                        this._clientCategory.id,
+                        {
+                            title  : this._targetCategory.title,
+                            comment: this._targetCategory.comment,
+                            article: this._targetCategory.article,
+                            pid    : parentCategoryId,
+                        },
+                        this._fetcher,
+                        this._logger,
+                    );
+
+                    this._clientCategory.title   = this._targetCategory.title;
+                    this._clientCategory.comment = this._targetCategory.comment;
+                    this._clientCategory.article = this._targetCategory.article;
+
                     // return item
+                    return this._clientCategory;
                 } else {
                     // update item
+                    await updateGoodCategoryRequestAction(
+                        this._clientId,
+                        this._clientCategory.id,
+                        {
+                            title  : this._targetCategory.title,
+                            comment: this._targetCategory.comment,
+                            article: this._targetCategory.article,
+                            pid    : parentCategoryId,
+                        },
+                        this._fetcher,
+                        this._logger,
+                    );
+
+                    this._clientCategory.title    = this._targetCategory.title;
+                    this._clientCategory.comment  = this._targetCategory.comment;
+                    this._clientCategory.article  = this._targetCategory.article;
                     // action children
+                    this._clientCategory.children = await new PromiseSplitter(1, 1).exec<GoodsCategoryTreeFullData>(
+                        this.getChildren().map((child) => ({
+                            chain: [ child.getAction(this._clientCategory!.id) ],
+                        })),
+                    );
                     // return item
+                    return this._clientCategory;
                 }
             }
         } else {
             if (!this._isNoCreateNew()) {
                 // create item
+                const categoryId = await createGoodsCategoryRequestAction(
+                    this._clientId,
+                    {
+                        title  : this._targetCategory.title,
+                        comment: this._targetCategory.comment,
+                        article: this._targetCategory.article,
+                        pid    : parentCategoryId,
+                    },
+                    this._fetcher,
+                    this._logger,
+                );
+
+                const category = await getGoodsCategoryRequestAction(
+                    this._clientId,
+                    categoryId,
+                    this._logger,
+                );
 
                 if (!this._childrenIsValid()) {
-                    // action children
+                    const children = await new PromiseSplitter(1, 1).exec<GoodsCategoryTreeFullData>(
+                        this.getChildren().map((child) => ({
+                            chain: [ child.getAction(category.id) ],
+                        })),
+                    );
+
+                    // return item
+                    return { ...category, children: children };
                 }
 
                 // return item
+                return { ...category, children: [] };
             }
 
             return null;
         }
-
-        console.log(parentCategoryId);
-        return null;
     }
 
     public getChildren (): Array<ICompareEntity<any>> {
@@ -182,7 +253,10 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                 components: [
                     new Row({
                         cols: [
-                            new GoodCategoryDropdownActions({ compareEntity: this }),
+                            new GoodCategoryDropdownActions({
+                                compareEntity    : this,
+                                withCurrentHeader: false,
+                            }),
                         ],
                     }),
                 ],

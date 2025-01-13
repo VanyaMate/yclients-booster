@@ -6,7 +6,8 @@ import { GOOD_CATEGORY_HEADER_TYPE } from '@/widget/header-types.ts';
 
 
 export type GoodCategoryDropdownActionsProps = {
-    compareEntity: ICompareEntity<any>
+    compareEntity: ICompareEntity<any>,
+    withCurrentHeader?: boolean;
 }
 
 export class GoodCategoryDropdownActions extends DropdownActionsButton {
@@ -17,7 +18,7 @@ export class GoodCategoryDropdownActions extends DropdownActionsButton {
             },
             compareEntity    : props.compareEntity,
             headerType       : GOOD_CATEGORY_HEADER_TYPE,
-            withCurrentHeader: false,
+            withCurrentHeader: props.withCurrentHeader,
         });
     }
 }
