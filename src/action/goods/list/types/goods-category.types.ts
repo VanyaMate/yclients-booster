@@ -37,6 +37,8 @@ export type GoodsCategoryTreeFullData =
         children: Array<GoodsCategoryTreeFullData>;
     };
 
+export type GoodCategoriesMapper = Record<string, GoodsCategoryTreeFullData>;
 export type GoodCategoriesCopyData = {
-    mapper: Record<string, GoodsCategoryTreeFullData>;
+    mapper: GoodCategoriesMapper;
+    list: Array<GoodsCategoryTreeFullData>;
 }

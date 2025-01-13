@@ -2,7 +2,6 @@ import {
     CompareComponent, CompareComponentProps,
 } from '@/entity/compare/CompareComponent/CompareComponent.ts';
 import {
-    GoodCategoriesCopyData,
     GoodsCategoryFullData, GoodsCategoryTreeFullData,
 } from '@/action/goods/list/types/goods-category.types.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
@@ -10,9 +9,6 @@ import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 import { CompareHeader } from '@/entity/compare/CompareHeader/CompareHeader.ts';
 import { CompareBox } from '@/entity/compare/CompareBox/CompareBox.ts';
 import { CompareRow } from '@/entity/compare/CompareRow/CompareRow.ts';
-import {
-    CompareSelectValue,
-} from '@/entity/compare/CompareValue/CompareSelectValue/CompareSelectValue.ts';
 import {
     CompareTextValue,
 } from '@/entity/compare/CompareValue/CompareTextValue/CompareTextValue.ts';
@@ -27,7 +23,7 @@ export type GoodCategoryCompareComponentProps =
         clientId: string;
         bearer: string;
         targetCategory: GoodsCategoryTreeFullData;
-        clientCategories: GoodCategoriesCopyData;
+        clientCategories: Array<GoodsCategoryTreeFullData>;
         logger?: ILogger;
         fetcher?: IFetcher;
     }
@@ -36,7 +32,7 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
     private readonly _clientId: string;
     private readonly _bearer: string;
     private readonly _targetCategory: GoodsCategoryTreeFullData;
-    private readonly _clientCategories: GoodCategoriesCopyData;
+    private readonly _clientCategories: Array<GoodsCategoryTreeFullData>;
     private readonly _logger?: ILogger;
     private readonly _fetcher?: IFetcher;
     private _clientCategory?: GoodsCategoryTreeFullData;
@@ -58,7 +54,9 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
         this._clientCategories = clientCategories;
         this._logger           = logger;
         this._fetcher          = fetcher;
-        this._clientCategory   = Object.values(this._clientCategories.mapper).find((value) => value.title === this._targetCategory.title);
+        this._clientCategory   = this._clientCategories.find((value) => value.title === this._targetCategory.title);
+
+        this._render();
     }
 
     protected _action (parentId: string | null): Promise<GoodsCategoryFullData | null> {
@@ -76,7 +74,7 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                 level     : 2,
                 components: [
                     new CompareRow({
-                        label      : '',
+                        label      : 'Id',
                         targetValue: new CompareTextValue({
                             value: this._targetCategory.id,
                         }),
@@ -91,32 +89,6 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                 title     : 'Основные настройки',
                 level     : 2,
                 components: [
-                    new CompareRow({
-                        label      : 'Родительская категория',
-                        targetValue: new CompareSelectValue({
-                            defaultValue: 'Родительская',
-                            defaultLabel: '0',
-                            list        : Object.values(this._clientCategories.mapper).map((category) => ({
-                                value   : category.id,
-                                label   : category.title,
-                                selected: this._targetCategory.title === category.parent?.title,
-                            })),
-                            onChange    : (select) => {
-                                if (select.value === '0') {
-                                    this._targetCategory.parent = null;
-                                } else {
-                                    this._targetCategory.parent = {
-                                        id   : select.value,
-                                        title: select.label,
-                                    };
-                                }
-                            },
-                        }),
-                        clientValue: new CompareTextValue({
-                            value: this._clientCategory?.parent?.id,
-                            label: this._clientCategories.mapper[this._clientCategory?.parent?.id ?? ''].title,
-                        }),
-                    }),
                     new CompareRow({
                         label      : 'Артикул',
                         targetValue: new CompareTextInputValue({
@@ -146,12 +118,22 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                 ],
             }),
         ];
-        this._compareChildren = [];
+        this._compareChildren = this._targetCategory.children.map((childCategory) => (
+            new GoodCategoryCompareComponent({
+                clientId        : this._clientId,
+                bearer          : this._bearer,
+                targetCategory  : childCategory,
+                clientCategories: this._clientCategory?.children ?? [],
+                parent          : this,
+                logger          : this._logger,
+                fetcher         : this._fetcher,
+            })
+        ));
         this._header          = new CompareHeader({
             label           : 'Категория товаров',
             targetHeaderData: this._targetCategory.title,
             clientHeaderData: this._clientCategory?.title,
-            variants        : Object.values(this._clientCategories.mapper).map((category) => ({
+            variants        : this._clientCategories.map((category) => ({
                 value   : category.id,
                 label   : category.title,
                 selected: category.id === this._clientCategory?.id,
@@ -161,7 +143,7 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                 ...this._compareChildren,
             ],
             onVariantChange : (variant) => {
-                this._clientCategory = this._clientCategories.mapper[variant.value];
+                this._clientCategory = this._clientCategories.find((category) => category.id === variant.value);
                 this._render();
             },
             onRename        : (title: string) => {
@@ -169,6 +151,6 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
             },
         });
 
-        this._beforeEndRender();
+        this._beforeEndRender(this._clientCategory);
     }
 }

@@ -52,8 +52,11 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
             resources       : [],
         },
         goodsCopyData   : {
-            goods           : [],
-            categoriesMapper: {},
+            goods     : [],
+            categories: {
+                list  : [],
+                mapper: {},
+            },
         },
     };
 
@@ -118,7 +121,7 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
     if (hasGoods || forceUploadGoods) {
         const categoriesShort = await getGoodsCategoriesRequestAction(bearer, clientId, logger);
         categoriesShort.forEach((category) => {
-            dataForCopy.goodsCopyData.categoriesMapper[category.id] = {
+            dataForCopy.goodsCopyData.categories.mapper[category.id] = {
                 id             : category.id,
                 title          : category.title,
                 article        : '',
@@ -133,14 +136,14 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
                 chain: [
                     () => getGoodsCategoryRequestAction(clientId, category.id),
                     async (category: GoodsCategoryFullData) => {
-                        const categoryData           = dataForCopy.goodsCopyData.categoriesMapper[category.id];
+                        const categoryData           = dataForCopy.goodsCopyData.categories.mapper[category.id];
                         categoryData.article         = category.article;
                         categoryData.comment         = category.comment;
                         categoryData.isChainCategory = category.isChainCategory;
                         categoryData.parent          = category.parent;
 
                         if (category.parent) {
-                            dataForCopy.goodsCopyData.categoriesMapper[category.parent.id].children.push(categoryData);
+                            dataForCopy.goodsCopyData.categories.mapper[category.parent.id].children.push(categoryData);
                         }
                     },
                 ],

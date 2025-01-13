@@ -17,6 +17,9 @@ import {
     getBearerTokenDomAction,
 } from '@/action/bearer/dom-action/getBearerToken/getBearerToken.dom-action.ts';
 import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
+import {
+    GoodCategoriesCompareForm,
+} from '@/widget/goods/list/GoodCategoriesCompareForm/GoodCategoriesCompareForm.ts';
 
 
 const getCategoriesCreateButtonPlace = function () {
@@ -53,8 +56,9 @@ export const goodsPageHandler = function () {
                     modalProps : {
                         label      : 'Копировать категории из',
                         preferWidth: 800,
-                        content    : new Col({
-                            rows: [],
+                        content    : new GoodCategoriesCompareForm({
+                            clientId: clientId,
+                            bearer  : bearer,
                         }),
                     },
                 }),

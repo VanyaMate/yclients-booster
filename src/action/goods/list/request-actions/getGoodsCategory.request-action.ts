@@ -7,9 +7,12 @@ import {
 import {
     fetchResponseToDom,
 } from '@/helper/action/fetchResponseToDom/fetchResponseToDom.ts';
+import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 
-export const getGoodsCategoryRequestAction = function (clientId: string, categoryId: string): Promise<GoodsCategoryFullData> {
+export const getGoodsCategoryRequestAction = async function (clientId: string, categoryId: string, logger?: ILogger): Promise<GoodsCategoryFullData> {
+    logger?.log(`получение полной информации о категории товаров "${ categoryId }" клиента "${ clientId }"`);
+
     return fetch(`https://yclients.com/goods/category_edit/${ clientId }/${ categoryId }/`, {
         method: 'GET',
     })
@@ -26,6 +29,8 @@ export const getGoodsCategoryRequestAction = function (clientId: string, categor
                 if (titleElement && pidElement && articleElement && commentElement) {
                     const option = pidElement.querySelector<HTMLOptionElement>(`option[value="${ pidElement.value }"]`);
 
+                    logger?.success(`полная информация о категории "${ categoryId }" клиента "${ clientId }" получена`);
+
                     return {
                         id             : categoryId,
                         isChainCategory: titleElement.disabled,
@@ -38,8 +43,14 @@ export const getGoodsCategoryRequestAction = function (clientId: string, categor
                         },
                     };
                 }
+
+                throw new Error(`не получилось найти все нужные элементы формы на странице`);
             }
 
             throw new Error(ERROR_GOODS_CATEGORY_GETTING);
+        })
+        .catch((error: Error) => {
+            logger?.error(`не получилось получить полную информацию о категории "${ categoryId }" клиента "${ clientId }". ${ error.message }`);
+            throw error;
         });
 };
