@@ -9,6 +9,8 @@ const gitFolder = resolve(__dirname, '..', '..');
 export default {
     types                  : [ '💡 Update', '🙏 Fix', '🔥 New feature' ],
     entities               : [
+        'UI Kit',
+        'Общее',
         'Товары',
         'Критерии товаров',
         'Ресурсы',

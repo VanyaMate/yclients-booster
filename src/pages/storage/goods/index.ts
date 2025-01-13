@@ -21,6 +21,7 @@ import {
     GoodCategoriesCompareForm,
 } from '@/widget/goods/list/GoodCategoriesCompareForm/GoodCategoriesCompareForm.ts';
 import { LabelDivider } from '@/shared/divider/LabelDivider/LabelDivider.ts';
+import { Modal } from '@/shared/modal/Modal/Modal.ts';
 
 
 const getCategoriesCreateButtonPlace = function () {
@@ -57,7 +58,7 @@ export const goodsPageHandler = function () {
                     styleType  : ButtonStyleType.PRIMARY,
                     modalProps : {
                         label      : 'Копировать категории из',
-                        preferWidth: 800,
+                        preferWidth: Modal.getPreferWidthByNesting(3),
                         content    : new GoodCategoriesCompareForm({
                             clientId: clientId,
                             bearer  : bearer,
@@ -69,7 +70,7 @@ export const goodsPageHandler = function () {
                     styleType  : ButtonStyleType.PRIMARY,
                     modalProps : {
                         label      : 'Копировать категории с товарами из',
-                        preferWidth: 1000,
+                        preferWidth: Modal.getPreferWidthByNesting(4),
                         content    : new GoodCategoriesCompareForm({
                             clientId: clientId,
                             bearer  : bearer,
@@ -91,7 +92,7 @@ export const goodsPageHandler = function () {
                             bearer,
                         }),
                         label      : 'Выбор новой категории',
-                        preferWidth: 700,
+                        preferWidth: Modal.getPreferWidthByNesting(1),
                     },
                 }),
             ],

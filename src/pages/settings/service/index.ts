@@ -10,6 +10,7 @@ import { ModalButton } from '@/shared/buttons/ModalButton/ModalButton.ts';
 import {
     SettingsServiceMassivePriceUpdate,
 } from '@/widget/settings/service/SettingsServiceMassivePriceUpdate/SettingsServiceMassivePriceUpdate.ts';
+import { Modal } from '@/shared/modal/Modal/Modal.ts';
 
 
 export const isSettingsServicePage = function (pathname: Array<string>) {
@@ -33,7 +34,7 @@ export const settingsServicePageHandler = function (pathname: Array<string>) {
                                 clientId,
                                 bearer,
                             }),
-                            preferWidth: 1000,
+                            preferWidth: Modal.getPreferWidthByNesting(5),
                             label      : 'Копирование услуг',
                         },
                     }),
@@ -44,7 +45,7 @@ export const settingsServicePageHandler = function (pathname: Array<string>) {
                                 clientId,
                                 bearer,
                             }),
-                            preferWidth: 700,
+                            preferWidth: Modal.getPreferWidthByNesting(1),
                             label      : 'Изменить цены',
                         },
                     }),

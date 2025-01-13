@@ -21,6 +21,12 @@ export type ModalOnChangeCallback = (state: boolean) => void;
 export class Modal extends Component<HTMLDivElement> {
     private readonly _onChangeCallbacks: Array<ModalOnChangeCallback> = [];
 
+    static getPreferWidthByNesting (nesting: number): number {
+        const MINIMAL_WIDTH     = 600;
+        const WIDTH_FOR_NESTING = 100;
+        return MINIMAL_WIDTH + nesting * WIDTH_FOR_NESTING;
+    }
+
     constructor (props: ModalProps) {
         const { content, label, preferWidth, ...other } = props;
         super('div', other);

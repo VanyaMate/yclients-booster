@@ -11,6 +11,7 @@ import {
 import {
     getBearerTokenDomAction,
 } from '@/action/bearer/dom-action/getBearerToken/getBearerToken.dom-action.ts';
+import { Modal } from '@/shared/modal/Modal/Modal.ts';
 
 
 export const isSalaryCriteriaPage = function (pathnameParts: Array<string>): boolean {
@@ -34,7 +35,7 @@ export const salaryCriteriaPageHandler = function () {
                                 clientId, bearer,
                             }),
                             label      : 'Копирование критериев расчета ЗП',
-                            preferWidth: 1100,
+                            preferWidth: Modal.getPreferWidthByNesting(6),
                         },
                     }),
                     new SalaryCriteriaListInfo(),
