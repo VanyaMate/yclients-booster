@@ -25,7 +25,7 @@ import { Modal } from '@/shared/modal/Modal/Modal.ts';
 
 
 const getCategoriesCreateButtonPlace = function () {
-    return document.querySelector('#nestable')!.parentNode;
+    return document.querySelector('#nestable')?.parentNode as Element;
 };
 
 const getGoodsActionButtonPlace = function (): Element {
@@ -43,59 +43,60 @@ export const isGoodsPage = function (pathNameParts: Array<string>) {
 
 export const goodsPageHandler = function () {
     startHandler(() => {
-        const position        = getCategoriesCreateButtonPlace() as Element;
+        const position        = getCategoriesCreateButtonPlace();
         const actionsPosition = getGoodsActionButtonPlace();
         const bearer          = getBearerTokenDomAction();
 
-        new Col({
-            rows: [
-                new LabelDivider({ textContent: 'Действия с категориями' }),
-                new CreateManyCategoriesButton(),
-                new GetCategoriesIdsButton({ clientId: clientId }),
-                new DeleteManyCategoriesButton(),
-                new ModalButton({
-                    textContent: 'Копировать категории',
-                    styleType  : ButtonStyleType.PRIMARY,
-                    modalProps : {
-                        label      : 'Копировать категории из',
-                        preferWidth: Modal.getPreferWidthByNesting(3),
-                        content    : new GoodCategoriesCompareForm({
-                            clientId: clientId,
-                            bearer  : bearer,
-                        }),
-                    },
-                }),
-                new ModalButton({
-                    textContent: 'Копировать категории с товарами',
-                    styleType  : ButtonStyleType.PRIMARY,
-                    modalProps : {
-                        label      : 'Копировать категории с товарами из',
-                        preferWidth: Modal.getPreferWidthByNesting(4),
-                        content    : new GoodCategoriesCompareForm({
-                            clientId: clientId,
-                            bearer  : bearer,
-                        }),
-                    },
-                }),
-            ],
-        }).insert(position, 'beforeend');
+        if (position) {
+            new Col({
+                rows: [
+                    new LabelDivider({ textContent: 'Действия с категориями' }),
+                    new CreateManyCategoriesButton(),
+                    new GetCategoriesIdsButton({ clientId: clientId }),
+                    new DeleteManyCategoriesButton(),
+                    new ModalButton({
+                        textContent: 'Копировать категории',
+                        styleType  : ButtonStyleType.PRIMARY,
+                        modalProps : {
+                            label      : 'Копировать категории из',
+                            preferWidth: Modal.getPreferWidthByNesting(3),
+                            content    : new GoodCategoriesCompareForm({
+                                clientId: clientId,
+                                bearer  : bearer,
+                            }),
+                        },
+                    }),
+                    new ModalButton({
+                        textContent: 'Копировать категории с товарами',
+                        styleType  : ButtonStyleType.PRIMARY,
+                        modalProps : {
+                            label      : 'Копировать категории с товарами из',
+                            preferWidth: Modal.getPreferWidthByNesting(4),
+                            content    : new Col({ rows: [] }),
+                        },
+                    }),
+                ],
+            }).insert(position, 'beforeend');
+        }
 
-        new Col({
-            rows: [
-                new LabelDivider({ textContent: 'Действия с товарами' }),
-                new ModalButton({
-                    textContent: 'Перенести выбранные',
-                    styleType  : ButtonStyleType.PRIMARY,
-                    modalProps : {
-                        content    : new ChangeManyGoodsCategory({
-                            clientId,
-                            bearer,
-                        }),
-                        label      : 'Выбор новой категории',
-                        preferWidth: Modal.getPreferWidthByNesting(1),
-                    },
-                }),
-            ],
-        }).insert(actionsPosition, 'beforeend');
+        if (actionsPosition) {
+            new Col({
+                rows: [
+                    new LabelDivider({ textContent: 'Действия с товарами' }),
+                    new ModalButton({
+                        textContent: 'Перенести выбранные',
+                        styleType  : ButtonStyleType.PRIMARY,
+                        modalProps : {
+                            content    : new ChangeManyGoodsCategory({
+                                clientId,
+                                bearer,
+                            }),
+                            label      : 'Выбор новой категории',
+                            preferWidth: Modal.getPreferWidthByNesting(1),
+                        },
+                    }),
+                ],
+            }).insert(actionsPosition, 'beforeend');
+        }
     });
 };

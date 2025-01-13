@@ -14,7 +14,6 @@ import { Modal } from '@/shared/modal/Modal/Modal.ts';
 
 
 export const isSettingsServicePage = function (pathname: Array<string>) {
-    console.log(pathname);
     return pathname[1] === 'settings' && pathname[2] === 'service_categories';
 };
 
