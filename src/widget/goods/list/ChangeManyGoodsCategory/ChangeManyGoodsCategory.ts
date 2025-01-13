@@ -19,8 +19,8 @@ import {
 import { GoodData } from '@/action/goods/types/good.types.ts';
 import { Is } from '@/types/Is.ts';
 import {
-    changeGoodCategoryRequestAction,
-} from '@/action/goods/edit/changeGoodCategory/changeGoodCategory.request-action.ts';
+    changeCategoryOfGoodRequestAction,
+} from '@/action/goods/edit/changeCategoryOfGood/changeCategoryOfGood.request-action.ts';
 
 
 export type ChangeManyGoodsCategoryProps =
@@ -90,7 +90,7 @@ export class ChangeManyGoodsCategory extends Component<HTMLDivElement> {
                                 () => getGoodRequestAction(this._clientId, good.categoryId, good.id, this._logger),
                                 async (goodData: unknown) => {
                                     if (Is<GoodData>(goodData)) {
-                                        return changeGoodCategoryRequestAction(
+                                        return changeCategoryOfGoodRequestAction(
                                             this._clientId,
                                             goodData.category_id.toString(),
                                             goodData.id,

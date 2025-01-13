@@ -8,19 +8,26 @@ export type ToggleCompareTypeButtonProps =
         container: ICompareEntity<any>;
         headerType: string;
         compareType: CompareType;
+        withCurrentHeader?: boolean;
     };
 
 export class ToggleCompareTypeButton extends Button {
     constructor (props: ToggleCompareTypeButtonProps) {
-        const { container, headerType, compareType, ...other } = props;
+        const {
+                  container,
+                  headerType,
+                  compareType,
+                  withCurrentHeader,
+                  ...other
+              } = props;
         super(other);
-        this.element.addEventListener('click', () => this._handler(container, headerType, compareType));
+        this.element.addEventListener('click', () => this._handler(container, headerType, compareType, withCurrentHeader));
     }
 
-    private _handler (container: ICompareEntity<any>, headerType: string, compareType: CompareType) {
+    private _handler (container: ICompareEntity<any>, headerType: string, compareType: CompareType, withCurrentHeader: boolean = true) {
         const header = container.getHeader();
 
-        if (header) {
+        if (header && withCurrentHeader) {
             if (header.getType() === headerType) {
                 header.setCompareType(compareType);
                 return;

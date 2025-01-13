@@ -30,6 +30,7 @@ export type DropdownActionsButtonProps = {
     compareEntity: ICompareEntity<any>;
     headerType: string;
     buttonProps: ButtonProps;
+    withCurrentHeader?: boolean;
 }
 
 export class DropdownActionsButton extends Dropdown {
@@ -43,26 +44,30 @@ export class DropdownActionsButton extends Dropdown {
                     }),
                     new DropdownBoxItem({
                         content: new ToggleCompareToAllButton({
-                            container : props.compareEntity,
-                            headerType: props.headerType,
+                            container        : props.compareEntity,
+                            headerType       : props.headerType,
+                            withCurrentHeader: props.withCurrentHeader,
                         }),
                     }),
                     new DropdownBoxItem({
                         content: new ToggleCompareToOnlyItemButton({
-                            container : props.compareEntity,
-                            headerType: props.headerType,
+                            container        : props.compareEntity,
+                            headerType       : props.headerType,
+                            withCurrentHeader: props.withCurrentHeader,
                         }),
                     }),
                     new DropdownBoxItem({
                         content: new ToggleCompareToOnlyChildrenButton({
-                            container : props.compareEntity,
-                            headerType: props.headerType,
+                            container        : props.compareEntity,
+                            headerType       : props.headerType,
+                            withCurrentHeader: props.withCurrentHeader,
                         }),
                     }),
                     new DropdownBoxItem({
                         content: new ToggleCompareToDisableButton({
-                            container : props.compareEntity,
-                            headerType: props.headerType,
+                            container        : props.compareEntity,
+                            headerType       : props.headerType,
+                            withCurrentHeader: props.withCurrentHeader,
                         }),
                     }),
                     new LabelDivider({
@@ -70,14 +75,16 @@ export class DropdownActionsButton extends Dropdown {
                     }),
                     new DropdownBoxItem({
                         content: new ToggleCompareWithAutomaticButton({
-                            container : props.compareEntity,
-                            headerType: props.headerType,
+                            container        : props.compareEntity,
+                            headerType       : props.headerType,
+                            withCurrentHeader: props.withCurrentHeader,
                         }),
                     }),
                     new DropdownBoxItem({
                         content: new ToggleCompareWithNoneButton({
-                            container : props.compareEntity,
-                            headerType: props.headerType,
+                            container        : props.compareEntity,
+                            headerType       : props.headerType,
+                            withCurrentHeader: props.withCurrentHeader,
                         }),
                     }),
                 ],

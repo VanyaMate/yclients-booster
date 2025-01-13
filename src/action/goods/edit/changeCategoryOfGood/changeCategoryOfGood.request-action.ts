@@ -2,7 +2,7 @@ import { GoodUpdateData } from '@/action/goods/types/good.types.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 
-export const changeGoodCategoryRequestAction = async function (clientId: string, previousCategoryId: string, goodId: string, updateData: GoodUpdateData, logger?: ILogger): Promise<boolean> {
+export const changeCategoryOfGoodRequestAction = async function (clientId: string, previousCategoryId: string, goodId: string, updateData: GoodUpdateData, logger?: ILogger): Promise<boolean> {
     logger?.log(`обновление категории товара "${ goodId }" с "${ previousCategoryId }" -> "${ updateData.category_id }"`);
 
     const formData = new FormData();

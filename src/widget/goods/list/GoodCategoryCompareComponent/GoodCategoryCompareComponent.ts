@@ -2,7 +2,7 @@ import {
     CompareComponent, CompareComponentProps,
 } from '@/entity/compare/CompareComponent/CompareComponent.ts';
 import {
-    GoodsCategoryFullData, GoodsCategoryTreeFullData,
+    GoodsCategoryTreeFullData,
 } from '@/action/goods/list/types/goods-category.types.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
@@ -15,6 +15,16 @@ import {
 import {
     CompareTextInputValue,
 } from '@/entity/compare/CompareValue/CompareTextInputValue/CompareTextInputValue.ts';
+import { GOOD_CATEGORY_HEADER_TYPE } from '@/widget/header-types.ts';
+import {
+    CompareBoxWithoutValidation,
+} from '@/entity/compare/CompareWithoutValidation/CompareBoxWithoutValidation.ts';
+import { Row } from '@/shared/box/Row/Row.ts';
+import {
+    GoodCategoryDropdownActions,
+} from '@/widget/goods/list/GoodCategoryDropdownActions/GoodCategoryDropdownActions.ts';
+import { ICompareEntity } from '@/entity/compare/Compare.types.ts';
+import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 
 
 export type GoodCategoryCompareComponentProps =
@@ -28,7 +38,7 @@ export type GoodCategoryCompareComponentProps =
         fetcher?: IFetcher;
     }
 
-export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategoryFullData> {
+export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategoryTreeFullData> {
     private readonly _clientId: string;
     private readonly _bearer: string;
     private readonly _targetCategory: GoodsCategoryTreeFullData;
@@ -36,6 +46,7 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
     private readonly _logger?: ILogger;
     private readonly _fetcher?: IFetcher;
     private _clientCategory?: GoodsCategoryTreeFullData;
+    private _childrenGoodCategories: Array<GoodCategoryCompareComponent> = [];
 
     constructor (props: GoodCategoryCompareComponentProps) {
         const {
@@ -59,10 +70,52 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
         this._render();
     }
 
-    protected _action (parentId: string | null): Promise<GoodsCategoryFullData | null> {
-        console.log('ParentId', parentId);
-        console.log('logs', this._clientId, this._bearer, this._logger, this._fetcher);
-        throw new Error('Method not implemented.');
+    protected async _action (parentCategoryId: string): Promise<GoodsCategoryTreeFullData | null> {
+        if (this._clientCategory) {
+            if (this._itemIsValid()) {
+                if (this._childrenIsValid()) {
+                    // return item
+                    return this._clientCategory;
+                } else {
+                    // action children
+                    this._clientCategory.children = await new PromiseSplitter(1, 1).exec<GoodsCategoryTreeFullData>(
+                        this.getChildren().map((child) => ({
+                            chain: [ child.getAction(this._clientCategory!.id) ],
+                        })),
+                    );
+                    return this._clientCategory;
+                    // return item
+                }
+            } else {
+                if (this._childrenIsValid()) {
+                    // update item
+                    // return item
+                } else {
+                    // update item
+                    // action children
+                    // return item
+                }
+            }
+        } else {
+            if (!this._isNoCreateNew()) {
+                // create item
+
+                if (!this._childrenIsValid()) {
+                    // action children
+                }
+
+                // return item
+            }
+
+            return null;
+        }
+
+        console.log(parentCategoryId);
+        return null;
+    }
+
+    public getChildren (): Array<ICompareEntity<any>> {
+        return this._childrenGoodCategories;
     }
 
     protected _render (): void {
@@ -101,6 +154,8 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                         clientValue: new CompareTextValue({
                             value: this._clientCategory?.article,
                         }),
+                        disable    : this._clientCategory?.isChainCategory,
+                        parent     : this,
                     }),
                     new CompareRow({
                         label      : 'Комментарий',
@@ -114,21 +169,40 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                         clientValue: new CompareTextValue({
                             value: this._clientCategory?.comment,
                         }),
+                        disable    : this._clientCategory?.isChainCategory,
+                        parent     : this,
                     }),
                 ],
             }),
         ];
-        this._compareChildren = this._targetCategory.children.map((childCategory) => (
-            new GoodCategoryCompareComponent({
-                clientId        : this._clientId,
-                bearer          : this._bearer,
-                targetCategory  : childCategory,
-                clientCategories: this._clientCategory?.children ?? [],
-                parent          : this,
-                logger          : this._logger,
-                fetcher         : this._fetcher,
-            })
-        ));
+        this._compareChildren = [
+            new CompareBoxWithoutValidation({
+                title     : 'Массовые действия',
+                level     : 3,
+                components: [
+                    new Row({
+                        cols: [
+                            new GoodCategoryDropdownActions({ compareEntity: this }),
+                        ],
+                    }),
+                ],
+            }),
+            new CompareBox({
+                title     : 'Категории товаров',
+                level     : 3,
+                components: this._childrenGoodCategories = this._targetCategory.children.map((childCategory) => (
+                    new GoodCategoryCompareComponent({
+                        clientId        : this._clientId,
+                        bearer          : this._bearer,
+                        targetCategory  : childCategory,
+                        clientCategories: this._clientCategory?.children ?? [],
+                        parent          : this,
+                        logger          : this._logger,
+                        fetcher         : this._fetcher,
+                    })
+                )),
+            }),
+        ];
         this._header          = new CompareHeader({
             label           : 'Категория товаров',
             targetHeaderData: this._targetCategory.title,
@@ -149,6 +223,9 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
             onRename        : (title: string) => {
                 this._targetCategory.title = title;
             },
+            disable         : this._clientCategory?.isChainCategory,
+            type            : GOOD_CATEGORY_HEADER_TYPE,
+            parent          : this,
         });
 
         this._beforeEndRender(this._clientCategory);
