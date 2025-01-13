@@ -5,6 +5,13 @@ export type GoodsCategoryCreateData = {
     comment?: string;
 }
 
+export type GoodsCategoryUpdateData = {
+    title: string;
+    pid: string;
+    article: string;
+    comment: string;
+}
+
 export type GoodsCategoryShortData = {
     id: string;
     title: string;
