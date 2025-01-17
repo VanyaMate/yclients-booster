@@ -90,11 +90,11 @@ export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<S
                 }),
                 ...this._criteriaComponent = this._targetCopyData.criteriaList.map((criteria) => (
                     new SalaryCriteriaCompareComponent({
-                        clientId          : this._clientId,
-                        bearer            : this._bearer,
-                        targetCriteria    : criteria,
-                        targetSettingsData: this._targetCopyData.settingsCopyData,
-                        clientCopyData    : this._clientCopyData,
+                        clientId      : this._clientId,
+                        bearer        : this._bearer,
+                        targetCriteria: criteria,
+                        targetCopyData: this._targetCopyData,
+                        clientCopyData: this._clientCopyData,
                     })
                 )),
             ],

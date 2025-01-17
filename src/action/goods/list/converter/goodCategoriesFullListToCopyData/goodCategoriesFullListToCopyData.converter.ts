@@ -19,13 +19,13 @@ export const goodCategoriesFullListToCopyDataConverter = function (list: Array<G
 
     let item: GoodsCategoryFullData;
     for (let i = 0; i < list.length; i++) {
-        item = list[i];
-
+        item                = list[i];
         temporally[item.id] = {
             ...item,
             children: temporally[item.id]?.children ?? [],
             goods   : goods[item.id] ?? [],
         };
+        response.list.push(temporally[item.id]);
 
         if (item.parent?.id && item.parent.id !== '0') {
             const parent = temporally[item.parent.id];
@@ -42,6 +42,5 @@ export const goodCategoriesFullListToCopyDataConverter = function (list: Array<G
         }
     }
 
-    response.list = Object.values(response.mapper);
     return response;
 };

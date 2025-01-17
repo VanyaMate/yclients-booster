@@ -29,11 +29,14 @@ import {
     getSettingsServiceCategoryRequestAction,
 } from '@/action/settings/service_categories/request-action/getSettingsServiceCategory/getSettingsServiceCategory.request-action.ts';
 import {
-    getGoodsCategoriesRequestAction,
-} from '@/action/goods/list/request-actions/getGoodsCategories.request-action.ts';
-import {
     getGoodsSortByCategoriesRequestAction,
 } from '@/action/goods/request-actions/getGoodsSortByCategories.request-action.ts';
+import {
+    getGoodsCategoriesFullDataRequestAction,
+} from '@/action/goods/list/request-actions/getGoodsCategoriesFullData.request-action.ts';
+import {
+    goodCategoriesFullListToCopyDataConverter,
+} from '@/action/goods/list/converter/goodCategoriesFullListToCopyData/goodCategoriesFullListToCopyData.converter.ts';
 
 
 export const getSalaryCriteriaListDataForCopyRequestAction = async function (bearer: string, clientId: string, forceUploadServices: boolean, forceUploadGoods: boolean, maxSplit: number, maxRetry: number, logger?: ILogger): Promise<SalaryCriteriaListDataForCopy> {
@@ -116,21 +119,10 @@ export const getSalaryCriteriaListDataForCopyRequestAction = async function (bea
     }
 
     if (hasGoods || forceUploadGoods) {
-        const categoriesShort = await getGoodsCategoriesRequestAction(bearer, clientId, logger);
-        categoriesShort.forEach((category) => {
-            dataForCopy.goodsCopyData.categories.mapper[category.id] = {
-                id             : category.id,
-                title          : category.title,
-                article        : '',
-                comment        : '',
-                isChainCategory: false,
-                parent         : null,
-                children       : [],
-                goods          : [],
-            };
-        });
+        const categoriesFullData = await getGoodsCategoriesFullDataRequestAction(bearer, clientId, logger);
+        const goods              = await getGoodsSortByCategoriesRequestAction(bearer, clientId, categoriesFullData.map((category) => category.id), logger);
 
-        const goods = await getGoodsSortByCategoriesRequestAction(bearer, clientId, categoriesShort.map((category) => category.id), logger);
+        dataForCopy.goodsCopyData.categories = goodCategoriesFullListToCopyDataConverter(categoriesFullData, goods);
 
         Object.entries(goods).forEach(([ categoryId, goodsList ]) => {
             if (dataForCopy.goodsCopyData.categories.mapper[categoryId]) {

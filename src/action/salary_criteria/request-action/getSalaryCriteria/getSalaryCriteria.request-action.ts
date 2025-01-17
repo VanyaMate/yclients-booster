@@ -16,16 +16,22 @@ import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 const getSalaryCriteriaContextData = function (contextJson: string): SalaryCriteriaContext {
     try {
-        const context    = JSON.parse(contextJson);
-        const categories = context?.services?.categories;
-        const items      = context?.services?.items;
+        const context         = JSON.parse(contextJson);
+        const categories      = context?.services?.categories;
+        const items           = context?.services?.items;
+        const goodsCategories = context?.goods?.categories;
+        const goodsItems      = context?.goods?.items;
 
-        if (!(categories?.length || items?.length)) {
+        if (!(categories?.length || items?.length || goodsCategories?.length || goodsItems?.length)) {
             return {};
         }
 
         const response: SalaryCriteriaContext = {
             services: {
+                categories: [],
+                items     : [],
+            },
+            goods   : {
                 categories: [],
                 items     : [],
             },
@@ -51,6 +57,31 @@ const getSalaryCriteriaContextData = function (contextJson: string): SalaryCrite
                     response.services?.items.push({
                         categoryId: item.category,
                         itemId    : item.item,
+                    });
+                }
+            }
+        }
+
+        let goodCategory: any;
+        if (goodsCategories) {
+            for (let i = 0; i < goodsCategories.length; i++) {
+                goodCategory = goodsCategories[i];
+                if (goodCategory?.category) {
+                    response.goods?.categories.push({
+                        categoryId: goodCategory.category,
+                    });
+                }
+            }
+        }
+
+        let goodItem: any;
+        if (goodsItems) {
+            for (let i = 0; i < goodsItems.length; i++) {
+                goodItem = goodsItems[i];
+                if (goodItem?.category && goodItem?.item) {
+                    response.goods?.items.push({
+                        categoryId: goodItem.category,
+                        itemId    : goodItem.item,
                     });
                 }
             }

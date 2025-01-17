@@ -20,7 +20,6 @@ import {
 import { Converter } from '@/converter/Converter.ts';
 import {
     SettingsServiceCategoryDataWithChildren,
-    SettingsServiceCopyData,
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 import {
     SalaryCriteriaRuleCompareValue,
@@ -40,13 +39,22 @@ import {
 } from '@/widget/salary_criteria/salary-criteria.header-type.ts';
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
+import {
+    GoodCategoryCompareComponent,
+} from '@/widget/goods/list/GoodCategoryCompareComponent/GoodCategoryCompareComponent.ts';
+import {
+    getOnlyContextGoodCopyData,
+} from '@/widget/salary_criteria/SalaryCriteriaCompareComponent/lib/getOnlyContextGoodCopyData.ts';
+import {
+    GoodsCategoryTreeFullData,
+} from '@/action/goods/list/types/goods-category.types.ts';
 
 
 export type SalaryCriteriaCompareComponentProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
         targetCriteria: SalaryCriteriaFullData;
-        targetSettingsData: SettingsServiceCopyData;
+        targetCopyData: SalaryCriteriaListDataForCopy;
         clientCopyData: SalaryCriteriaListDataForCopy;
         clientId: string;
         bearer: string;
@@ -56,7 +64,7 @@ export type SalaryCriteriaCompareComponentProps =
 
 export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCriteriaFullData> {
     private readonly _targetCriteria: SalaryCriteriaFullData;
-    private readonly _targetSettingsData: SettingsServiceCopyData;
+    private readonly _targetCopyData: SalaryCriteriaListDataForCopy;
     private readonly _clientCopyData: SalaryCriteriaListDataForCopy;
     private readonly _clientId: string;
     private readonly _bearer: string;
@@ -71,21 +79,21 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                   clientCopyData,
                   clientId,
                   bearer,
-                  targetSettingsData,
+                  targetCopyData,
                   logger,
                   fetcher,
                   ...other
               } = props;
         super(other);
 
-        this._targetCriteria     = { ...targetCriteria };
-        this._targetSettingsData = targetSettingsData;
-        this._clientCopyData     = clientCopyData;
-        this._clientId           = clientId;
-        this._bearer             = bearer;
-        this._logger             = logger;
-        this._fetcher            = fetcher;
-        this._clientCriteria     = this._clientCopyData.criteriaList.find((criteria) => criteria.title === this._targetCriteria.title);
+        this._targetCriteria = { ...targetCriteria };
+        this._targetCopyData = targetCopyData;
+        this._clientCopyData = clientCopyData;
+        this._clientId       = clientId;
+        this._bearer         = bearer;
+        this._logger         = logger;
+        this._fetcher        = fetcher;
+        this._clientCriteria = this._clientCopyData.criteriaList.find((criteria) => criteria.title === this._targetCriteria.title);
 
         this._render();
     }
@@ -190,10 +198,11 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                 title     : 'Условия',
                 level     : 2,
                 components: this._targetCriteria.rules?.map((rule, index) => {
-                    const categories = rule.context.services?.categories.map((ruleCategory) => (
+                    // Categories
+                    const categories        = rule.context.services?.categories.map((ruleCategory) => (
                         new SettingsServiceCategoryCompareComponent({
-                            targetCategory : this._targetSettingsData.tree.find((category) => category.id.toString() === ruleCategory.categoryId.toString())!,
-                            targetResources: this._targetSettingsData.resources,
+                            targetCategory : this._targetCopyData.settingsCopyData.tree.find((category) => category.id.toString() === ruleCategory.categoryId.toString())!,
+                            targetResources: this._targetCopyData.settingsCopyData.resources,
                             clientId       : this._clientId,
                             bearer         : this._bearer,
                             clientData     : this._clientCopyData.settingsCopyData,
@@ -202,14 +211,140 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                             fetcher        : this._fetcher,
                         })
                     )) ?? [];
-                    const children   = new CompareBox({
+                    const concatenatedItems = rule.context.services?.items.reduce((acc, item) => {
+                        if (acc[item.categoryId]) {
+                            acc[item.categoryId].push(item.itemId.toString());
+                        } else {
+                            acc[item.categoryId] = [ item.itemId.toString() ];
+                        }
+                        return acc;
+                    }, {} as Record<string, Array<string>>) ?? {};
+                    const categoriesItems   = Object.entries(concatenatedItems)
+                        .map(([ categoryId, itemsIds ]) => {
+                            const category = this._targetCopyData.settingsCopyData.tree.find((category) => category.id.toString() === categoryId);
+
+                            if (category) {
+                                category.children = category.children.filter((child) => itemsIds.includes(child.id.toString()));
+
+                                return new SettingsServiceCategoryCompareComponent({
+                                    targetCategory : category,
+                                    targetResources: this._targetCopyData.settingsCopyData.resources,
+                                    clientData     : this._clientCopyData.settingsCopyData,
+                                    clientId       : this._clientId,
+                                    bearer         : this._bearer,
+                                    parent         : this,
+                                    logger         : this._logger,
+                                    fetcher        : this._fetcher,
+                                });
+                            }
+                            return null;
+                        })
+                        .filter((item) => item !== null);
+
+                    // Goods
+                    const goodsCategoriesIds: Array<string> = [];
+                    const goodsItemsIds: Array<string>      = [];
+
+                    rule.context.goods?.categories.forEach((category) => goodsCategoriesIds.push(category.categoryId));
+                    rule.context.goods?.items.forEach((item) => {
+                        goodsItemsIds.push(item.categoryId);
+                        goodsItemsIds.push(item.itemId);
+                    });
+
+                    const goods                  = rule.context.goods?.categories
+                        .map((ruleGoodCategory) => {
+                            const category = this._targetCopyData.goodsCopyData.categories.list.find((category) => category.id.toString() === ruleGoodCategory.categoryId.toString());
+
+                            if (category) {
+                                const categoryGoodsIds                                    = category.goods.map((good) => good.id);
+                                let parentCategory: GoodsCategoryTreeFullData | undefined = category;
+                                const path: Array<string>                                 = [ category.id ];
+                                while (parentCategory?.parent?.id !== undefined && parentCategory?.parent?.id !== '0') {
+                                    path.push(parentCategory.parent.id);
+                                    parentCategory = this._targetCopyData.goodsCopyData.categories.list.find((category) => category.id.toString() === parentCategory?.parent?.id);
+                                }
+
+                                if (parentCategory) {
+                                    return new GoodCategoryCompareComponent({
+                                        targetCategory  : getOnlyContextGoodCopyData(parentCategory, path, categoryGoodsIds),
+                                        clientCategories: this._clientCopyData.goodsCopyData.categories.list,
+                                        bearer          : this._bearer,
+                                        clientId        : this._clientId,
+                                        logger          : this._logger,
+                                        fetcher         : this._fetcher,
+                                    });
+                                }
+                            }
+
+                            return null;
+                        })
+                        .filter((item) => item !== null) ?? [];
+                    const concatenatedGoodsItems = rule.context.goods?.items.reduce((acc, item) => {
+                        if (acc[item.categoryId]) {
+                            acc[item.categoryId].push(item.itemId.toString());
+                        } else {
+                            acc[item.categoryId] = [ item.itemId.toString() ];
+                        }
+                        return acc;
+                    }, {} as Record<string, Array<string>>) ?? {};
+
+                    const goodsItems = Object.keys(concatenatedGoodsItems)
+                        .map((categoryId) => {
+                            const category = this._targetCopyData.goodsCopyData.categories.list.find((category) => category.id.toString() === categoryId);
+
+                            if (category) {
+                                let parentCategory: GoodsCategoryTreeFullData | undefined = category;
+                                const path: Array<string>                                 = [ category.id ];
+                                while (parentCategory?.parent?.id !== undefined && parentCategory?.parent?.id !== '0') {
+                                    path.push(parentCategory.parent.id);
+                                    parentCategory = this._targetCopyData.goodsCopyData.categories.list.find((category) => category.id.toString() === parentCategory?.parent?.id);
+                                }
+
+                                if (parentCategory) {
+                                    return new GoodCategoryCompareComponent({
+                                        targetCategory  : getOnlyContextGoodCopyData(parentCategory, goodsCategoriesIds.concat(path), goodsItemsIds),
+                                        clientCategories: this._clientCopyData.goodsCopyData.categories.list,
+                                        bearer          : this._bearer,
+                                        clientId        : this._clientId,
+                                        logger          : this._logger,
+                                        fetcher         : this._fetcher,
+                                    });
+                                }
+                            }
+
+                            return null;
+                        })
+                        .filter((item) => item !== null);
+
+                    const childrenCategories = new CompareBox({
                         level     : 4,
-                        title     : 'Категории / Услуги',
+                        title     : 'Категории услуг целиком',
                         components: categories,
                     });
 
+                    const childrenCategoriesItems = new CompareBox({
+                        level     : 4,
+                        title     : 'Категории услуг частично',
+                        components: categoriesItems,
+                    });
+
+                    const goodsCategories = new CompareBox({
+                        level     : 4,
+                        title     : 'Категории товаров целиком',
+                        components: goods,
+                    });
+
+                    const goodsPartOfItems = new CompareBox({
+                        level     : 4,
+                        title     : 'Категории товаров частично',
+                        components: goodsItems,
+                    });
+
                     this._ruleCategories = this._ruleCategories.concat(categories);
-                    this._compareChildren.push(children);
+                    this._compareChildren.push(childrenCategories);
+                    this._compareChildren.push(childrenCategoriesItems);
+                    this._compareChildren.push(goodsCategories);
+                    this._compareChildren.push(goodsPartOfItems);
 
                     return [
                         new CompareRow({
@@ -226,7 +361,10 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                             parent           : this,
                             revalidateOnCheck: true,
                         }),
-                        children,
+                        childrenCategories,
+                        childrenCategoriesItems,
+                        goodsCategories,
+                        goodsPartOfItems,
                     ];
                 }).flat(),
             }),

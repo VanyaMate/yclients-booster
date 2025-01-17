@@ -27,13 +27,15 @@ export const createGoodRequestAction = async function (clientId: string, createD
             throw new Error(`ошибка ответа с сервера. Статус: ${ response.status }`);
         })
         .then((response) => {
-            console.log(response);
             // "/goods/edit/1092329/1454508/35505992/" ->
             // response.meta.redirect_url
 
             if (response.success) {
                 logger?.success(`создание товара "${ createData.title }" для категории "${ createData.category_id }" клиента "${ clientId }" прошло успешно`);
-                return { ...createData, id: '' };
+                return {
+                    ...createData,
+                    id: response.meta.redirect_url.split('/').slice(-2)[0],
+                };
             }
 
             throw new Error(`ошибка обновления. ${ response?.meta?.message }`);
