@@ -36,7 +36,7 @@ export class CompareTextValue<ValueType> extends Component<HTMLDivElement> imple
             this.element.textContent = 'Пусто';
             this.element.classList.add(css.empty);
             this.element.classList.add(css.isNotValue);
-        } else if (this._label) {
+        } else if (this._label !== undefined && this._label !== null) {
             this.element.textContent = this._label;
             this.element.classList.add(css.isNotValue);
         } else {

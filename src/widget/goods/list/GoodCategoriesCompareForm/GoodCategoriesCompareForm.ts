@@ -21,6 +21,12 @@ import { Row } from '@/shared/box/Row/Row.ts';
 import {
     GoodCategoryDropdownActions,
 } from '@/widget/goods/list/GoodCategoryDropdownActions/GoodCategoryDropdownActions.ts';
+import {
+    getGoodsSortByCategoriesRequestAction,
+} from '@/action/goods/request-actions/getGoodsSortByCategories.request-action.ts';
+import {
+    CheckboxWithLabel,
+} from '@/shared/input/CheckboxWithLabel/CheckboxWithLabel.ts';
 
 
 export type GoodCategoriesCompareFormProps =
@@ -55,6 +61,10 @@ export class GoodCategoriesCompareForm extends Component<HTMLDivElement> {
             placeholder: 'Введите ID клиента',
         });
 
+        const withProductsCheckbox = new CheckboxWithLabel({
+            label: 'Вместе с товарами',
+        });
+
         const compareButton = new Button({
             textContent: 'Сравнить',
             onclick    : () => {
@@ -62,21 +72,30 @@ export class GoodCategoriesCompareForm extends Component<HTMLDivElement> {
                 if (targetClientId) {
                     targetClientIdInput.remove();
                     compareButton.remove();
-                    this._renderCompareForm(targetClientId);
+                    withProductsCheckbox.remove();
+                    this._renderCompareForm(targetClientId, withProductsCheckbox.getState());
                 }
             },
         });
 
         this._content.add(targetClientIdInput);
+        this._content.add(withProductsCheckbox);
         this._content.add(compareButton);
     }
 
-    private async _renderCompareForm (targetClientId: string) {
+    private async _renderCompareForm (targetClientId: string, withGoods: boolean = false) {
         const targetData = await getGoodsCategoriesFullDataRequestAction(this._bearer, targetClientId, this._logger);
         const clientData = await getGoodsCategoriesFullDataRequestAction(this._bearer, this._clientId, this._logger);
 
-        const targetList     = goodCategoriesFullListToCopyDataConverter(targetData).list;
-        const clientCopyData = goodCategoriesFullListToCopyDataConverter(clientData).list;
+        const targetGoods = withGoods
+                            ? await getGoodsSortByCategoriesRequestAction(this._bearer, this._clientId, targetData.map((category) => category.id), this._logger)
+                            : {};
+        const clientGoods = withGoods
+                            ? await getGoodsSortByCategoriesRequestAction(this._bearer, this._clientId, targetData.map((category) => category.id), this._logger)
+                            : {};
+
+        const targetList     = goodCategoriesFullListToCopyDataConverter(targetData, targetGoods).list;
+        const clientCopyData = goodCategoriesFullListToCopyDataConverter(clientData, clientGoods).list;
 
         const categoriesCompareComponent = new GoodCategoriesCompareComponent({
             clientId        : this._clientId,
@@ -100,7 +119,7 @@ export class GoodCategoriesCompareForm extends Component<HTMLDivElement> {
                             onclick    : () => {
                                 col.remove();
                                 this._logger.reset();
-                                this._renderCompareForm(targetClientId);
+                                this._renderCompareForm(targetClientId, withGoods);
                             },
                         });
 

@@ -1,3 +1,6 @@
+import { GoodData } from '@/action/goods/types/good.types.ts';
+
+
 export type GoodsCategoryCreateData = {
     title: string;
     pid?: string;
@@ -42,6 +45,7 @@ export type GoodsCategoryTreeFullData =
     GoodsCategoryFullData
     & {
         children: Array<GoodsCategoryTreeFullData>;
+        goods: Array<GoodData>;
     };
 
 export type GoodCategoriesMapper = Record<string, GoodsCategoryTreeFullData>;

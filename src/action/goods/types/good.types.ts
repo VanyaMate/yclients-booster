@@ -3,46 +3,30 @@ import {
 } from '@/action/goods/list/types/goods-category.types.ts';
 
 
-export type GoodUpdateData = {
-    title: string;
-    print_title: string;
-    article: number;
-    barcode: string;
-    category_id: number;
-    sale_unit_id: number;
-    unit_equals: number;
-    service_unit_id: number;
-    netto: number;
-    brutto: number;
-    cost: number;
-    actual_cost: number;
-    tax_variant: number;
-    vat_id: number;
-    critical_amount: number;
-    desired_amount: number;
-    comment: string;
-};
-
 export type GoodData = {
     id: string;
     title: string;
     print_title: string;
-    article: number;
+    article: string;
     barcode: string;
     category_id: number;
     sale_unit_id: number;
-    unit_equals: number;
+    unit_equals: string;
     service_unit_id: number;
-    netto: number;
-    brutto: number;
-    cost: number;
-    actual_cost: number;
+    netto: string;
+    brutto: string;
+    cost: string;
+    actual_cost: string;
     tax_variant: number;
     vat_id: number;
-    critical_amount: number;
-    desired_amount: number;
+    critical_amount: string;
+    desired_amount: string;
     comment: string;
 }
+
+export type GoodUpdateData = Omit<GoodData, 'id'>;
+
+export type GoodCreateData = Omit<GoodData, 'id'>;
 
 
 export type GoodsCopyData = {

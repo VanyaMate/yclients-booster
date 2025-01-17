@@ -2,6 +2,7 @@ import {
     GoodCategoriesMapper,
     GoodsCategoryFullData, GoodsCategoryTreeFullData,
 } from '@/action/goods/list/types/goods-category.types.ts';
+import { GoodData } from '@/action/goods/types/good.types.ts';
 
 
 export type GoodsCategoriesFullCopyData = {
@@ -9,7 +10,7 @@ export type GoodsCategoriesFullCopyData = {
     mapper: GoodCategoriesMapper;
 }
 
-export const goodCategoriesFullListToCopyDataConverter = function (list: Array<GoodsCategoryFullData>): GoodsCategoriesFullCopyData {
+export const goodCategoriesFullListToCopyDataConverter = function (list: Array<GoodsCategoryFullData>, goods: Record<string, Array<GoodData>>): GoodsCategoriesFullCopyData {
     const temporally: any                       = {}; // len' tipizirovat
     const response: GoodsCategoriesFullCopyData = {
         mapper: {},
@@ -23,6 +24,7 @@ export const goodCategoriesFullListToCopyDataConverter = function (list: Array<G
         temporally[item.id] = {
             ...item,
             children: temporally[item.id]?.children ?? [],
+            goods   : goods[item.id] ?? [],
         };
 
         if (item.parent?.id && item.parent.id !== '0') {
@@ -30,7 +32,10 @@ export const goodCategoriesFullListToCopyDataConverter = function (list: Array<G
             if (parent) {
                 parent.children.push(temporally[item.id]!);
             } else {
-                temporally[item.parent.id] = { children: [ temporally[item.id]! ] };
+                temporally[item.parent.id] = {
+                    children: [ temporally[item.id]! ],
+                    goods   : goods[item.id],
+                };
             }
         } else {
             response.mapper[item.id] = temporally[item.id]!;

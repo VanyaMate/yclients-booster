@@ -34,6 +34,10 @@ import {
 import {
     getGoodsCategoryRequestAction,
 } from '@/action/goods/list/request-actions/getGoodsCategory.request-action.ts';
+import {
+    GoodCompareComponent,
+} from '@/widget/goods/list/GoodCompareComponent/GoodCompareComponent.ts';
+import { GoodData } from '@/action/goods/types/good.types.ts';
 
 
 export type GoodCategoryCompareComponentProps =
@@ -56,6 +60,7 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
     private readonly _fetcher?: IFetcher;
     private _clientCategory?: GoodsCategoryTreeFullData;
     private _childrenGoodCategories: Array<GoodCategoryCompareComponent> = [];
+    private _childrenGoods: Array<GoodCompareComponent>                  = [];
 
     constructor (props: GoodCategoryCompareComponentProps) {
         const {
@@ -70,7 +75,7 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
         super(other);
         this._clientId         = clientId;
         this._bearer           = bearer;
-        this._targetCategory   = targetCategory;
+        this._targetCategory   = { ...targetCategory };
         this._clientCategories = clientCategories;
         this._logger           = logger;
         this._fetcher          = fetcher;
@@ -88,7 +93,12 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                 } else {
                     // action children
                     this._clientCategory.children = await new PromiseSplitter(1, 1).exec<GoodsCategoryTreeFullData>(
-                        this.getChildren().map((child) => ({
+                        this._getChildrenCategories().map((child) => ({
+                            chain: [ child.getAction(this._clientCategory!.id) ],
+                        })),
+                    );
+                    this._clientCategory.goods    = await new PromiseSplitter(1, 1).exec<GoodData>(
+                        this._getChildrenGoods().map((child) => ({
                             chain: [ child.getAction(this._clientCategory!.id) ],
                         })),
                     );
@@ -137,7 +147,12 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                     this._clientCategory.article  = this._targetCategory.article;
                     // action children
                     this._clientCategory.children = await new PromiseSplitter(1, 1).exec<GoodsCategoryTreeFullData>(
-                        this.getChildren().map((child) => ({
+                        this._getChildrenCategories().map((child) => ({
+                            chain: [ child.getAction(this._clientCategory!.id) ],
+                        })),
+                    );
+                    this._clientCategory.goods    = await new PromiseSplitter(1, 1).exec<GoodData>(
+                        this._getChildrenGoods().map((child) => ({
                             chain: [ child.getAction(this._clientCategory!.id) ],
                         })),
                     );
@@ -168,17 +183,23 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
 
                 if (!this._childrenIsValid()) {
                     const children = await new PromiseSplitter(1, 1).exec<GoodsCategoryTreeFullData>(
-                        this.getChildren().map((child) => ({
+                        this._getChildrenCategories().map((child) => ({
+                            chain: [ child.getAction(category.id) ],
+                        })),
+                    );
+
+                    const goods = await new PromiseSplitter(1, 1).exec<GoodData>(
+                        this._getChildrenGoods().map((child) => ({
                             chain: [ child.getAction(category.id) ],
                         })),
                     );
 
                     // return item
-                    return { ...category, children: children };
+                    return { ...category, children, goods };
                 }
 
                 // return item
-                return { ...category, children: [] };
+                return { ...category, children: [], goods: [] };
             }
 
             return null;
@@ -186,7 +207,18 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
     }
 
     public getChildren (): Array<ICompareEntity<any>> {
+        return [
+            ...this._getChildrenCategories(),
+            ...this._getChildrenGoods(),
+        ];
+    }
+
+    private _getChildrenCategories () {
         return this._childrenGoodCategories;
+    }
+
+    private _getChildrenGoods () {
+        return this._childrenGoods;
     }
 
     protected _render (): void {
@@ -262,6 +294,20 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                 ],
             }),
             new CompareBox({
+                title     : 'Товары',
+                level     : 3,
+                components: this._childrenGoods = this._targetCategory.goods.map((good) => (
+                    new GoodCompareComponent({
+                        clientId   : this._clientId,
+                        targetGood : good,
+                        clientGoods: this._clientCategory?.goods ?? [],
+                        parent     : this,
+                        logger     : this._logger,
+                        fetcher    : this._fetcher,
+                    })
+                )),
+            }),
+            new CompareBox({
                 title     : 'Категории товаров',
                 level     : 3,
                 components: this._childrenGoodCategories = this._targetCategory.children.map((childCategory) => (
@@ -299,7 +345,6 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
             },
             disable         : this._clientCategory?.isChainCategory,
             type            : GOOD_CATEGORY_HEADER_TYPE,
-            parent          : this,
         });
 
         this._beforeEndRender(this._clientCategory);
