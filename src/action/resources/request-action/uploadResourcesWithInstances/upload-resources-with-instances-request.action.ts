@@ -83,6 +83,13 @@ export const uploadResourcesWithInstancesRequestAction = async function (
                 return resources;
             }
 
+            const emptyMessage = dom.querySelector(`.page-table > .text-center > h3`);
+
+            if (emptyMessage) {
+                logger?.warning(`у клиента "${ clientId }" нет ресурсов или что-то пошло не так. причина: ${ emptyMessage.textContent!.trim() }`);
+                return [];
+            }
+
             logger?.error(`не получилось получить ресурсы клиента "${ clientId }"`);
             throw new Error('ошибка запроса');
         });
