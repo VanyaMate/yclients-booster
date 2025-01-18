@@ -50,6 +50,17 @@ import {
 } from '@/action/goods/list/types/goods-category.types.ts';
 
 
+export type SalaryCriteriaTitlesTree = {
+    title: string;
+    items: Array<SalaryCriteriaTitlesTree>;
+}
+
+export type SalaryCriteriaChildrenItem<Type> = {
+    component: ICompareEntity<Type>;
+    titlesTree: SalaryCriteriaTitlesTree;
+}
+
+
 export type SalaryCriteriaCompareComponentProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
@@ -71,7 +82,11 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
     private readonly _logger?: ILogger;
     private readonly _fetcher?: IFetcher;
     private _clientCriteria?: SalaryCriteriaFullData;
-    private _ruleCategories: Array<ICompareEntity<SettingsServiceCategoryDataWithChildren>> = [];
+    private _ruleCategories: Array<ICompareEntity<SettingsServiceCategoryDataWithChildren>>                            = [];
+    private _servicesCompareComponents: Array<SalaryCriteriaChildrenItem<SettingsServiceCategoryDataWithChildren>>     = [];
+    private _serviceItemsCompareComponents: Array<SalaryCriteriaChildrenItem<SettingsServiceCategoryDataWithChildren>> = [];
+    private _goodsCompareComponents: Array<SalaryCriteriaChildrenItem<GoodsCategoryTreeFullData>>                      = [];
+    private _goodItemsCompareComponents: Array<SalaryCriteriaChildrenItem<GoodsCategoryTreeFullData>>                  = [];
 
     constructor (props: SalaryCriteriaCompareComponentProps) {
         const {
@@ -199,8 +214,8 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                 level     : 2,
                 components: this._targetCriteria.rules?.map((rule, index) => {
                     // Categories
-                    const categories        = rule.context.services?.categories.map((ruleCategory) => (
-                        new SettingsServiceCategoryCompareComponent({
+                    const categories        = this._servicesCompareComponents = rule.context.services?.categories.map((ruleCategory) => ({
+                        component : new SettingsServiceCategoryCompareComponent({
                             targetCategory : this._targetCopyData.settingsCopyData.tree.find((category) => category.id.toString() === ruleCategory.categoryId.toString())!,
                             targetResources: this._targetCopyData.settingsCopyData.resources,
                             clientId       : this._clientId,
@@ -209,8 +224,12 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                             parent         : this,
                             logger         : this._logger,
                             fetcher        : this._fetcher,
-                        })
-                    )) ?? [];
+                        }),
+                        titlesTree: {
+                            title: '',
+                            items: [],
+                        },
+                    })) ?? [];
                     const concatenatedItems = rule.context.services?.items.reduce((acc, item) => {
                         if (acc[item.categoryId]) {
                             acc[item.categoryId].push(item.itemId.toString());
@@ -219,7 +238,7 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                         }
                         return acc;
                     }, {} as Record<string, Array<string>>) ?? {};
-                    const categoriesItems   = Object.entries(concatenatedItems)
+                    const categoriesItems   = this._serviceItemsCompareComponents = Object.entries(concatenatedItems)
                         .map(([ categoryId, itemsIds ]) => {
                             const category = this._targetCopyData.settingsCopyData.tree.find((category) => category.id.toString() === categoryId);
 
@@ -251,7 +270,7 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                         goodsItemsIds.push(item.itemId);
                     });
 
-                    const goods                  = rule.context.goods?.categories
+                    const goods                  = this._goodsCompareComponents = rule.context.goods?.categories
                         .map((ruleGoodCategory) => {
                             const category = this._targetCopyData.goodsCopyData.categories.list.find((category) => category.id.toString() === ruleGoodCategory.categoryId.toString());
 
@@ -288,7 +307,7 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                         return acc;
                     }, {} as Record<string, Array<string>>) ?? {};
 
-                    const goodsItems = Object.keys(concatenatedGoodsItems)
+                    const goodsItems = this._goodItemsCompareComponents = Object.keys(concatenatedGoodsItems)
                         .map((categoryId) => {
                             const category = this._targetCopyData.goodsCopyData.categories.list.find((category) => category.id.toString() === categoryId);
 
@@ -302,7 +321,7 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
 
                                 if (parentCategory) {
                                     return new GoodCategoryCompareComponent({
-                                        targetCategory  : getOnlyContextGoodCopyData(parentCategory, goodsCategoriesIds.concat(path), goodsItemsIds),
+                                        targetCategory  : getOnlyContextGoodCopyData(parentCategory, path, goodsItemsIds),
                                         clientCategories: this._clientCopyData.goodsCopyData.categories.list,
                                         bearer          : this._bearer,
                                         clientId        : this._clientId,

@@ -38,6 +38,9 @@ import {
     GoodCompareComponent,
 } from '@/widget/goods/list/GoodCompareComponent/GoodCompareComponent.ts';
 import { GoodData } from '@/action/goods/types/good.types.ts';
+import {
+    GoodDropdownActions,
+} from '@/widget/goods/list/GoodDropdownActions/GoodDropdownActions.ts';
 
 
 export type GoodCategoryCompareComponentProps =
@@ -288,6 +291,9 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                             new GoodCategoryDropdownActions({
                                 compareEntity    : this,
                                 withCurrentHeader: false,
+                            }),
+                            new GoodDropdownActions({
+                                compareEntity: this,
                             }),
                         ],
                     }),

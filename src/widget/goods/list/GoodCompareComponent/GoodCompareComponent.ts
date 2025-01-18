@@ -27,6 +27,7 @@ import { TaxMapper } from '@/mapper/TaxMapper.ts';
 import { Converter } from '@/converter/Converter.ts';
 import { VatMapper } from '@/mapper/VatMapper.ts';
 import { isUndefined } from '@vanyamate/types-kit';
+import { GOOD_HEADER_TYPE } from '@/widget/header-types.ts';
 
 
 export type GoodCompareComponentProps =
@@ -418,6 +419,7 @@ export class GoodCompareComponent extends CompareComponent<GoodData> {
             onRename        : (title) => {
                 this._targetGood.title = title;
             },
+            type            : GOOD_HEADER_TYPE,
         });
 
         this._beforeEndRender(this._clientGood);

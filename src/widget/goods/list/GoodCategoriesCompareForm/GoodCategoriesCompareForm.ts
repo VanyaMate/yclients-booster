@@ -27,6 +27,9 @@ import {
 import {
     CheckboxWithLabel,
 } from '@/shared/input/CheckboxWithLabel/CheckboxWithLabel.ts';
+import {
+    GoodDropdownActions,
+} from '@/widget/goods/list/GoodDropdownActions/GoodDropdownActions.ts';
 
 
 export type GoodCategoriesCompareFormProps =
@@ -94,16 +97,16 @@ export class GoodCategoriesCompareForm extends Component<HTMLDivElement> {
                             ? await getGoodsSortByCategoriesRequestAction(this._bearer, this._clientId, targetData.map((category) => category.id), this._logger)
                             : {};
 
-        const targetList     = goodCategoriesFullListToCopyDataConverter(targetData, targetGoods).list;
-        const clientCopyData = goodCategoriesFullListToCopyDataConverter(clientData, clientGoods).list;
+        const targetList     = goodCategoriesFullListToCopyDataConverter(targetData, targetGoods);
+        const clientCopyData = goodCategoriesFullListToCopyDataConverter(clientData, clientGoods);
 
         const categoriesCompareComponent = new GoodCategoriesCompareComponent({
             clientId        : this._clientId,
             bearer          : this._bearer,
             logger          : this._logger,
             fetcher         : new MemoFetch(),
-            targetCategories: targetList,
-            clientCategories: clientCopyData,
+            targetCategories: Object.values(targetList.mapper),
+            clientCategories: Object.values(clientCopyData.mapper),
         });
 
         const compareButton = new Button({
@@ -132,6 +135,7 @@ export class GoodCategoriesCompareForm extends Component<HTMLDivElement> {
         const actions = new Row({
             cols: [
                 new GoodCategoryDropdownActions({ compareEntity: categoriesCompareComponent }),
+                new GoodDropdownActions({ compareEntity: categoriesCompareComponent }),
             ],
         });
 

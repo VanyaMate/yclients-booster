@@ -5,3 +5,4 @@ export const RESOURCE_HEADER_TYPE          = 'resource-header-type';
 export const RESOURCE_INSTANCE_HEADER_TYPE = 'resource-instance-header-type';
 
 export const GOOD_CATEGORY_HEADER_TYPE = 'good-category-header-type';
+export const GOOD_HEADER_TYPE          = 'good-header-type';
