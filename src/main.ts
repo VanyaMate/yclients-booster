@@ -26,6 +26,10 @@ import {
     settingsServicePageHandler,
 } from '@/pages/settings/service';
 import { isResourcesPage, resourcesPageHandler } from '@/pages/resources';
+import {
+    groupLoyaltyAbonement,
+    isGroupLoyaltyAbonement,
+} from '@/pages/net/group_loyalty_abonement/groupLoyaltyAbonement.ts';
 
 
 // document.body.classList.add('booster-dark');
@@ -48,6 +52,8 @@ if (isGoodsPage(pathParts)) {
     settingsServicePageHandler(pathParts);
 } else if (isResourcesPage(pathParts)) {
     resourcesPageHandler(pathParts);
+} else if (isGroupLoyaltyAbonement(pathParts)) {
+    groupLoyaltyAbonement();
 }
 
 commonPageHandler();

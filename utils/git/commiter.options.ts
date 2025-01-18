@@ -21,6 +21,7 @@ export default {
         'Критерии ЗП',
         'Сеть (Сервисы-Миграции)',
         'Параметры ЗП',
+        'Типы абонементов',
     ],
     postfixes              : [ 'wip', 'temp' ],
     postfixesSeparator     : ', ',
