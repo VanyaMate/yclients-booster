@@ -1,0 +1,81 @@
+@keyframes rotate360 {
+    0% {
+        transform : rotate(0deg);
+    }
+    50% {
+        transform : rotate(180deg);
+    }
+    100% {
+        transform : rotate(360deg);
+    }
+}
+
+.container {
+    height          : 30px;
+    width           : 50px;
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    padding         : 0 var(--offset-small);
+    border-radius   : var(--offset-small);
+    border          : 1px solid transparent;;
+
+    &:after {
+        font-size : 10px;
+    }
+
+    &.none {
+        &:after {
+            content : '•';
+        }
+
+        color        : var(--text-color-invisible);
+        background   : var(--bg-second);
+        border-color : var(--border-color);
+    }
+
+    &.idle {
+        &:after {
+            content : 'idle';
+        }
+
+        color        : var(--text-color-invisible);
+        background   : var(--bg-second);
+        border-color : var(--border-color);
+    }
+
+    &.process {
+        &:after {
+            content       : '';
+            width         : 12px;
+            height        : 12px;
+            border-radius : 50%;
+            border-bottom : 1px solid var(--border-color);
+            animation     : rotate360 .5s infinite ease-in-out;
+        }
+
+        color        : var(--text-color-invisible);
+        background   : var(--bg-second);
+        border-color : var(--border-color);
+    }
+
+    &.success {
+        &:after {
+            content : 'suc';
+        }
+
+        color        : var(--on-success-color);
+        background   : var(--success-color);
+        border-color : var(--success-color);
+    }
+
+    &.error {
+        &:after {
+            content : 'err';
+        }
+
+        color        : var(--on-danger-color);
+        background   : var(--danger-color);
+        border-color : var(--danger-color);
+    }
+}

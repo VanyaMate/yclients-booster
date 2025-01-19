@@ -16,6 +16,14 @@ import {
     GroupLoyaltyAbonementTimeUnitType,
 } from '@/widget/net/group_loyalty_abonement/GroupLoyaltyAbonementMassAddForm/types/mass-add-form.types.ts';
 import { isNull } from '@vanyamate/types-kit';
+import {
+    CheckboxWithLabel,
+} from '@/shared/input/CheckboxWithLabel/CheckboxWithLabel.ts';
+import { Logger } from '@/entity/logger/Logger/Logger.ts';
+import { ProgressBar } from '@/shared/progress/ProgressBar/ProgressBar.ts';
+import {
+    GroupLoyaltyAbonementActionComponent,
+} from '@/widget/net/group_loyalty_abonement/GroupLayaltyAbonementActionComponent/GroupLoyaltyAbonementActionComponent.ts';
 
 
 export type GroupLoyaltyAbonementMassAddFormProps =
@@ -25,12 +33,16 @@ export type GroupLoyaltyAbonementMassAddFormProps =
     }
 
 export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> {
+    private readonly _clientId: string;
+    private readonly _logger: Logger           = new Logger({});
+    private readonly _progressBar: ProgressBar = new ProgressBar({ max: 0 });
     private _content: Col;
 
     constructor (props: GroupLoyaltyAbonementMassAddFormProps) {
         const { clientId, ...other } = props;
         super('div', other);
-        this._content = new Col({ rows: [] });
+        this._clientId = clientId;
+        this._content  = new Col({ rows: [ this._progressBar, this._logger ] });
         this._content.insert(this.element, 'afterbegin');
         this._renderInitialForm();
 
@@ -44,19 +56,63 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
     }
 
     private _renderInitialForm () {
-        const textarea = new TextArea({
+        const dataTextarea = new TextArea({
             placeholder: `Введите строку в формате`,
+        });
+
+        const noCreateSimilarRowsCheckbox = new CheckboxWithLabel({
+            label: 'Не создавать если с таким заголовком уже создано',
+        });
+
+        const autoSetClientIdsCheckbox = new CheckboxWithLabel({
+            label: 'Автоматически установить все филиалы',
         });
 
         const acceptButton = new Button({
             textContent: 'Проверить',
             onclick    : () => {
-                console.log(this._parseTextareaValue(textarea.getValue()));
+                noCreateSimilarRowsCheckbox.remove();
+                autoSetClientIdsCheckbox.remove();
+                dataTextarea.remove();
+                acceptButton.remove();
+
+                const noCreateSimilar  = noCreateSimilarRowsCheckbox.getState();
+                const autoSetClientIds = autoSetClientIdsCheckbox.getState();
+                const data             = dataTextarea.getValue();
+                const rows             = this._parseTextareaValue(data);
+
+                const clientIds = autoSetClientIds ? [] : null;
+
+                if (!isNull(clientIds)) {
+                    rows.forEach((row) => row.salonIds = clientIds);
+                }
+
+                if (noCreateSimilar) {
+                    // upload current
+                    const currentAbonements: Array<string> = [];
+                    return this._renderRowsForm(rows.filter((row) => !currentAbonements.includes(row.title)));
+                }
+
+                return this._renderRowsForm(rows);
             },
         });
 
-        this._content.add(textarea);
+        this._content.add(dataTextarea);
+        this._content.add(autoSetClientIdsCheckbox);
+        this._content.add(noCreateSimilarRowsCheckbox);
         this._content.add(acceptButton);
+    }
+
+    private _renderRowsForm (rows: Array<GroupLoyaltyAbonementAddItem>) {
+        rows.forEach((row) => {
+            this._content.add(
+                new GroupLoyaltyAbonementActionComponent({
+                    data    : row,
+                    clientId: this._clientId,
+                }),
+            );
+        });
+        this._content.add(new Button({ textContent: 'Добавить' }));
     }
 
     private _parseTextareaValue (value: string): Array<GroupLoyaltyAbonementAddItem> {
@@ -152,10 +208,17 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
                     time: null,
                 };
             case 'посещение':
-                return {
-                    type: GroupLoyaltyAbonementActivationType.VISIT,
-                    time: this._getTimeUnit(time),
-                };
+                if (time) {
+                    return {
+                        type: GroupLoyaltyAbonementActivationType.VISIT,
+                        time: this._getTimeUnit(time),
+                    };
+                } else {
+                    return {
+                        type: GroupLoyaltyAbonementActivationType.VISIT,
+                        time: null,
+                    };
+                }
             case 'дата':
                 return {
                     type: GroupLoyaltyAbonementActivationType.DATE,
