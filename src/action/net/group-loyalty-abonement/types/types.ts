@@ -1,12 +1,12 @@
-export interface GroupLoyaltyAbonementCreateData {
+export type GroupLoyaltyAbonementCreateData = {
     title: string;
     salon_group_id: number;
     cost: number;
-    salon_ids: any[];
+    salon_ids: Array<string>;
     period: number;
     period_unit_id: number;
     allow_freeze: boolean;
-    freeze_limit: number;
+    freeze_limit: number | null;
     freeze_limit_unit_id: number;
     is_booking_when_frozen_allowed: boolean;
     service_price_correction: boolean;
@@ -19,41 +19,34 @@ export interface GroupLoyaltyAbonementCreateData {
     online_sale_title: string;
     online_sale_description: string;
     online_sale_price: number;
-    online_image: any;
+    online_image: string | null;
     delete_online_image: boolean;
     auto_activation_time_in_days: number;
     autoactivation_time_unit_id: number;
     is_archived: boolean;
-    service_rows: ServiceRow[];
-    availability: Availability[];
+    service_rows: Array<GroupLoyaltyAbonementServiceRow>;
+    availability: Array<GroupLoyaltyAbonementAvailability>;
     autoactivation_period: number;
-    services: Services;
-    service_categories: ServiceCategories;
+    services: GroupLoyaltyAbonementServices;
+    service_categories: GroupLoyaltyAbonementServiceCategories;
 }
 
-export interface ServiceRow {
+export type GroupLoyaltyAbonementServiceRow = {
     key: number;
-    serviceId: number;
-    categoryId: number;
+    serviceId: string;
+    categoryId: string;
     count: number;
 }
 
-export interface Availability {
-    week_days: number[];
-    intervals: Interval[];
+export type GroupLoyaltyAbonementAvailability = {
+    week_days: Array<number>;
+    intervals: Array<GroupLoyaltyAbonementInterval>;
 }
 
-export interface Interval {
+export type GroupLoyaltyAbonementInterval = {
     from: number;
     to: number;
 }
 
-export interface Services {
-    '17055503': number;
-    '17055505': number;
-    '17055506': number;
-}
-
-export interface ServiceCategories {
-    '16588852': number;
-}
+export type GroupLoyaltyAbonementServices = Record<string, number>;
+export type GroupLoyaltyAbonementServiceCategories = Record<string, number>;

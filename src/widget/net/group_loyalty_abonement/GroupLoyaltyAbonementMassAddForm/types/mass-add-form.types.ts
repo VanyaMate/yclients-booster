@@ -5,10 +5,10 @@ export type GroupLoyaltyAbonementServiceAmount = {
 }
 
 export enum GroupLoyaltyAbonementTimeUnitType {
-    DAY   = '1',
-    WEEK  = '2',
-    MONTH = '3',
-    YEAR  = '4'
+    DAY   = 1,
+    WEEK  = 2,
+    MONTH = 3,
+    YEAR  = 4
 }
 
 export type GroupLoyaltyAbonementTimeUnit = {
@@ -23,9 +23,9 @@ export type GroupLoyaltyAbonementFreezing = {
 }
 
 export enum GroupLoyaltyAbonementActivationType {
-    PURCHASE,
-    VISIT,
-    DATE
+    VISIT    = 1,
+    PURCHASE = 2,
+    DATE     = 3
 }
 
 export type GroupLoyaltyAbonementActivation = {
@@ -34,10 +34,19 @@ export type GroupLoyaltyAbonementActivation = {
 }
 
 export enum GroupLoyaltyAbonementSalonChangeType {
-    NONE,
-    PURCHASE,
-    ALL
+    NONE     = 0,
+    PURCHASE = 1,
+    ALL      = 2
 }
+
+export type GroupLoyaltyAbonementOnline =
+    {
+        title: string;
+        price: number;
+        image: string;
+        description: string;
+    }
+    | null;
 
 export type GroupLoyaltyAbonementAddItem = {
     // Любой текст
@@ -61,7 +70,7 @@ export type GroupLoyaltyAbonementAddItem = {
     // да нет
     isNamedType: boolean;
     // да нет
-    online: boolean;
+    online: GroupLoyaltyAbonementOnline;
     // 1092329,557451
     salonIds: Array<string>;
     // нет гдепродан везде

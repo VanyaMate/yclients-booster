@@ -9,10 +9,10 @@ import {
 
 export type ActionComponentProps = ComponentPropsOptional<HTMLDivElement>;
 
-export abstract class ActionComponent extends Component<HTMLDivElement> implements IActionComponent<HTMLDivElement> {
+export abstract class ActionComponent<ResponseType, DataType extends any> extends Component<HTMLDivElement> implements IActionComponent<HTMLDivElement, ResponseType, DataType> {
     protected constructor (props: ActionComponentProps) {
         super('div', props);
     }
 
-    abstract getAction<ResponseType, DataType extends unknown> (): (data?: DataType) => Promise<ResponseType>;
+    abstract getAction (): (data?: DataType) => Promise<ResponseType>;
 }

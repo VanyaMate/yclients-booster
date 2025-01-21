@@ -6,4 +6,8 @@
     &.inline {
         display : inline-flex;
     }
+
+    &.alignItemsCenter {
+        align-items : center;
+    }
 }

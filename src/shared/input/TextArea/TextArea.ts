@@ -11,11 +11,12 @@ export type TextAreaProps =
     ComponentPropsOptional<HTMLTextAreaElement>
     & {
         onInput?: TextAreaInputHandler;
+        preferHeight?: number;
     };
 
 export class TextArea extends Component<HTMLTextAreaElement> {
     constructor (props: TextAreaProps) {
-        const { onInput, ...other } = props;
+        const { onInput, preferHeight, ...other } = props;
         super('textarea', other);
         this.element.classList.add(css.container);
 
@@ -23,6 +24,10 @@ export class TextArea extends Component<HTMLTextAreaElement> {
             this.element.addEventListener('input', (event) => {
                 onInput(((event.target) as HTMLTextAreaElement).value);
             });
+        }
+
+        if (preferHeight) {
+            this.element.style.height = `${ preferHeight }px`;
         }
     }
 
