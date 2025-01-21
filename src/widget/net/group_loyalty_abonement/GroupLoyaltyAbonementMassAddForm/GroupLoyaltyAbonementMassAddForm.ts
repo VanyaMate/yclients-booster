@@ -192,24 +192,38 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
                       salonChangeType,
                   ] = this._getCols(row);
 
+            try {
+                const visitAmountValue = this._getVisitNumber(visitAmount);
 
-            const visitAmountValue = this._getVisitNumber(visitAmount);
+                return {
+                    title                  : this._getTitle(title),
+                    price                  : this._getPrice(price),
+                    validityPeriod         : this._getValidityPeriod(validityPeriod),
+                    freezing               : this._getFreezing(freezing),
+                    activation             : this._getActivation(activation),
+                    visitAmount            : visitAmountValue,
+                    categories             : this._getCategories(categories, visitAmountValue),
+                    services               : this._getServices(services, visitAmountValue),
+                    recalculateAfterPayment: this._getRecalculateAfterPayment(recalculateAfterPayment),
+                    isNamedType            : this._getIsNamedType(isNamedType),
+                    online                 : this._getOnline(online, onlineTitle, onlinePrice, onlineDescription, onlineImage),
+                    salonIds               : this._getSalonIds(salonIds),
+                    salonChangeType        : this._getSalonChangeType(salonChangeType),
+                };
+            } catch (e: unknown) {
+                this._logger.error(`ошибка заполнения формы. ${ (e as Error).message }`);
 
-            return {
-                title                  : this._getTitle(title),
-                price                  : this._getPrice(price),
-                validityPeriod         : this._getValidityPeriod(validityPeriod),
-                freezing               : this._getFreezing(freezing),
-                activation             : this._getActivation(activation),
-                visitAmount            : visitAmountValue,
-                categories             : this._getCategories(categories, visitAmountValue),
-                services               : this._getServices(services, visitAmountValue),
-                recalculateAfterPayment: this._getRecalculateAfterPayment(recalculateAfterPayment),
-                isNamedType            : this._getIsNamedType(isNamedType),
-                online                 : this._getOnline(online, onlineTitle, onlinePrice, onlineDescription, onlineImage),
-                salonIds               : this._getSalonIds(salonIds),
-                salonChangeType        : this._getSalonChangeType(salonChangeType),
-            };
+                const button = new Button({
+                    textContent: 'Попробовать заново',
+                    onclick    : () => {
+                        button.remove();
+                        this._renderInitialForm();
+                    },
+                });
+
+                this._content.add(button);
+                throw e;
+            }
         });
     }
 
@@ -301,7 +315,7 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
 
     private _getCategories (value: string, visitNumber: number | null): Array<GroupLoyaltyAbonementServiceAmount> {
         const categories = value.split(',');
-        return categories.map((category) => {
+        return categories.filter(Boolean).map((category) => {
             const [ categoryId, amount ] = category.split('-');
 
             if (categoryId) {
@@ -331,7 +345,7 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
 
     private _getServices (value: string, visitNumber: number | null): Array<GroupLoyaltyAbonementServiceAmount> {
         const items = value.split(',');
-        return items.map((item) => {
+        return items.filter(Boolean).map((item) => {
             const [ categoryId, serviceId, amount ] = item.split('-');
 
             if (categoryId && serviceId) {
@@ -381,7 +395,7 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
     }
 
     private _getSalonIds (value: string): Array<string> {
-        return value.split(',');
+        return value.split(',').filter(Boolean);
     }
 
     private _getSalonChangeType (value: string): GroupLoyaltyAbonementSalonChangeType {
