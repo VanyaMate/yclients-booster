@@ -26,6 +26,7 @@ import {
 } from '@/widget/net/group_loyalty_abonement/GroupLayaltyAbonementActionComponent/GroupLoyaltyAbonementActionComponent.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 import {
+    PROMISE_SPLITTER_MAX_REQUESTS,
     PROMISE_SPLITTER_MAX_RETRY,
 } from '@/service/PromiseSplitter/const/const.ts';
 import {
@@ -145,7 +146,7 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
             textContent: 'Добавить',
             onclick    : () => {
                 createButton.setLoading(true);
-                new PromiseSplitter(1, PROMISE_SPLITTER_MAX_RETRY)
+                new PromiseSplitter(PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY)
                     .exec<void>(
                         actionComponents.map((component) => ({
                             chain    : [ component.getAction() ],
