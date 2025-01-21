@@ -228,7 +228,7 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
     }
 
     private _getRows (value: string): Array<string> {
-        return value.split(/\n/gi);
+        return value.split(/\n/gi).filter(Boolean);
     }
 
     private _getCols (value: string): Array<string> {
