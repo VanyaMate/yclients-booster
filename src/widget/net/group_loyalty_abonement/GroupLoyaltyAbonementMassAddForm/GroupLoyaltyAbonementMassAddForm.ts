@@ -46,7 +46,7 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
     private readonly _bearer: string;
     private readonly _logger: Logger           = new Logger({});
     private readonly _progressBar: ProgressBar = new ProgressBar({ max: 0 });
-    private _content: Col;
+    private readonly _content: Col;
 
     constructor (props: GroupLoyaltyAbonementMassAddFormProps) {
         const { clientId, bearer, ...other } = props;
@@ -56,14 +56,6 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
         this._content  = new Col({ rows: [ this._progressBar, this._logger ] });
         this._content.insert(this.element, 'afterbegin');
         this._renderInitialForm();
-
-        // add textarea
-        // add button
-
-        // add list of items
-        // add button
-
-        // show process
     }
 
     private _renderInitialForm () {

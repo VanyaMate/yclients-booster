@@ -30,6 +30,10 @@ import {
     groupLoyaltyAbonement,
     isGroupLoyaltyAbonement,
 } from '@/pages/net/group_loyalty_abonement/groupLoyaltyAbonement.ts';
+import {
+    groupLoyaltyCertificate,
+    isGroupLoyaltyCertificate,
+} from '@/pages/net/group_loyalty_certificate/groupLoyaltyCertificate.ts';
 
 
 // document.body.classList.add('booster-dark');
@@ -54,6 +58,8 @@ if (isGoodsPage(pathParts)) {
     resourcesPageHandler(pathParts);
 } else if (isGroupLoyaltyAbonement(pathParts)) {
     groupLoyaltyAbonement();
+} else if (isGroupLoyaltyCertificate(pathParts)) {
+    groupLoyaltyCertificate();
 }
 
 commonPageHandler();

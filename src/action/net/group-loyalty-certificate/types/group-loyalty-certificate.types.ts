@@ -21,11 +21,16 @@ export type GroupLoyaltyCertificateCreateData = {
     online_image: string | null;
     online_sale_description: string;
     online_sale_price: number;
-    files: null;
+    files: '';
     /**
      * Массив из салонов (id) - (объединить через ,)
      */
     salon_ids: string;
     save: number;
     partial_update: number;
+}
+
+export type GroupLoyaltyCertificateShortData = {
+    title: string;
+    id: string;
 }
