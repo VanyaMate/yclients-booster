@@ -22,6 +22,7 @@ export default {
         'Сеть (Сервисы-Миграции)',
         'Параметры ЗП',
         'Типы абонементов',
+        'Типы сертификатов',
     ],
     postfixes              : [ 'wip', 'temp' ],
     postfixesSeparator     : ', ',
