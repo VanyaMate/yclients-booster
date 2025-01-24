@@ -1,0 +1,15 @@
+.container {
+    .row {
+        > details {
+            > summary {
+                padding : 5px 5px 10px;
+            }
+
+            border : 1px solid var(--border-color);
+        }
+
+        > *:nth-child(2) {
+            padding : 5px;
+        }
+    }
+}
