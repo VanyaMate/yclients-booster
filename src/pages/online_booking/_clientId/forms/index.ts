@@ -1,4 +1,9 @@
 import { startHandler } from '@/shared/lib/startHandler.ts';
+import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
+import {
+    mutateDom, mutation, rule,
+    url,
+} from '@/widget/online_booking/lib/online-booking.lib.ts';
 
 
 export const isOnlineBookingForm = function (pathname: Array<string>): boolean {
@@ -27,6 +32,43 @@ export const onlineBookingFormPageHandler = function () {
                     link.setAttribute('data-link-once', 'true');
                 }
             },
+            () => {
+                const codeEditor = document.querySelector('.v-code-editor.online-booking-form-settings-injections-tab__code:not([data-button-injected="true"])');
+                if (codeEditor) {
+                    const editorContent = codeEditor.querySelector('.cm-content');
+                    if (editorContent) {
+                        const editorHasScripts    = hasInjectedScriptTags(editorContent.textContent ?? '');
+                        const injectScriptsButton = new Button({
+                            textContent: 'Добавить необходимые скрипты',
+                            onclick    : () => {
+                                navigator.clipboard.writeText(`<script>
+
+/* __INJECTED_YCLIENTS_BOOSTER__ */
+/* ______DO_NOT_DELETE_THIS_____ */
+var url = ${ url.toString() }
+var rule = ${ rule.toString() }
+var mutation = ${ mutation.toString() }
+var mutateDom = ${ mutateDom.toString() }
+/* _______WRITE_RULES_HERE______ */
+
+/* ______DO_NOT_DELETE_THIS_____ */
+
+</script>`);
+                            },
+                            disabled   : editorHasScripts,
+                            styleType  : editorHasScripts
+                                         ? ButtonStyleType.DEFAULT
+                                         : ButtonStyleType.PRIMARY,
+                        });
+                        injectScriptsButton.insert(codeEditor, 'beforebegin');
+                        codeEditor.setAttribute('data-button-injected', 'true');
+                    }
+                }
+            },
         ]);
     });
+};
+
+const hasInjectedScriptTags = function (value: string): boolean {
+    return !!value.match(/__INJECTED_YCLIENTS_BOOSTER__/);
 };
