@@ -1,23 +1,22 @@
-import { Component } from '@/shared/component/Component.ts';
+import { Component } from "@/shared/component/Component.ts";
 
+const END_OF_DAY = new Date().getHours() >= 21;
 
-const END_OF_DAY = new Date().getHours() >= 19;
-
-new Component<HTMLDivElement>('div', { id: 'app' }, [
-    new Component<HTMLStyleElement>('style', {
-        innerHTML: `
+new Component<HTMLDivElement>("div", { id: "app" }, [
+	new Component<HTMLStyleElement>("style", {
+		innerHTML: `
             * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
             }
-        
+
             body {
                 background: #f4f4ff;
                 width: fit-content;
                 height: fit-content;
             }
-            
+
             #app {
                 display: flex;
                 flex-direction: column;
@@ -27,35 +26,33 @@ new Component<HTMLDivElement>('div', { id: 'app' }, [
                 background: #fff;
                 border-radius: 20px;
             }
-        
+
             h1 {
                 font-family: Consolas, 'monospace';
                 text-align: center;
                 color: #111;
                 font-size: 1.7em;
             }
-            
+
             video {
                 border-radius: 10px;
             }
         `,
-    }),
-    new Component<HTMLHeadingElement>('h1', {
-        innerHTML: END_OF_DAY ? `Топ топ домой` : `Балдежный котик`,
-    }),
-    new Component<HTMLVideoElement>(
-        'video',
-        {
-            autoplay: true,
-            loop    : true,
-        },
-        [
-            new Component<HTMLSourceElement>('source', {
-                src : END_OF_DAY ? '/domoy.webm'
-                                 : '/sticker-2.webm',
-                type: 'video/webm',
-            }),
-        ],
-    ),
-])
-    .insert(document.body, 'beforeend');
+	}),
+	new Component<HTMLHeadingElement>("h1", {
+		innerHTML: END_OF_DAY ? `Топ топ домой` : `Балдежный котик`,
+	}),
+	new Component<HTMLVideoElement>(
+		"video",
+		{
+			autoplay: true,
+			loop: true,
+		},
+		[
+			new Component<HTMLSourceElement>("source", {
+				src: END_OF_DAY ? "/domoy.webm" : "/sticker-2.webm",
+				type: "video/webm",
+			}),
+		],
+	),
+]).insert(document.body, "beforeend");
