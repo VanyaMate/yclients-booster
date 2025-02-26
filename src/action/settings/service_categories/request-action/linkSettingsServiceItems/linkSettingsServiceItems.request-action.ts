@@ -16,7 +16,7 @@ export const linkSettingsServiceItemsRequestAction = async function (bearer: str
     })
         .then((response) => {
             if (response.ok) {
-                logger?.success(`ссылоки для "${ updateData.service_id }" для клиента "${ clientId }" созданы`);
+                logger?.success(`ссылки для "${ updateData.service_id }" для клиента "${ clientId }" созданы`);
                 return true;
             }
 
