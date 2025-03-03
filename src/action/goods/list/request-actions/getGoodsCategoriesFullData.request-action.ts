@@ -4,7 +4,7 @@ import {
 } from '@/action/goods/list/request-actions/getGoodsCategories.request-action.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 import {
-    PROMISE_SPLITTER_MAX_REQUESTS,
+    PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY,
 } from '@/service/PromiseSplitter/const/const.ts';
 import {
     getGoodsCategoryRequestAction,
@@ -18,7 +18,7 @@ export const getGoodsCategoriesFullDataRequestAction = async function (bearer: s
     logger?.log(`получение списка категорий товаров клиента "${ clientId }" с полной информацией`);
 
     const categoriesShotInfoList = await getGoodsCategoriesRequestAction(bearer, clientId, logger);
-    const categoriesFullInfoList = await new PromiseSplitter(PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_REQUESTS)
+    const categoriesFullInfoList = await new PromiseSplitter(PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY)
         .exec<GoodsCategoryFullData>(
             categoriesShotInfoList.map((shortInfo) => ({
                 chain: [
