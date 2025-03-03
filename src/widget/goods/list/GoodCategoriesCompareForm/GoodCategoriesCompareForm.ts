@@ -91,10 +91,10 @@ export class GoodCategoriesCompareForm extends Component<HTMLDivElement> {
         const clientData = await getGoodsCategoriesFullDataRequestAction(this._bearer, this._clientId, this._logger);
 
         const targetGoods = withGoods
-                            ? await getGoodsSortByCategoriesRequestAction(this._bearer, this._clientId, targetData.map((category) => category.id), this._logger)
+                            ? await getGoodsSortByCategoriesRequestAction(this._bearer, targetClientId, targetData.map((category) => category.id), this._logger)
                             : {};
         const clientGoods = withGoods
-                            ? await getGoodsSortByCategoriesRequestAction(this._bearer, this._clientId, targetData.map((category) => category.id), this._logger)
+                            ? await getGoodsSortByCategoriesRequestAction(this._bearer, this._clientId, clientData.map((category) => category.id), this._logger)
                             : {};
 
         const targetList     = goodCategoriesFullListToCopyDataConverter(targetData, targetGoods);

@@ -66,15 +66,6 @@ export const goodsPageHandler = function () {
                             }),
                         },
                     }),
-                    new ModalButton({
-                        textContent: 'Копировать категории с товарами',
-                        styleType  : ButtonStyleType.PRIMARY,
-                        modalProps : {
-                            label      : 'Копировать категории с товарами из',
-                            preferWidth: Modal.getPreferWidthByNesting(4),
-                            content    : new Col({ rows: [] }),
-                        },
-                    }),
                 ],
             }).insert(position, 'beforeend');
         }
