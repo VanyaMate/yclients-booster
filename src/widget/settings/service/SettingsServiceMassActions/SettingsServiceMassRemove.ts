@@ -63,6 +63,6 @@ export class SettingsServiceMassRemove extends Component<HTMLDivElement> {
     private async _renderList () {
         const categories = await getSettingsServiceCategoriesFullDataRequestAction(this._bearer, this._clientId, this._logger);
 
-        console.log('categories', categories);
+        console.log(categories);
     }
 }

@@ -11,10 +11,9 @@ import {
     SettingsServiceMassivePriceUpdate,
 } from '@/widget/settings/service/SettingsServiceMassivePriceUpdate/SettingsServiceMassivePriceUpdate.ts';
 import { Modal } from '@/shared/modal/Modal/Modal.ts';
-import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import {
-    SettingsServiceMassRemove,
-} from '@/widget/settings/service/SettingsServiceMassActions/SettingsServiceMassRemove.ts';
+    SettingsServiceOnlineTitleUpdateForm,
+} from '@/widget/settings/service/SettingsServiceOnlineTitleUpdateForm/SettingsServiceOnlineTitleUpdateForm.ts';
 
 
 export const isSettingsServicePage = function (pathname: Array<string>) {
@@ -53,17 +52,28 @@ export const settingsServicePageHandler = function (pathname: Array<string>) {
                         },
                     }),
                     new ModalButton({
-                        textContent: 'Массовое удаление',
-                        styleType  : ButtonStyleType.DANGER,
+                        textContent: 'Обновить чек и оз',
                         modalProps : {
-                            content    : new SettingsServiceMassRemove({
+                            content    : new SettingsServiceOnlineTitleUpdateForm({
                                 clientId,
                                 bearer,
                             }),
                             preferWidth: Modal.getPreferWidthByNesting(1),
-                            label      : 'Массовое удаление',
+                            label      : 'Изменить чек и оз',
                         },
                     }),
+                    /*                    new ModalButton({
+                     textContent: 'Массовое удаление',
+                     styleType  : ButtonStyleType.DANGER,
+                     modalProps : {
+                     content    : new SettingsServiceMassRemove({
+                     clientId,
+                     bearer,
+                     }),
+                     preferWidth: Modal.getPreferWidthByNesting(1),
+                     label      : 'Массовое удаление',
+                     },
+                     }),*/
                 ],
             })
                 .insert(container, 'afterbegin');
