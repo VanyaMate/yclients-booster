@@ -16,8 +16,11 @@ import {
 } from '@/widget/settings/service/SettingsServiceOnlineTitleUpdateForm/SettingsServiceOnlineTitleUpdateForm.ts';
 import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import {
-    SettingsServiceMassRemove
+    SettingsServiceMassRemove,
 } from '@/widget/settings/service/SettingsServiceMassActions/SettingsServiceMassRemove.ts';
+import {
+    SettingsServiceGetIdsForm,
+} from '@/widget/settings/service/SettingsServiceGetIdsForm/SettingsServiceGetIdsForm.ts';
 
 
 export const isSettingsServicePage = function (pathname: Array<string>) {
@@ -64,6 +67,17 @@ export const settingsServicePageHandler = function (pathname: Array<string>) {
                             }),
                             preferWidth: Modal.getPreferWidthByNesting(1),
                             label      : 'Изменить чек и оз',
+                        },
+                    }),
+                    new ModalButton({
+                        textContent: 'Узнать ID',
+                        modalProps : {
+                            content    : new SettingsServiceGetIdsForm({
+                                clientId,
+                                bearer,
+                            }),
+                            preferWidth: Modal.getPreferWidthByNesting(1),
+                            label      : 'Узнать ID',
                         },
                     }),
                     new ModalButton({
