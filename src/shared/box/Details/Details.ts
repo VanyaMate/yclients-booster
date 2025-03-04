@@ -18,15 +18,19 @@ export type DetailsProps =
         details: IComponent<HTMLElement>,
         type?: DetailsType,
         fullHide?: boolean;
+        padding?: number;
     };
 
 export class Details extends Component<HTMLDetailsElement> {
     constructor (props: DetailsProps) {
-        const { header, details, type, fullHide = false, ...other } = props;
+        const {
+                  header, details, type, fullHide = false, padding = 0, ...other
+              } = props;
         super('details', other, [
             new Component<HTMLDetailsElement>('summary', {}, [ header ]),
         ]);
 
+        this.element.style.padding = `${ padding }px`;
         this.element.classList.add(css.container);
 
         if (type === DetailsType.SECOND) {

@@ -20,6 +20,7 @@ import {
 } from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
 import { LabelDivider } from '@/shared/divider/LabelDivider/LabelDivider.ts';
 import { ProgressBar } from '@/shared/progress/ProgressBar/ProgressBar.ts';
+import css from './SettingsServiceOnlineTitleUpdateForm.module.css';
 
 
 export type SettingsServiceOnlineTitleUpdateFormProps =
@@ -52,6 +53,7 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
         this._logger   = new Logger({});
         this._content  = new Col({ rows: [ this._logger ] });
         this._content.insert(this.element, 'afterbegin');
+        this.element.classList.add(css.container);
 
         this._renderForm();
     }
@@ -59,6 +61,7 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
     private _renderForm () {
         const form = new TextArea({
             placeholder: 'Формат Id/Название в чеке/Название для ОЗ',
+            className  : css.textarea,
         });
 
         const compareButton = new Button({
@@ -145,7 +148,9 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
     }
 
     private _renderProcess (services: Array<ServiceOnlineTitleUpdateItem>) {
-        const progressBar = new ProgressBar({ max: services.length });
+        const progressBar   = new ProgressBar({ max: services.length });
+        let success: number = 0;
+        let error: number   = 0;
 
         const actionComponents = services.map((service) => {
             return new SettingsServiceOnlineTitleUpdateAction({
@@ -167,7 +172,13 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
                 new PromiseSplitter(1, 1)
                     .exec(
                         actionComponents.map((component) => ({
-                            chain: [ component.getAction() ],
+                            chain    : [ component.getAction() ],
+                            onSuccess: () => {
+                                progressBar.setLeftProgress(++success);
+                            },
+                            onError  : () => {
+                                progressBar.setRightProgress(++error);
+                            },
                         })),
                     )
                     .then(() => {

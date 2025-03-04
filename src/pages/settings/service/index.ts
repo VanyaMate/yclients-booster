@@ -14,6 +14,10 @@ import { Modal } from '@/shared/modal/Modal/Modal.ts';
 import {
     SettingsServiceOnlineTitleUpdateForm,
 } from '@/widget/settings/service/SettingsServiceOnlineTitleUpdateForm/SettingsServiceOnlineTitleUpdateForm.ts';
+import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
+import {
+    SettingsServiceMassRemove
+} from '@/widget/settings/service/SettingsServiceMassActions/SettingsServiceMassRemove.ts';
 
 
 export const isSettingsServicePage = function (pathname: Array<string>) {
@@ -62,18 +66,18 @@ export const settingsServicePageHandler = function (pathname: Array<string>) {
                             label      : 'Изменить чек и оз',
                         },
                     }),
-                    /*                    new ModalButton({
-                     textContent: 'Массовое удаление',
-                     styleType  : ButtonStyleType.DANGER,
-                     modalProps : {
-                     content    : new SettingsServiceMassRemove({
-                     clientId,
-                     bearer,
-                     }),
-                     preferWidth: Modal.getPreferWidthByNesting(1),
-                     label      : 'Массовое удаление',
-                     },
-                     }),*/
+                    new ModalButton({
+                        textContent: 'Массовое удаление',
+                        styleType  : ButtonStyleType.DANGER,
+                        modalProps : {
+                            content    : new SettingsServiceMassRemove({
+                                clientId,
+                                bearer,
+                            }),
+                            preferWidth: Modal.getPreferWidthByNesting(1),
+                            label      : 'Массовое удаление',
+                        },
+                    }),
                 ],
             })
                 .insert(container, 'afterbegin');

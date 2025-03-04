@@ -12,7 +12,7 @@ export const removeSettingsServiceCategoryRequestAction = async function (bearer
     })
         .then((response) => {
             if (response.ok) {
-                logger?.success(`категория "${ categoryId }" клиента "${ clientId }" удален`);
+                logger?.success(`категория "${ categoryId }" клиента "${ clientId }" удалена`);
                 return;
             }
 
