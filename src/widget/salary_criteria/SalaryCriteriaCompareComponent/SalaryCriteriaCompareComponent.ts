@@ -82,7 +82,8 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
     private readonly _logger?: ILogger;
     private readonly _fetcher?: IFetcher;
     private _clientCriteria?: SalaryCriteriaFullData;
-    private _ruleCategories: Array<ICompareEntity<SettingsServiceCategoryDataWithChildren>>                            = [];
+    private _ruleCategories: Array<ICompareEntity<SettingsServiceCategoryDataWithChildren>> = [];
+    private _ruleGoods: Array<ICompareEntity<GoodsCategoryTreeFullData>>                    = [];
     //private _servicesCompareComponents: Array<SalaryCriteriaChildrenItem<SettingsServiceCategoryDataWithChildren>>     = [];
     //private _serviceItemsCompareComponents: Array<SalaryCriteriaChildrenItem<SettingsServiceCategoryDataWithChildren>> = [];
     //private _goodsCompareComponents: Array<SalaryCriteriaChildrenItem<GoodsCategoryTreeFullData>>                      = [];
@@ -113,8 +114,8 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
         this._render();
     }
 
-    public getChildren (): Array<ICompareEntity<SettingsServiceCategoryDataWithChildren>> {
-        return this._ruleCategories;
+    public getChildren (): Array<ICompareEntity<SettingsServiceCategoryDataWithChildren | GoodsCategoryTreeFullData>> {
+        return [ ...this._ruleCategories, ...this._ruleGoods ];
     }
 
     protected async _action (): Promise<SalaryCriteriaFullData | null> {
@@ -355,7 +356,11 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                         components: goodsItems,
                     });
 
-                    this._ruleCategories = this._ruleCategories.concat(categories);
+                    this._ruleCategories.push(...categories);
+                    this._ruleCategories.push(...categoriesItems);
+                    this._ruleGoods.push(...goods);
+                    this._ruleGoods.push(...goodsItems);
+
                     this._compareChildren.push(childrenCategories);
                     this._compareChildren.push(childrenCategoriesItems);
                     this._compareChildren.push(goodsCategories);
