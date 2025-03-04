@@ -14,18 +14,25 @@ export type TableProps =
 export class Table extends Component<HTMLTableElement> {
     private _thead: HTMLElement;
     private _tbody: HTMLElement;
+    private _empty: HTMLElement | null;
 
     constructor (props: TableProps) {
         const { header, ...other } = props;
         super('table', other);
-        this.element.innerHTML = `<thead></thead><tbody></tbody>`;
+        this.element.innerHTML = `<thead></thead><tbody><tr class="${ css.empty }"><td colspan="${ header.length }">Ничего не добавлено</td></tr></tbody>`;
         this.element.classList.add(css.container);
         this._thead = this.element.querySelector('thead')!;
         this._tbody = this.element.querySelector('tbody')!;
+        this._empty = this.element.querySelector(`.${ css.empty }`)!;
         this.setHeader(header);
     }
 
     addRow (items: Array<string>) {
+        if (this._empty) {
+            this._empty.remove();
+            this._empty = null;
+        }
+
         this._tbody.insertAdjacentHTML('beforeend', `
             <tr>
                 ${ items.map((item) => `<td>${ item }</td>`).join('') }

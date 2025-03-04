@@ -11,6 +11,15 @@ import {
     SettingsServiceOnlineTitleUpdateAction,
 } from '@/widget/settings/service/SettingsServiceOnlineTitleUpdateAction/SettingsServiceOnlineTitleUpdateAction.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
+import {
+    getSettingsServicesRequestAction,
+} from '@/action/settings/service_categories/request-action/getSettingsServices/getSettingsServices.request-action.ts';
+import { isNull, isUndefined } from '@vanyamate/types-kit';
+import {
+    SettingsServiceData,
+} from '@/action/settings/service_categories/types/settings-service_categories.types.ts';
+import { LabelDivider } from '@/shared/divider/LabelDivider/LabelDivider.ts';
+import { ProgressBar } from '@/shared/progress/ProgressBar/ProgressBar.ts';
 
 
 export type SettingsServiceOnlineTitleUpdateFormProps =
@@ -23,9 +32,10 @@ export type SettingsServiceOnlineTitleUpdateFormProps =
 export type ServiceOnlineTitleUpdateItem = {
     id: string;
     onlineTitleBefore: string | null;
-    onlineTitleAfter: string;
+    onlineTitleAfter?: string;
     checkTitleBefore: string | null;
-    checkTitleAfter: string;
+    checkTitleAfter?: string;
+    data: SettingsServiceData | null;
 }
 
 export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivElement> {
@@ -76,18 +86,26 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
     private _renderCompare (compareData: Array<ServiceOnlineTitleUpdateItem>) {
         const validItems: Array<ServiceOnlineTitleUpdateItem> = [];
 
+        const nonValidTitle = new LabelDivider({
+            textContent: 'Невалидные данные',
+        });
         const nonValidTable = new Table({
-            header: [ 'id' ],
+            header: [ 'id', 'Чек', 'ОЗ' ],
         });
 
+        const validTitle = new LabelDivider({
+            textContent: 'Валидные данные',
+        });
         const validTable = new Table({
-            header: [ 'id', 'Чек (До)', 'Чек (После)', 'ОЗ (До)', 'Оз (После)' ],
+            header: [ 'id', 'Чек (До)', 'Чек (После)', 'ОЗ (До)', `ОЗ (После)` ],
         });
 
         const startProcessButton = new Button({
             textContent: 'Преобразовать',
             onclick    : () => {
+                nonValidTitle.remove();
                 nonValidTable.remove();
+                validTitle.remove();
                 validTable.remove();
                 startProcessButton.remove();
                 this._renderProcess(validItems);
@@ -95,9 +113,17 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
         });
 
         compareData.forEach((data) => {
-            if (data.onlineTitleBefore === null || data.checkTitleBefore === null) {
+            if (
+                isNull(data.onlineTitleBefore) ||
+                isNull(data.checkTitleBefore) ||
+                isUndefined(data.checkTitleAfter) ||
+                isUndefined(data.onlineTitleAfter) ||
+                isNull(data.data)
+            ) {
                 nonValidTable.addRow([
                     data.id,
+                    `${ data.checkTitleAfter }`,
+                    `${ data.onlineTitleAfter }`,
                 ]);
             } else {
                 validItems.push(data);
@@ -111,20 +137,26 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
             }
         });
 
+        this._content.add(nonValidTitle);
         this._content.add(nonValidTable);
+        this._content.add(validTitle);
         this._content.add(validTable);
         this._content.add(startProcessButton);
     }
 
-    private _renderProcess (input: Array<ServiceOnlineTitleUpdateItem>) {
-        // Зарендерить список со всеми услугами
-        const actionComponents = input.map((item) => {
+    private _renderProcess (services: Array<ServiceOnlineTitleUpdateItem>) {
+        const progressBar = new ProgressBar({ max: services.length });
+
+        const actionComponents = services.map((service) => {
             return new SettingsServiceOnlineTitleUpdateAction({
-                clientId  : this._clientId,
-                bearer    : this._bearer,
-                updateData: item,
+                clientId   : this._clientId,
+                bearer     : this._bearer,
+                serviceData: service.data!,
+                logger     : this._logger,
             });
         });
+
+        this._content.add(progressBar);
 
         actionComponents.forEach((component) => this._content.add(component));
 
@@ -132,7 +164,7 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
             textContent: 'Преобразовать',
             onclick    : () => {
                 button.setLoading(true);
-                new PromiseSplitter(5, 1)
+                new PromiseSplitter(1, 1)
                     .exec(
                         actionComponents.map((component) => ({
                             chain: [ component.getAction() ],
@@ -140,7 +172,17 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
                     )
                     .then(() => {
                         button.setLoading(false);
-                        button.element.textContent = 'end';
+                        button.element.disabled    = true;
+                        button.element.textContent = 'Завершено';
+                        button.element.onclick     = () => {
+                        };
+                    })
+                    .catch(() => {
+                        button.setLoading(false);
+                        button.element.disabled    = true;
+                        button.element.textContent = 'Произошла ошибка';
+                        button.element.onclick     = () => {
+                        };
                     });
             },
         });
@@ -150,11 +192,20 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
 
     private async _fillFormInput (services: Array<ServiceOnlineTitleUpdateItem>): Promise<Array<ServiceOnlineTitleUpdateItem>> {
         // Получить все услуги и заполнить информацию
+        const allClientServices = await getSettingsServicesRequestAction(this._bearer, this._clientId, this._logger);
 
-        services.forEach((val) => {
-            val.onlineTitleBefore = val.onlineTitleAfter;
-            val.checkTitleBefore  = val.checkTitleAfter;
-        });
+        for (let i = 0, clientService: SettingsServiceData | undefined = undefined, service: ServiceOnlineTitleUpdateItem | undefined = undefined; i < services.length; i++) {
+            service       = services[i];
+            clientService = allClientServices.data.find((clientService) => clientService.id.toString() === service.id);
+            if (clientService) {
+                service.checkTitleBefore   = clientService.print_title;
+                service.onlineTitleBefore  = clientService.booking_title;
+                service.data               = clientService;
+                service.data.booking_title = service.onlineTitleAfter!;
+                service.data.print_title   = service.checkTitleAfter!;
+            }
+        }
+
         return services;
     }
 
@@ -168,6 +219,7 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
                 onlineTitleAfter : onlineTitle,
                 checkTitleBefore : null,
                 onlineTitleBefore: null,
+                data             : null,
             };
         });
     }
