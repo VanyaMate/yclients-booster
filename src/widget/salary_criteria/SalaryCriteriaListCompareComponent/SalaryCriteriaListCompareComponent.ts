@@ -28,6 +28,7 @@ import {
     ResourceInstanceDropdownActions,
 } from '@/widget/resources/ResourceInstanceDropdownActions/ResourceInstanceDropdownActions.ts';
 import { Row } from '@/shared/box/Row/Row.ts';
+import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 
 
 export type SalaryCriteriaListCompareComponentProps =
@@ -62,6 +63,13 @@ export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<S
 
     public getChildren (): Array<ICompareEntity<SalaryCriteriaFullData>> {
         return this._criteriaComponent;
+    }
+
+    public getAction (): () => Promise<Array<SalaryCriteriaFullData> | null> {
+        return () => {
+            const splitter = new PromiseSplitter(5, 1);
+            return splitter.exec(this.getChildren().map((child) => ({ chain: [ child.getAction() ] })));
+        };
     }
 
     protected async _action (): Promise<SalaryCriteriaFullData[] | null> {

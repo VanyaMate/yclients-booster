@@ -48,6 +48,7 @@ import {
 import {
     GoodsCategoryTreeFullData,
 } from '@/action/goods/list/types/goods-category.types.ts';
+import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 
 
 export type SalaryCriteriaTitlesTree = {
@@ -82,8 +83,10 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
     private readonly _logger?: ILogger;
     private readonly _fetcher?: IFetcher;
     private _clientCriteria?: SalaryCriteriaFullData;
-    private _ruleCategories: Array<ICompareEntity<SettingsServiceCategoryDataWithChildren>> = [];
-    private _ruleGoods: Array<ICompareEntity<GoodsCategoryTreeFullData>>                    = [];
+    private _ruleCategories: Array<ICompareEntity<SettingsServiceCategoryDataWithChildren>>     = [];
+    private _ruleCategoriesPart: Array<ICompareEntity<SettingsServiceCategoryDataWithChildren>> = [];
+    private _ruleGoods: Array<ICompareEntity<GoodsCategoryTreeFullData>>                        = [];
+    private _ruleGoodsPart: Array<ICompareEntity<GoodsCategoryTreeFullData>>                    = [];
     //private _servicesCompareComponents: Array<SalaryCriteriaChildrenItem<SettingsServiceCategoryDataWithChildren>>     = [];
     //private _serviceItemsCompareComponents: Array<SalaryCriteriaChildrenItem<SettingsServiceCategoryDataWithChildren>> = [];
     //private _goodsCompareComponents: Array<SalaryCriteriaChildrenItem<GoodsCategoryTreeFullData>>                      = [];
@@ -115,7 +118,12 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
     }
 
     public getChildren (): Array<ICompareEntity<SettingsServiceCategoryDataWithChildren | GoodsCategoryTreeFullData>> {
-        return [ ...this._ruleCategories, ...this._ruleGoods ];
+        return [
+            ...this._ruleCategories,
+            ...this._ruleCategoriesPart,
+            ...this._ruleGoods,
+            ...this._ruleGoodsPart,
+        ];
     }
 
     protected async _action (): Promise<SalaryCriteriaFullData | null> {
@@ -123,6 +131,18 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
             if (this._itemIsValid()) {
                 if (this._childrenIsValid()) {
                     // return item
+                    const splitter       = new PromiseSplitter(5, 1);
+                    const categories     = await splitter.exec(this._ruleCategories.map((component) => ({ chain: [ component.getAction() ] })));
+                    const categoriesPart = await splitter.exec(this._ruleCategoriesPart.map((component) => ({ chain: [ component.getAction() ] })));
+                    const goods          = await splitter.exec(this._ruleGoods.map((component) => ({ chain: [ component.getAction() ] })));
+                    const goodsPart      = await splitter.exec(this._ruleGoodsPart.map((component) => ({ chain: [ component.getAction() ] })));
+
+                    console.log('Categories', categories);
+                    console.log('CategoriesPart', categoriesPart);
+                    console.log('Goods', goods);
+                    console.log('GoodsPart', goodsPart);
+                    console.log('Criteria', this._clientCriteria);
+
                     return this._clientCriteria;
                 } else {
                     // action children
@@ -158,6 +178,8 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
 
     protected _render (): void {
         this._beforeRender();
+
+        console.log('this._targetCriteria', this._targetCriteria);
 
         this._compareChildren = [];
         this._ruleCategories  = [];
@@ -214,6 +236,8 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                 title     : 'Условия',
                 level     : 2,
                 components: this._targetCriteria.rules?.map((rule, index) => {
+                    console.log('Rule', rule);
+
                     // Categories
                     const categories        = rule.context.services?.categories.map((ruleCategory) => (
                         new SettingsServiceCategoryCompareComponent({
@@ -235,7 +259,10 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                         }
                         return acc;
                     }, {} as Record<string, Array<string>>) ?? {};
-                    const categoriesItems   = Object.entries(concatenatedItems)
+
+                    console.log('concatenatedItems', concatenatedItems);
+
+                    const categoriesItems = Object.entries(concatenatedItems)
                         .map(([ categoryId, itemsIds ]) => {
                             const category = this._targetCopyData.settingsCopyData.tree.find((category) => category.id.toString() === categoryId);
 
@@ -266,6 +293,9 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                         goodsItemsIds.push(item.categoryId);
                         goodsItemsIds.push(item.itemId);
                     });
+
+                    console.log('goodsCategoriesIds', goodsCategoriesIds);
+                    console.log('goodsItemsIds', goodsItemsIds);
 
                     const goods                  = rule.context.goods?.categories
                         .map((ruleGoodCategory) => {
@@ -303,6 +333,8 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                         }
                         return acc;
                     }, {} as Record<string, Array<string>>) ?? {};
+
+                    console.log('concatenatedGoodsItems', concatenatedGoodsItems);
 
                     const goodsItems = Object.keys(concatenatedGoodsItems)
                         .map((categoryId) => {
@@ -357,9 +389,9 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                     });
 
                     this._ruleCategories.push(...categories);
-                    this._ruleCategories.push(...categoriesItems);
+                    this._ruleCategoriesPart.push(...categoriesItems);
                     this._ruleGoods.push(...goods);
-                    this._ruleGoods.push(...goodsItems);
+                    this._ruleGoodsPart.push(...goodsItems);
 
                     this._compareChildren.push(childrenCategories);
                     this._compareChildren.push(childrenCategoriesItems);

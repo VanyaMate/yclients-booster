@@ -31,6 +31,7 @@ export class PromiseSplitter {
                 reject(new Error(ERROR_PROMISE_SPLITTER_IS_ACTIVE));
             }
 
+            this._response         = [];
             this._chains           = chains;
             this._finishedChains   = 0;
             this._chainsIsActive   = true;

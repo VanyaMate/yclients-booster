@@ -46,6 +46,9 @@ export type SalaryCriteriaFullData = {
     rules: Array<SalaryCriteriaRuleData>;
 }
 
+export type SalaryCriteriaCreateData = Omit<SalaryCriteriaFullData, 'id'>
+export type SalaryCriteriaUpdateData = SalaryCriteriaFullData;
+
 export type SalaryCriteriaList = Array<SalaryCriteriaFullData>;
 
 export type SalaryCriteriaListDataForCopy = {
