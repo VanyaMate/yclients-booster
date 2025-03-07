@@ -55,10 +55,16 @@ const insertText = function (text, position) {
 
 const url = function () {
 	const hasList = [];
+	const orList = [];
 	let isNot = false;
 
 	const has = function (value) {
 		hasList.push(value);
+		return methods;
+	};
+
+	const or = function (value) {
+		orList.push(value);
 		return methods;
 	};
 
@@ -68,12 +74,18 @@ const url = function () {
 	};
 
 	const get = function () {
-		const condition = hasList.every((has) => !!location.href.match(has));
+		const hasCondition = hasList.length
+			? hasList.every((has) => !!location.href.match(has))
+			: true;
+		const orCondition = orList.length
+			? orList.some((or) => !!location.href.match(or))
+			: true;
+		const condition = hasCondition && orCondition;
 
 		return isNot ? !condition : condition;
 	};
 
-	const methods = { has, not, get };
+	const methods = { has, not, or, get };
 	return methods;
 };
 
