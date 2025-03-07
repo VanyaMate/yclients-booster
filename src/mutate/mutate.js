@@ -29,6 +29,30 @@ const replaceText = function (from, to) {
 	};
 };
 
+const setAttribute = function (attributeName, to) {
+	return (element) => {
+		element.setAttribute(attributeName, to);
+	};
+};
+
+const insertElement = function (element, position) {
+	return (parentElement) => {
+		parentElement.insertAdjacentElement(position, element);
+	};
+};
+
+const insertHTML = function (html, position) {
+	return (parentElement) => {
+		parentElement.insertAdjacentHTML(position, html);
+	};
+};
+
+const insertText = function (text, position) {
+	return (parentElement) => {
+		parentElement.insertAdjacentText(position, text);
+	};
+};
+
 const url = function () {
 	const hasList = [];
 	let isNot = false;
@@ -58,7 +82,6 @@ const mutate = function (rootElement) {
 	const actions = [];
 
 	const onMutate = function () {
-		console.log("OnMutate");
 		actions.forEach((config) => {
 			if (config.when.every((condition) => condition.get())) {
 				const inElements = config.in
@@ -91,16 +114,9 @@ const mutate = function (rootElement) {
 	return methods;
 };
 
-mutate()
-	.action({
-		when: [url().has("dev/ui")],
-		in: ["#__nuxt"],
-		for: ["*"],
-		actions: [replaceText("404", "505")],
-	})
-	.action({
-		when: [url().has("dev/ui").not()],
-		in: [".content"],
-		for: [".rainbow.title"],
-		actions: [hide()],
-	});
+mutate().action({
+	when: [url().has("dev/ui")],
+	in: [".error"],
+	for: ["*"],
+	actions: [replaceText("404", "505")],
+});
