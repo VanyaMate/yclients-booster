@@ -56,10 +56,10 @@ export class SettingsServiceGetIdsForm extends Component<HTMLDivElement> {
 
     private _renderTable (category: SettingsServiceCategoryDataWithChildren) {
         const label         = new LabelDivider({ textContent: category.title });
-        const categoryTable = new Table({ header: [ 'Id', 'Заголовок' ] });
+        const categoryTable = new Table({ header: [ 'Id', 'Заголовок категории' ] });
         categoryTable.addRow([ category.id.toString(), category.title ]);
 
-        const serviceTable = new Table({ header: [ 'Id', 'Заголовок' ] });
+        const serviceTable = new Table({ header: [ 'Id', 'Заголовок услуги' ] });
         category.children.forEach((service) => serviceTable.addRow([ service.id.toString(), service.title ]));
 
         this._content.add(label);
