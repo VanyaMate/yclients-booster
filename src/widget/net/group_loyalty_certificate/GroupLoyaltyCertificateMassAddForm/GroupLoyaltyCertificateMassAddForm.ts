@@ -33,6 +33,7 @@ import {
 import {
     GroupLoyaltyCertificateActionComponent,
 } from '@/widget/net/group_loyalty_certificate/GroupLoyaltyCertificateActionComponent/GroupLoyaltyCertificateActionComponent.ts';
+import { delay } from '@/helper/lib/delay/delay';
 
 
 export type GroupLoyaltyCertificateMassAddFormProps =
@@ -134,25 +135,50 @@ export class GroupLoyaltyCertificateMassAddForm extends Component<HTMLDivElement
 
         const createButton = new Button({
             textContent: 'Добавить',
-            onclick    : () => {
-                createButton.setLoading(true);
-                new PromiseSplitter(PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY)
-                    .exec<void>(
-                        actionComponents.map((component) => ({
-                            chain    : [ component.getAction() ],
-                            onSuccess: () => {
-                                this._progressBar.setLeftProgress(++successAmount);
-                            },
-                            onError  : () => {
-                                this._progressBar.setRightProgress(++errorAmount);
-                            },
-                        })),
-                    )
-                    .finally(() => {
-                        createButton.setLoading(false);
-                        createButton.element.disabled    = true;
-                        createButton.element.textContent = 'Закончено';
-                    });
+            onclick    : async () => {
+			        if (actionComponents.length > 0) {
+								const promiseSplitter = new PromiseSplitter(
+									PROMISE_SPLITTER_MAX_REQUESTS,
+									PROMISE_SPLITTER_MAX_RETRY,
+								);
+								createButton.setLoading(true);
+			        
+								// Создается сначала 1 для того, чтобы система успела создать категорию товаров системную
+								await promiseSplitter.exec<void>(
+									actionComponents.slice(0, 1).map((component) => ({
+										chain: [component.getAction()],
+										onSuccess: () => {
+											this._progressBar.setLeftProgress(++successAmount);
+										},
+										onError: () => {
+											this._progressBar.setRightProgress(++errorAmount);
+										},
+									})),
+								);
+			        
+								// Ну и на всякий случай добавлю еще задержку в пол секунды
+								await delay(500);
+			        
+								await promiseSplitter
+									.exec<void>(
+										actionComponents
+											.slice(1, actionComponents.length)
+											.map((component) => ({
+												chain: [component.getAction()],
+												onSuccess: () => {
+													this._progressBar.setLeftProgress(++successAmount);
+												},
+												onError: () => {
+													this._progressBar.setRightProgress(++errorAmount);
+												},
+											})),
+									)
+									.finally(() => {
+										createButton.setLoading(false);
+										createButton.element.disabled = true;
+										createButton.element.textContent = "Закончено";
+									});
+							}
             },
         });
 
