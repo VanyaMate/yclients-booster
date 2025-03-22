@@ -357,7 +357,7 @@ export class GroupLoyaltyCertificateMassAddForm extends Component<HTMLDivElement
             case 'нет':
                 return false;
             default:
-                throw new Error(`"${ value }" не валидное значение`);
+                throw new Error(`"${ value }" не валидное значение "да" или "нет`);
         }
     }
 
@@ -394,7 +394,7 @@ export class GroupLoyaltyCertificateMassAddForm extends Component<HTMLDivElement
                         type  : GroupLoyaltyCertificateTimeUnitType.YEAR,
                     };
                 default:
-                    throw new Error(`"${ value }" не валидное значение`);
+                    throw new Error(`"${ value }" не валидное значение времени`);
             }
         }
 

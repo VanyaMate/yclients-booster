@@ -400,7 +400,7 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
             case 'везде':
                 return GroupLoyaltyAbonementSalonChangeType.ALL;
             default:
-                throw new Error(`"${ value }" не является валидным значением`);
+                throw new Error(`"${ value }" не является валидным значением типа. "нет", "гдепродан", "везде"`);
         }
     }
 
@@ -411,7 +411,7 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
             case 'нет':
                 return false;
             default:
-                throw new Error(`"${ value }" не валидное значение`);
+                throw new Error(`"${ value }" не валидное значение. Можно только "да" или "нет"`);
         }
     }
 
@@ -448,7 +448,7 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
                         type  : GroupLoyaltyAbonementTimeUnitType.YEAR,
                     };
                 default:
-                    throw new Error(`"${ value }" не валидное значение`);
+                    throw new Error(`"${ value }" не валидное значение времени`);
             }
         }
 
