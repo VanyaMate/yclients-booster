@@ -18,9 +18,10 @@ export const groupLoyaltyCertificate = function () {
     startHandler(() => {
         const validClientId: number = Number(clientId);
         if (validClientId !== 0 && !isNaN(validClientId)) {
-            const container = document.querySelector(`#loyalty-certificate-type-app-wrapper`);
+            const container = document.querySelector(`#page-wrapper > .wrapper-content > .ibox`);
+            const newContainer = document.querySelector('#loyalty-certificate-type-app-wrapper');
 
-            if (container) {
+            if (container || newContainer) {
                 new Col({
                     rows: [
                         new ModalButton({
@@ -35,7 +36,7 @@ export const groupLoyaltyCertificate = function () {
                             },
                         }),
                     ],
-                }).insert(container, 'beforebegin');
+                }).insert(container || newContainer!, 'beforebegin');
             }
         }
     });
