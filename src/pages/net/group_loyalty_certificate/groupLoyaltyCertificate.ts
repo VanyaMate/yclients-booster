@@ -18,7 +18,7 @@ export const groupLoyaltyCertificate = function () {
     startHandler(() => {
         const validClientId: number = Number(clientId);
         if (validClientId !== 0 && !isNaN(validClientId)) {
-            const container = document.querySelector(`#page-wrapper > .wrapper-content > .ibox`);
+            const container = document.querySelector(`#loyalty-certificate-type-app-wrapper`);
 
             if (container) {
                 new Col({
