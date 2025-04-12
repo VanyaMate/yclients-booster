@@ -29,13 +29,13 @@ export const getSettingsServiceCategoriesFullDataRequestAction = async function 
         categoryMapper: {},
     };
     const categories                                = await getSettingsServiceCategoriesRequestAction(bearer, clientId, logger);
-    const promiseSplitter: PromiseSplitter          = new PromiseSplitter(1, PROMISE_SPLITTER_MAX_RETRY);
+    const promiseSplitter: PromiseSplitter          = new PromiseSplitter(2, PROMISE_SPLITTER_MAX_RETRY);
     await promiseSplitter.exec(
         categories.data.map((category) => {
             return {
                 chain: [
                     async () => {
-                        const categoryFullData                                      = await getSettingsServiceCategoryRequestAction(bearer, clientId, category.id.toString());
+                        const categoryFullData                                      = await getSettingsServiceCategoryRequestAction(bearer, clientId, category.id.toString(), logger);
                         const categoryItem: SettingsServiceCategoryDataWithChildren = {
                             ...categoryFullData,
                             children: [],

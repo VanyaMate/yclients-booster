@@ -73,6 +73,10 @@ export type SettingsServiceCategoryCompareComponentProps =
         fetcher?: IFetcher;
         // ILogger для логирования
         logger?: ILogger;
+        // Лимит для splitter
+        splitterLimit?: number;
+        // Количество попыток для splitter
+        splitterRetry?: number;
     };
 
 export class SettingsServiceCategoryCompareComponent extends CompareComponent<SettingsServiceCategoryDataWithChildren> {
@@ -83,6 +87,9 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
     private readonly _bearer: string;
     private readonly _fetcher?: IFetcher;
     private readonly _logger?: ILogger;
+    private readonly _splitterLimit: number;
+    private readonly _splitterRetry: number;
+    private readonly _splitter: PromiseSplitter;
     private _serviceComponents: Array<ICompareEntity<SettingsServiceData>> = [];
     private _clientCategory?: SettingsServiceCategoryDataWithChildren;
 
@@ -95,6 +102,8 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                   bearer,
                   fetcher,
                   logger,
+                  splitterLimit = 2,
+                  splitterRetry = 3,
                   ...other
               } = props;
         super(other);
@@ -106,6 +115,9 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
         this._bearer          = bearer;
         this._fetcher         = fetcher;
         this._logger          = logger;
+        this._splitterLimit   = splitterLimit;
+        this._splitterRetry   = splitterRetry;
+        this._splitter        = new PromiseSplitter(this._splitterLimit, this._splitterRetry);
         this._clientCategory  = this._clientData.tree.find((category) => category.title === this._targetCategory.title);
 
         this._render();
@@ -124,7 +136,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                     return this._clientCategory;
                 } else {
                     // action children
-                    const services = await new PromiseSplitter(1, 3)
+                    const services = await this._splitter
                         .exec<SettingsServiceData | null>(
                             this._serviceComponents.map(
                                 (service) => ({
@@ -157,7 +169,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                     // return item
                 } else {
                     // action children
-                    const services = await new PromiseSplitter(1, 3)
+                    const services = await this._splitter
                         .exec<SettingsServiceData | null>(
                             this._serviceComponents.map(
                                 (service) => ({
@@ -195,9 +207,11 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                                   this._bearer,
                                   this._clientId,
                                   {
-                                      title        : this._targetCategory.title,
-                                      services     : [],
-                                      booking_title: this._targetCategory.booking_title ?? this._targetCategory.title,
+                                      title   : this._targetCategory.title,
+                                      services: [],
+                                      // Прошлая версия
+                                      /* booking_title:this._targetCategory.booking_title ?? this._targetCategory.title,*/
+                                      booking_title: this._targetCategory.booking_title ?? '',
                                       service_count: 0,
                                       api_id       : '0',
                                       staff        : [],
@@ -211,7 +225,7 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
 
                 if (!this._childrenIsValid()) {
                     // action children
-                    const services = await new PromiseSplitter(1, 3)
+                    const services = await this._splitter
                         .exec<SettingsServiceData | null>(
                             this._serviceComponents.map(
                                 (service) => ({
@@ -262,6 +276,8 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                         targetResourceList: this._targetResources,
                         clientResourceList: this._clientData.resources,
                         parent            : this,
+                        splitterLimit     : 4,
+                        splitterRetry     : 3,
                     })
                 )),
             }),

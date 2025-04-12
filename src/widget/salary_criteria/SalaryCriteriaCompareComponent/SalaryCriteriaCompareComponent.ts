@@ -278,6 +278,8 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                                     parent         : this,
                                     logger         : this._logger,
                                     fetcher        : this._fetcher,
+                                    splitterLimit  : 2,
+                                    splitterRetry  : 3,
                                 });
                             }
                             return null;

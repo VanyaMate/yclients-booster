@@ -78,7 +78,7 @@ export class SettingsServiceCategoriesCompareComponent extends CompareComponent<
     }
 
     protected _action (): Promise<Array<SettingsServiceCategoryDataWithChildren> | null> {
-        return new PromiseSplitter(1, 5).exec(
+        return new PromiseSplitter(2, 5).exec(
             this._compareComponents.map((component) => ({ chain: [ component.getAction() ] })),
         );
     }
@@ -96,6 +96,8 @@ export class SettingsServiceCategoriesCompareComponent extends CompareComponent<
                     bearer         : this._bearer,
                     fetcher        : this._fetcher,
                     logger         : this._logger,
+                    splitterLimit  : 3,
+                    splitterRetry  : 3,
                 })
             )),
         })

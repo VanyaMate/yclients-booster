@@ -5,8 +5,8 @@ import { ILogger } from '@/action/_logger/Logger.interface.ts';
 
 
 export const linkSettingsServiceItemsRequestAction = async function (bearer: string, clientId: string, updateData: SettingsServiceLinksUpdateData, logger?: ILogger) {
-    logger?.log(`попытка создания ссылок для "${ updateData.service_id }" для клиента "${ clientId }"`);
-    return fetch(`https://yclients.com/api/v1/company/1092329/services/links`, {
+    logger?.log(`попытка создания ссылок для услуги "${ updateData.service_id }" для клиента "${ clientId }"`);
+    return fetch(`https://yclients.com/api/v1/company/${ clientId }/services/links`, {
         method : 'POST',
         body   : JSON.stringify(updateData),
         headers: {
@@ -16,14 +16,14 @@ export const linkSettingsServiceItemsRequestAction = async function (bearer: str
     })
         .then((response) => {
             if (response.ok) {
-                logger?.success(`ссылки для "${ updateData.service_id }" для клиента "${ clientId }" созданы`);
+                logger?.success(`ссылки для услуги "${ updateData.service_id }" для клиента "${ clientId }" созданы`);
                 return true;
             }
 
             throw new Error(`ошибка обновления ссылок. Статус: ${ response.status }`);
         })
         .catch((error: Error) => {
-            logger?.error(`ошибка создания ссылок для "${ updateData.service_id }" для клиента "${ clientId }". ${ error.message }`);
+            logger?.error(`ошибка создания ссылок для услуги "${ updateData.service_id }" для клиента "${ clientId }". ${ error.message }`);
             throw error;
         });
 };

@@ -118,6 +118,10 @@ export type SettingsServiceItemCompareComponentProps =
         // Список ресурсов клиента
         clientResourceList?: Array<Resource>;
         // Родительский элемент для ревалидации
+        // Лимит для splitter
+        splitterLimit?: number;
+        // Количество попыток для splitter
+        splitterRetry?: number;
     };
 
 export class SettingsServiceItemCompareComponent extends CompareComponent<SettingsServiceData> {
@@ -127,6 +131,9 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
     private readonly _logger?: ILogger;
     private readonly _promiseSplitter: PromiseSplitter;
     private readonly _targetService: SettingsServiceData;
+    private readonly _splitterLimit: number;
+    private readonly _splitterRetry: number;
+    private readonly _splitter: PromiseSplitter;
     private _clientServices: Array<SettingsServiceData>;
     private _clientService?: SettingsServiceData;
     private _targetResourceList: Array<Resource>;
@@ -143,6 +150,8 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                   logger,
                   targetResourceList,
                   clientResourceList = [],
+                  splitterLimit      = 2,
+                  splitterRetry      = 3,
                   ...other
               } = props;
         super(other);
@@ -155,7 +164,12 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
         this._logger             = logger;
         this._targetResourceList = targetResourceList;
         this._clientResourceList = clientResourceList;
+        this._splitterLimit      = splitterLimit;
+        this._splitterRetry      = splitterRetry;
+        this._splitter           = new PromiseSplitter(this._splitterLimit, this._splitterRetry);
         this._clientService      = this._clientServices.find((service) => service.title === this._targetService.title);
+        // Да их 2 получается, но этот для использования внутри другого.
+        // Пусть будет так. Это не важно.
         this._promiseSplitter    = new PromiseSplitter(
             PROMISE_SPLITTER_MAX_REQUESTS,
             PROMISE_SPLITTER_MAX_RETRY,
@@ -840,7 +854,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                     return this._clientService;
                 } else {
                     // action children
-                    const children = await new PromiseSplitter(1, 3)
+                    const children = await this._splitter
                         .exec<Resource>(
                             this._compareResourcesComponents.map((component) => ({
                                 chain: [ component.getAction() ],
@@ -895,7 +909,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
                     // return item
                 } else {
                     // action children
-                    const children = await new PromiseSplitter(1, 3)
+                    const children = await this._splitter
                         .exec<Resource>(
                             this._compareResourcesComponents.map((component) => ({
                                 chain: [ component.getAction() ],
@@ -930,7 +944,7 @@ export class SettingsServiceItemCompareComponent extends CompareComponent<Settin
             if (!this._isNoCreateNew()) {
                 // create item
 
-                const [ service ] = await new PromiseSplitter(1, 3)
+                const [ service ] = await this._splitter
                     .exec([
                         {
                             chain: [
