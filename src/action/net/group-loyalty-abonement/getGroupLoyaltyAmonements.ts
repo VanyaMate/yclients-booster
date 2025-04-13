@@ -1,16 +1,14 @@
 // GET https://yclients.com/api/v1/chain/1093672/loyalty/abonement_types?page=1&limit=250&is_archived=0&title=
 
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
-import {
-    GroupLoyaltyAbonementCreateData,
-} from '@/action/net/group-loyalty-abonement/types/types.ts';
+import { Abonement } from '@/action/net/group-loyalty-abonement/types/types.ts';
 
 
 // Тут не такой тип возвращается, но пофигу
-export const getGroupLoyaltyAmonements = async function (bearer: string, salonId: string, page: number = 1, logger?: ILogger): Promise<Array<GroupLoyaltyAbonementCreateData>> {
+export const getGroupLoyaltyAmonements = async function (bearer: string, salonId: string, page: number = 1, include: Array<string> = [], logger?: ILogger): Promise<Array<Abonement>> {
     logger?.log(`получение списка абонементов клиента "${ salonId }"`);
 
-    return fetch(`https://yclients.com/api/v1/chain/${ salonId }/loyalty/abonement_types?page=${ page }&limit=250&is_archived=0&title=`, {
+    return fetch(`https://yclients.com/api/v1/chain/${ salonId }/loyalty/abonement_types?page=${ page }&limit=250&is_archived=0&title=&${ include.map((item, index) => `include[${ index }]=${ item }`).join('&') }`, {
         method : 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -32,7 +30,7 @@ export const getGroupLoyaltyAmonements = async function (bearer: string, salonId
                     return response.data;
                 }
 
-                const abonemets = await getGroupLoyaltyAmonements(bearer, salonId, page + 1, logger);
+                const abonemets = await getGroupLoyaltyAmonements(bearer, salonId, page + 1, include, logger);
                 return [ ...response.data, ...abonemets ];
             }
 

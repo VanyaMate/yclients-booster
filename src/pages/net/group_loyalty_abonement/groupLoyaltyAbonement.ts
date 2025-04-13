@@ -7,7 +7,13 @@ import {
     getBearerTokenDomAction,
 } from '@/action/bearer/dom-action/getBearerToken/getBearerToken.dom-action.ts';
 import { ModalButton } from '@/shared/buttons/ModalButton/ModalButton.ts';
-import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
+import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
+import {
+    getGroupLoyaltyAmonements,
+} from '@/action/net/group-loyalty-abonement/getGroupLoyaltyAmonements.ts';
+import {
+    getLoyaltyAmonement,
+} from '@/action/net/group-loyalty-abonement/getLoyaltyAmonement.ts';
 
 
 let clientId: string = '';
@@ -37,6 +43,23 @@ export const groupLoyaltyAbonement = function () {
                                 }),
                                 label      : 'Добавить множество абонементов',
                                 preferWidth: 700,
+                            },
+                        }),
+                        new ModalButton({
+                            textContent: 'Установить филиал везде где',
+                            styleType  : ButtonStyleType.PRIMARY,
+                            modalProps : {
+                                content: new Button({
+                                    onclick    : async () => {
+                                        console.log('start');
+                                        const targetAbonementId = 930235;
+                                        const abonements        = await getGroupLoyaltyAmonements(bearer, clientId, 1, [ 'attached_salon_ids', 'availability', 'online_sale_image' ]);
+                                        const abonement         = abonements.find((abonement) => abonement.id === targetAbonementId)!;
+                                        const abonementFullData = await getLoyaltyAmonement(bearer, clientId, abonement.id.toString(), [ 'attached_salon_ids' ]);
+                                        console.log(abonementFullData);
+                                    },
+                                    textContent: 'Получить',
+                                }),
                             },
                         }),
                     ],
