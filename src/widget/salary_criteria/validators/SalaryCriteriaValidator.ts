@@ -6,7 +6,7 @@ import { ICompareComponent } from '@/entity/compare/Compare.types.ts';
 
 
 export namespace SalaryCriteriaValidator {
-    export const rules = function (children: Array<ICompareComponent>) {
+    export const rules = function (children: Array<ICompareComponent>, withContext: boolean = true) {
         return function (targetRule: Nullable<SalaryCriteriaRuleData>, clientRule: Nullable<SalaryCriteriaRuleData>): boolean {
             if (targetRule && clientRule) {
                 if (targetRule.amount !== clientRule.amount) {
@@ -29,7 +29,7 @@ export namespace SalaryCriteriaValidator {
                     return false;
                 }
 
-                if (targetRule.context.services) {
+                if (targetRule.context.services && withContext) {
                     if (clientRule.context.services) {
                         if (
                             targetRule

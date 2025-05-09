@@ -12,6 +12,8 @@ import {
 import {
     SalaryCriteriaListCompareComponent,
 } from '@/widget/salary_criteria/SalaryCriteriaListCompareComponent/SalaryCriteriaListCompareComponent.ts';
+import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
+import { MemoFetch } from '@/service/Fetcher/implementations/MemoFetch.ts';
 
 
 export type SalaryCriteriaListCompareFormProps =
@@ -26,6 +28,7 @@ export class SalaryCriteriaListCompareForm extends Component<HTMLDivElement> {
     private readonly _content: Col;
     private readonly _clientId: string;
     private readonly _bearer: string;
+    private readonly _fetcher: IFetcher;
 
     constructor (props: SalaryCriteriaListCompareFormProps) {
         const { bearer, clientId, ...other } = props;
@@ -35,6 +38,7 @@ export class SalaryCriteriaListCompareForm extends Component<HTMLDivElement> {
         this._bearer   = bearer;
 
         this._logger  = new Logger({});
+        this._fetcher = new MemoFetch();
         this._content = new Col({
             rows: [
                 this._logger,
@@ -77,6 +81,8 @@ export class SalaryCriteriaListCompareForm extends Component<HTMLDivElement> {
             bearer        : this._bearer,
             targetCopyData: targetCopyData,
             clientCopyData: clientCopyData,
+            logger        : this._logger,
+            fetcher       : this._fetcher,
         });
 
         const actionButton = new Button({
@@ -86,6 +92,7 @@ export class SalaryCriteriaListCompareForm extends Component<HTMLDivElement> {
                 compareComponentList.getAction()()
                     .finally(() => {
                         actionButton.setLoading(false);
+                        actionButton.element.disabled = true;
                     });
             },
         });

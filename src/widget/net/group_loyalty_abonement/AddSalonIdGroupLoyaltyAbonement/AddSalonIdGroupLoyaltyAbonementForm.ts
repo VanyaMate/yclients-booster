@@ -23,10 +23,11 @@ export class AddSalonIdGroupLoyaltyAbonementForm extends Component<HTMLDivElemen
         super('div', other);
         this._content = new Col({ rows: [] });
         this._logger  = new Logger({});
+        console.log(this._logger);
     }
 
     // продолжить тут
-    private _renderInitialForm () {
+    public _renderInitialForm () {
         const uploadDataButton = new Button({
             textContent: 'Загрузить данные',
             onclick    : () => {

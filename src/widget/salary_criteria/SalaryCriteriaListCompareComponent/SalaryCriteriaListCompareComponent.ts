@@ -29,6 +29,8 @@ import {
 } from '@/widget/resources/ResourceInstanceDropdownActions/ResourceInstanceDropdownActions.ts';
 import { Row } from '@/shared/box/Row/Row.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
+import { ILogger } from '@/action/_logger/Logger.interface.ts';
+import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 
 
 export type SalaryCriteriaListCompareComponentProps =
@@ -38,6 +40,8 @@ export type SalaryCriteriaListCompareComponentProps =
         bearer: string;
         targetCopyData: SalaryCriteriaListDataForCopy;
         clientCopyData: SalaryCriteriaListDataForCopy;
+        logger?: ILogger;
+        fetcher?: IFetcher;
     };
 
 export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<SalaryCriteriaFullData>> {
@@ -45,11 +49,19 @@ export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<S
     private readonly _clientCopyData: SalaryCriteriaListDataForCopy;
     private readonly _clientId: string;
     private readonly _bearer: string;
+    private readonly _logger?: ILogger;
+    private readonly _fetcher?: IFetcher;
     private _criteriaComponent: Array<ICompareEntity<SalaryCriteriaFullData>> = [];
 
     constructor (props: SalaryCriteriaListCompareComponentProps) {
         const {
-                  clientId, targetCopyData, clientCopyData, bearer, ...other
+                  clientId,
+                  targetCopyData,
+                  clientCopyData,
+                  bearer,
+                  logger,
+                  fetcher,
+                  ...other
               } = props;
         super(other);
 
@@ -57,6 +69,8 @@ export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<S
         this._clientCopyData = clientCopyData;
         this._clientId       = clientId;
         this._bearer         = bearer;
+        this._logger         = logger;
+        this._fetcher        = fetcher;
 
         this._render();
     }
@@ -65,15 +79,9 @@ export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<S
         return this._criteriaComponent;
     }
 
-    public getAction (): () => Promise<Array<SalaryCriteriaFullData> | null> {
-        return () => {
-            const splitter = new PromiseSplitter(5, 1);
-            return splitter.exec(this.getChildren().map((child) => ({ chain: [ child.getAction() ] })));
-        };
-    }
-
     protected async _action (): Promise<SalaryCriteriaFullData[] | null> {
-        return null;
+        const splitter = new PromiseSplitter(5, 1);
+        return splitter.exec(this.getChildren().map((child) => ({ chain: [ child.getAction() ] })));
     }
 
     protected _render (): void {
@@ -103,6 +111,8 @@ export class SalaryCriteriaListCompareComponent extends CompareComponent<Array<S
                         targetCriteria: criteria,
                         targetCopyData: this._targetCopyData,
                         clientCopyData: this._clientCopyData,
+                        logger        : this._logger,
+                        fetcher       : this._fetcher,
                     })
                 )),
             ],
