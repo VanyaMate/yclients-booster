@@ -16,35 +16,58 @@ export type GetSalaryCriteriaContextProps = {
     partOfGoodsCategoryList: Array<GoodsCategoryTreeFullData>;
 }
 
+
+const getGoodCategoryIdsWithGoods = function (categories: GoodsCategoryTreeFullData[]): Array<string> {
+    let result: Array<string> = [];
+
+    while (categories.length) {
+        let newCategories: GoodsCategoryTreeFullData[] = [];
+
+        categories.forEach((category) => {
+            if (category.goods.length) {
+                result.push(category.id);
+            } else if (category.children.length) {
+                newCategories.push(...category.children);
+            }
+        });
+
+        categories = newCategories;
+    }
+
+    return result;
+};
+
 export const getSalaryContextByChildren = function (props: GetSalaryCriteriaContextProps): SalaryCriteriaContext {
+    console.log('getSalaryContextByChildren', props);
+
     const context: SalaryCriteriaContext = {};
 
     if (props.serviceCategoryList.length || props.partOfServiceCategoryList.length) {
         context.services = { categories: [], items: [] };
 
         context.services!.categories = props.serviceCategoryList.map((category) => ({
-            categoryId: category.id.toString(),
+            category: category.id.toString(),
         }));
         context.services!.items      = props.partOfServiceCategoryList
             .reduce(
                 (items, category) =>
                     items.concat(category.children.map((service) => ({
-                        categoryId: service.category_id.toString(),
-                        itemId    : service.id.toString(),
+                        category: service.category_id.toString(),
+                        item    : service.id.toString(),
                     })))
                 , [] as Array<SalaryCriteriaContextItem>,
             );
     }
 
-    if (props.partOfGoodsCategoryList && props.partOfGoodsCategoryList.length) {
+    if (props.goodsCategoryList.length || props.partOfGoodsCategoryList.length) {
         context.goods = { categories: [], items: [] };
 
-        context.goods!.categories = props.goodsCategoryList.map((category) => ({ categoryId: category.id }));
+        context.goods!.categories = getGoodCategoryIdsWithGoods(props.goodsCategoryList).map((category) => ({ category }));
         context.goods!.items      = props.partOfGoodsCategoryList
             .reduce((items, category) =>
                     items.concat(category.children.map((service) => ({
-                        categoryId: category.id.toString(),
-                        itemId    : service.id.toString(),
+                        category: category.id.toString(),
+                        item    : service.id.toString(),
                     })))
                 , [] as Array<SalaryCriteriaContextItem>,
             );

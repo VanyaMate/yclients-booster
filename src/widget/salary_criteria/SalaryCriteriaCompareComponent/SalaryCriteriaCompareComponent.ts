@@ -30,7 +30,17 @@ import {
     SalaryCriteriaRuleCompareComponent,
 } from '@/widget/salary_criteria/SalaryCriteriaRuleCompareComponent/SalaryCriteriaRuleCompareComponent.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
+import {
+    createSalaryCriteria,
+} from '@/action/salary_criteria/request-action/createSalaryCriteria/createSalaryCriteria.ts';
+import {
+    updateSalaryCriteria,
+} from '@/action/salary_criteria/request-action/updateSalaryCriteria/updateSalaryCriteria.ts';
 
+
+/**
+ * {"services":{"categories":[{"categoryId":18503638}],"items":[{"categoryId":17364733,"itemId":16402471},{"categoryId":17364733,"itemId":16402472}]},"goods":{"categories":[],"items":[{"categoryId":"1384539","itemId":"33914857"}]}}
+ */
 
 /**
  * Проблема в том, что сейчас все сервисы и услуги "лежат" вместе и не
@@ -116,32 +126,80 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                     // action children
                     const splitter = new PromiseSplitter(5, 1);
                     const rules    = await splitter.exec<SalaryCriteriaRuleData>(this._rules.map((rule) => ({ chain: [ rule.getAction() ] })));
-                    console.log(rules);
-                    return this._clientCriteria;
+
+                    console.log('UPDATE_CHILDREN', rules);
+                    return await updateSalaryCriteria(
+                        this._clientId,
+                        this._clientCriteria.id, {
+                            ...this._clientCriteria,
+                            rules: rules.filter(Boolean),
+                        },
+                        this._fetcher,
+                        this._logger,
+                    );
                     // return item
                 }
             } else {
                 if (this._childrenIsValid()) {
-                    // update item
-                    // return item
+                    return await updateSalaryCriteria(
+                        this._clientId,
+                        this._clientCriteria.id, {
+                            ...this._targetCriteria,
+                            rules: this._clientCriteria.rules,
+                        },
+                        this._fetcher,
+                        this._logger,
+                    );
                 } else {
-                    // update item
-                    // action children
-                    // return item
+                    const splitter = new PromiseSplitter(5, 1);
+                    const rules    = await splitter.exec<SalaryCriteriaRuleData>(this._rules.map((rule) => ({ chain: [ rule.getAction() ] })));
+
+                    console.log('UDPATE_CHILDREN', rules);
+                    return await updateSalaryCriteria(
+                        this._clientId,
+                        this._clientCriteria.id, {
+                            ...this._targetCriteria,
+                            rules: rules.filter(Boolean),
+                        },
+                        this._fetcher,
+                        this._logger,
+                    );
                 }
             }
-
-            // TEMP: Чтобы не было ошибки типизации
-            return null;
         } else {
+            console.log('NO_ITEM');
             if (!this._isNoCreateNew()) {
-                // create item
-
                 if (!this._childrenIsValid()) {
-                    // action children
+                    console.log('CREATE_WITH_CHILDREN');
+                    const splitter = new PromiseSplitter(5, 1);
+                    const rules    = await splitter
+                        .exec<SalaryCriteriaRuleData>(
+                            this._rules.map((rule) => ({ chain: [ rule.getAction() ] })),
+                        );
+
+                    console.log('Rules is', rules);
+
+                    return await createSalaryCriteria(
+                        this._clientId,
+                        {
+                            ...this._targetCriteria,
+                            rules: rules.filter(Boolean),
+                        },
+                        this._fetcher,
+                        this._logger,
+                    );
                 }
 
-                // return item
+                console.log('CREATE_WITHOUT_CHILDREN');
+                return await createSalaryCriteria(
+                    this._clientId,
+                    {
+                        ...this._targetCriteria,
+                        rules: [],
+                    },
+                    this._fetcher,
+                    this._logger,
+                );
             }
 
             return null;
@@ -150,8 +208,6 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
 
     protected _render (): void {
         this._beforeRender();
-
-        console.log('this._targetCriteria', this._targetCriteria);
 
         this._compareChildren = [];
         this._rules           = [];

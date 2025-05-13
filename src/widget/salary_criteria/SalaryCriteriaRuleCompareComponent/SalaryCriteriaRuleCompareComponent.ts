@@ -108,69 +108,31 @@ export class SalaryCriteriaRuleCompareComponent extends CompareComponent<SalaryC
     }
 
     protected async _action (): Promise<SalaryCriteriaRuleData | null> {
-        console.log('__RULE__', this._targetRule);
-        console.log('clientRule', !!this._clientRule, this._clientRule);
-        console.log('itemIsValid', this._itemIsValid());
-        console.log('childrenIsValid', this._childrenIsValid());
-        if (this._clientRule) {
-            if (this._itemIsValid()) {
-                if (this._childrenIsValid()) {
-                    // return item
-                    console.log('NOTHING RULE');
-                    return this._clientRule;
-                } else {
-                    // action children
-                    console.log('UPDATE CHILDREN');
-                    const splitter                = new PromiseSplitter(5, 1);
-                    const serviceCategories       = await splitter.exec<SettingsServiceCategoryDataWithChildren | null>(
-                        this._ruleCategories.map((category) => ({ chain: [ category.getAction() ] })),
-                    );
-                    const partOfServiceCategories = await splitter.exec<SettingsServiceCategoryDataWithChildren | null>(
-                        this._ruleCategoriesPart.map((category) => ({ chain: [ category.getAction() ] })),
-                    );
-                    const goodsCategories         = await splitter.exec<GoodsCategoryTreeFullData | null>(
-                        this._ruleGoods.map((category) => ({ chain: [ category.getAction() ] })),
-                    );
-                    const partOfGoodsCategories   = await splitter.exec<GoodsCategoryTreeFullData | null>(
-                        this._ruleGoodsPart.map((category) => ({ chain: [ category.getAction() ] })),
-                    );
-                    return {
-                        ...this._clientRule,
-                        context: getSalaryContextByChildren({
-                            serviceCategoryList      : serviceCategories.filter((category) => category !== null),
-                            partOfServiceCategoryList: partOfServiceCategories.filter((category) => category !== null),
-                            goodsCategoryList        : goodsCategories.filter((category) => category !== null),
-                            partOfGoodsCategoryList  : partOfGoodsCategories.filter((category) => category !== null),
-                        }),
-                    };
-                    // return item
-                }
-            } else {
-                if (this._childrenIsValid()) {
-                    // update item
-                    // return item
-                } else {
-                    // update item
-                    // action children
-                    // return item
-                }
-            }
+        const splitter                = new PromiseSplitter(5, 1);
+        const serviceCategories       = await splitter.exec<SettingsServiceCategoryDataWithChildren | null>(
+            this._ruleCategories.map((category) => ({ chain: [ category.getAction() ] })),
+        );
+        const partOfServiceCategories = await splitter.exec<SettingsServiceCategoryDataWithChildren | null>(
+            this._ruleCategoriesPart.map((category) => ({ chain: [ category.getAction() ] })),
+        );
+        const goodsCategories         = await splitter.exec<GoodsCategoryTreeFullData | null>(
+            this._ruleGoods.map((category) => ({ chain: [ category.getAction() ] })),
+        );
+        const partOfGoodsCategories   = await splitter.exec<GoodsCategoryTreeFullData | null>(
+            this._ruleGoodsPart.map((category) => ({ chain: [ category.getAction() ] })),
+        );
 
-            // TEMP: Чтобы не было ошибки типизации
-            return null;
-        } else {
-            if (!this._isNoCreateNew()) {
-                // create item
+        console.log('Category rule', this._targetRule, goodsCategories, partOfGoodsCategories);
 
-                if (!this._childrenIsValid()) {
-                    // action children
-                }
-
-                // return item
-            }
-
-            return null;
-        }
+        return {
+            ...this._targetRule!,
+            context: getSalaryContextByChildren({
+                serviceCategoryList      : serviceCategories.filter((category) => category !== null),
+                partOfServiceCategoryList: partOfServiceCategories.filter((category) => category !== null),
+                goodsCategoryList        : goodsCategories.filter((category) => category !== null),
+                partOfGoodsCategoryList  : partOfGoodsCategories.filter((category) => category !== null),
+            }),
+        };
     }
 
     protected _render (): void {
@@ -178,7 +140,7 @@ export class SalaryCriteriaRuleCompareComponent extends CompareComponent<SalaryC
 
         const categories        = this._targetRule?.context.services?.categories.map((ruleCategory) => (
             new SettingsServiceCategoryCompareComponent({
-                targetCategory : this._targetCopyData.settingsCopyData.tree.find((category) => category.id.toString() === ruleCategory.categoryId.toString())!,
+                targetCategory : this._targetCopyData.settingsCopyData.tree.find((category) => category.id.toString() === ruleCategory.category.toString())!,
                 targetResources: this._targetCopyData.settingsCopyData.resources,
                 clientId       : this._clientId,
                 bearer         : this._bearer,
@@ -189,15 +151,13 @@ export class SalaryCriteriaRuleCompareComponent extends CompareComponent<SalaryC
             })
         )) ?? [];
         const concatenatedItems = this._targetRule?.context.services?.items.reduce((acc, item) => {
-            if (acc[item.categoryId]) {
-                acc[item.categoryId].push(item.itemId.toString());
+            if (acc[item.category]) {
+                acc[item.category].push(item.item.toString());
             } else {
-                acc[item.categoryId] = [ item.itemId.toString() ];
+                acc[item.category] = [ item.item.toString() ];
             }
             return acc;
         }, {} as Record<string, Array<string>>) ?? {};
-
-        console.log('concatenatedItems', concatenatedItems);
 
         const categoriesItems = Object.entries(concatenatedItems)
             .map(([ categoryId, itemsIds ]) => {
@@ -227,18 +187,15 @@ export class SalaryCriteriaRuleCompareComponent extends CompareComponent<SalaryC
         const goodsCategoriesIds: Array<string> = [];
         const goodsItemsIds: Array<string>      = [];
 
-        this._targetRule?.context.goods?.categories.forEach((category) => goodsCategoriesIds.push(category.categoryId));
+        this._targetRule?.context.goods?.categories.forEach((category) => goodsCategoriesIds.push(category.category));
         this._targetRule?.context.goods?.items.forEach((item) => {
-            goodsItemsIds.push(item.categoryId);
-            goodsItemsIds.push(item.itemId);
+            goodsItemsIds.push(item.category);
+            goodsItemsIds.push(item.item);
         });
-
-        console.log('goodsCategoriesIds', goodsCategoriesIds);
-        console.log('goodsItemsIds', goodsItemsIds);
 
         const goods                  = this._targetRule?.context.goods?.categories
             .map((ruleGoodCategory) => {
-                const category = this._targetCopyData.goodsCopyData.categories.list.find((category) => category.id.toString() === ruleGoodCategory.categoryId.toString());
+                const category = this._targetCopyData.goodsCopyData.categories.list.find((category) => category.id.toString() === ruleGoodCategory.category.toString());
 
                 if (category) {
                     const categoryGoodsIds                                    = category.goods.map((good) => good.id);
@@ -266,15 +223,13 @@ export class SalaryCriteriaRuleCompareComponent extends CompareComponent<SalaryC
             })
             .filter((item) => item !== null) ?? [];
         const concatenatedGoodsItems = this._targetRule?.context.goods?.items.reduce((acc, item) => {
-            if (acc[item.categoryId]) {
-                acc[item.categoryId].push(item.itemId.toString());
+            if (acc[item.category]) {
+                acc[item.category].push(item.item.toString());
             } else {
-                acc[item.categoryId] = [ item.itemId.toString() ];
+                acc[item.category] = [ item.item.toString() ];
             }
             return acc;
         }, {} as Record<string, Array<string>>) ?? {};
-
-        console.log('concatenatedGoodsItems', concatenatedGoodsItems);
 
         const goodsItems = Object.keys(concatenatedGoodsItems)
             .map((categoryId) => {

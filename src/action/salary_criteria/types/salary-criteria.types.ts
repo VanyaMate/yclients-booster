@@ -10,12 +10,12 @@ export type  SalaryCriteriaShortData = {
 };
 
 export type SalaryCriteriaContextCategory = {
-    categoryId: string;
+    category: string;
 }
 
 export type SalaryCriteriaContextItem = {
-    categoryId: string;
-    itemId: string;
+    category: string;
+    item: string;
 }
 
 export type SalaryCriteriaContext = {

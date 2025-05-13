@@ -37,7 +37,7 @@ export namespace SalaryCriteriaValidator {
                                 .services
                                 .categories
                                 .some(
-                                    (category, index) => category.categoryId !== clientRule.context.services!.categories[index].categoryId,
+                                    (category, index) => category.category !== clientRule.context.services!.categories[index].category,
                                 )
                         ) {
                             return false;
@@ -50,8 +50,8 @@ export namespace SalaryCriteriaValidator {
                                 .items
                                 .some(
                                     (service, index) =>
-                                        service.categoryId !== clientRule.context.services!.items[index].categoryId ||
-                                        service.itemId !== clientRule.context.services!.items[index].itemId,
+                                        service.category !== clientRule.context.services!.items[index].category ||
+                                        service.item !== clientRule.context.services!.items[index].item,
                                 )
                         ) {
                             return false;

@@ -63,6 +63,8 @@ export const updateSalaryCriteria = async function (
     fetcher: IFetcher = new Fetch(),
     logger?: ILogger,
 ): Promise<SalaryCriteriaFullData> {
+    console.log('updateSalaryCriteria', criteriaId, updateData);
+
     logger?.log(`попытка обновить критерий расчета ЗП "${ criteriaId }" "${ updateData.title }" для клиента "${ clientId }"`);
 
     return fetcher.fetch(`https://yclients.com/salary_criteria/save/${ clientId }/${ criteriaId }/?title=${ updateData.title }`, {

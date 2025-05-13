@@ -38,6 +38,8 @@ export const createSalaryCriteria = async function (
     fetcher: IFetcher = new Fetch(),
     logger?: ILogger,
 ): Promise<SalaryCriteriaFullData> {
+    console.log('createSalaryCriteria', createData);
+
     logger?.log(`попытка создать критерий расчета ЗП "${ createData.title }" для клиента "${ clientId }"`);
 
     return fetcher.fetch(`https://yclients.com/salary_criteria/save/${ clientId }/0/?title=${ createData.title }`, {
@@ -46,7 +48,6 @@ export const createSalaryCriteria = async function (
     })
         .then((response) => {
             if (response.ok) {
-                console.log(response);
                 logger?.success(`критерий расчета ЗП "${ createData.title }" для клиента "${ clientId }" успешно создан`);
                 return response.json();
             }

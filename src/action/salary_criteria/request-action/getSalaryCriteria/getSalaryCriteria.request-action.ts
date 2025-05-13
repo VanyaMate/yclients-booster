@@ -43,7 +43,7 @@ const getSalaryCriteriaContextData = function (contextJson: string): SalaryCrite
                 category = categories[i];
                 if (category?.category) {
                     response.services?.categories.push({
-                        categoryId: category.category,
+                        category: category.category,
                     });
                 }
             }
@@ -55,8 +55,8 @@ const getSalaryCriteriaContextData = function (contextJson: string): SalaryCrite
                 item = items[i];
                 if (item?.category && item?.item) {
                     response.services?.items.push({
-                        categoryId: item.category,
-                        itemId    : item.item,
+                        category: item.category,
+                        item    : item.item,
                     });
                 }
             }
@@ -68,7 +68,7 @@ const getSalaryCriteriaContextData = function (contextJson: string): SalaryCrite
                 goodCategory = goodsCategories[i];
                 if (goodCategory?.category) {
                     response.goods?.categories.push({
-                        categoryId: goodCategory.category,
+                        category: goodCategory.category,
                     });
                 }
             }
@@ -80,8 +80,8 @@ const getSalaryCriteriaContextData = function (contextJson: string): SalaryCrite
                 goodItem = goodsItems[i];
                 if (goodItem?.category && goodItem?.item) {
                     response.goods?.items.push({
-                        categoryId: goodItem.category,
-                        itemId    : goodItem.item,
+                        category: goodItem.category,
+                        item    : goodItem.item,
                     });
                 }
             }

@@ -90,24 +90,17 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
     protected async _action (parentCategoryId: string): Promise<GoodsCategoryTreeFullData | null> {
         if (this._clientCategory) {
             if (this._itemIsValid()) {
-                if (this._childrenIsValid()) {
-                    // return item
-                    return this._clientCategory;
-                } else {
-                    // action children
-                    this._clientCategory.children = await new PromiseSplitter(1, 1).exec<GoodsCategoryTreeFullData>(
-                        this._getChildrenCategories().map((child) => ({
-                            chain: [ child.getAction(this._clientCategory!.id) ],
-                        })),
-                    );
-                    this._clientCategory.goods    = await new PromiseSplitter(1, 1).exec<GoodData>(
-                        this._getChildrenGoods().map((child) => ({
-                            chain: [ child.getAction(this._clientCategory!.id) ],
-                        })),
-                    );
-                    return this._clientCategory;
-                    // return item
-                }
+                this._clientCategory.children = await new PromiseSplitter(1, 1).exec<GoodsCategoryTreeFullData>(
+                    this._getChildrenCategories().map((child) => ({
+                        chain: [ child.getAction(this._clientCategory!.id) ],
+                    })),
+                );
+                this._clientCategory.goods    = await new PromiseSplitter(1, 1).exec<GoodData>(
+                    this._getChildrenGoods().map((child) => ({
+                        chain: [ child.getAction(this._clientCategory!.id) ],
+                    })),
+                );
+                return this._clientCategory;
             } else {
                 if (this._childrenIsValid()) {
                     // update item
