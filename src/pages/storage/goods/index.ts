@@ -29,7 +29,7 @@ const getCategoriesCreateButtonPlace = function () {
 };
 
 const getGoodsActionButtonPlace = function (): Element {
-    return document.querySelector(`#page-wrapper .wrapper-content .ibox .ibox-content.menu`) as Element;
+    return document.querySelector(`#page-wrapper .wrapper-content .ibox .ibox-content`) as Element;
 };
 
 let clientId: string = '';
@@ -66,8 +66,9 @@ export const goodsPageHandler = function () {
                             }),
                         },
                     }),
+                    new LabelDivider({ textContent: 'Категории' }),
                 ],
-            }).insert(position, 'beforeend');
+            }).insert(position, 'afterbegin');
         }
 
         if (actionsPosition) {

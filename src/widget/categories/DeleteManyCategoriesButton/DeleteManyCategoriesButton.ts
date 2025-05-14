@@ -3,6 +3,9 @@ import { Modal } from '@/shared/modal/Modal/Modal.ts';
 import {
     DeleteManyGoodsCategoriesForm,
 } from '@/widget/goods/list/DeleteManyGoodsCategoriesForm/DeleteManyGoodsCategoriesForm.ts';
+import {
+    getBearerTokenDomAction,
+} from '@/action/bearer/dom-action/getBearerToken/getBearerToken.dom-action.ts';
 
 
 export class DeleteManyCategoriesButton extends Button {
@@ -22,6 +25,7 @@ export class DeleteManyCategoriesButton extends Button {
         if (!this._modal) {
             this._content = new DeleteManyGoodsCategoriesForm({
                 clientId: this.getClientId(),
+                bearer  : this.getBearer(),
             });
             this._modal   = new Modal({
                 content: this._content,
@@ -34,5 +38,9 @@ export class DeleteManyCategoriesButton extends Button {
 
     private getClientId () {
         return location.pathname.split('/')[3];
+    }
+
+    private getBearer () {
+        return getBearerTokenDomAction();
     }
 }

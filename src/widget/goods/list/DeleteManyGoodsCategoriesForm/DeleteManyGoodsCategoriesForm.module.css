@@ -7,9 +7,10 @@
     position       : relative;
 
     .footer {
-        position : sticky;
-        bottom   : 0;
-        left     : 0;
+        position   : sticky;
+        bottom     : 0;
+        left       : 0;
+        background : var(--bg-main);
 
         .logger {
             max-height : 150px;

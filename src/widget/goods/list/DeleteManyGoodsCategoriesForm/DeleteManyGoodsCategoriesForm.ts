@@ -21,29 +21,43 @@ import {
 import {
     deleteGoodsCategoryRequestAction,
 } from '@/action/goods/list/request-actions/deleteGoodsCategory.request-action.ts';
+import {
+    getGoodsByCategoryRequestAction,
+} from '@/action/goods/request-actions/get-goods-by-category-request.action.ts';
+import { GoodApiResponseData } from '@/action/goods/types/good.types.ts';
+import {
+    deleteGoodRequestAction,
+} from '@/action/goods/request-actions/deleteGood.request-action.ts';
+import { Fetch } from '@/service/Fetcher/implementations/Fetch.ts';
+import { LabelDivider } from '@/shared/divider/LabelDivider/LabelDivider.ts';
 
 
 export type DeleteManyGoodsCategoriesFormProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
         clientId: string;
+        bearer: string;
     }
 
 export class DeleteManyGoodsCategoriesForm extends Component<HTMLDivElement> {
     private readonly _clientId: string = '';
-    private readonly _progressBar: ProgressBar;
+    private readonly _bearer: string   = '';
+    private readonly _deleteGoodsProgressBar: ProgressBar;
+    private readonly _deleteProgressBar: ProgressBar;
     private readonly _logger: Logger;
     private readonly _promiseSplitter: PromiseSplitter;
 
     constructor (props: DeleteManyGoodsCategoriesFormProps) {
-        const { clientId, ...other } = props;
+        const { clientId, bearer, ...other } = props;
         super('div', other);
         this.element.classList.add(css.container);
 
-        this._clientId        = clientId;
-        this._promiseSplitter = new PromiseSplitter(PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY);
-        this._logger          = new Logger({ className: css.logger });
-        this._progressBar     = new ProgressBar({ max: 0 });
+        this._clientId               = clientId;
+        this._bearer                 = bearer;
+        this._promiseSplitter        = new PromiseSplitter(PROMISE_SPLITTER_MAX_REQUESTS, PROMISE_SPLITTER_MAX_RETRY);
+        this._logger                 = new Logger({ className: css.logger });
+        this._deleteProgressBar      = new ProgressBar({ max: 0 });
+        this._deleteGoodsProgressBar = new ProgressBar({ max: 0 });
 
         const checkboxes = getGoodsCategoriesDomAction().map((category) => {
             return new CheckboxWithLabel({
@@ -53,23 +67,26 @@ export class DeleteManyGoodsCategoriesForm extends Component<HTMLDivElement> {
             });
         });
 
-        const search            = new TextInput({
+        const search                  = new TextInput({
             type       : 'text',
             placeholder: 'Поиск по категориям',
         });
-        const selectAllButton   = new Button({
+        const selectAllButton         = new Button({
             textContent: 'Выделить все',
             onclick    : () => checkboxes.forEach((checkbox) => checkbox.setChecked(true)),
         });
-        const unselectAllButton = new Button({
+        const unselectAllButton       = new Button({
             textContent: 'Снять выделение',
             onclick    : () => checkboxes.forEach((checkbox) => checkbox.setChecked(false)),
+        });
+        const removeWithGoodsCheckbox = new CheckboxWithLabel({
+            label: 'Удалить вместе с товарами',
         });
 
         const removeAllSelectedButton = new Button({
             textContent: 'Удалить выделенные',
             styleType  : ButtonStyleType.DANGER,
-            onclick    : () => {
+            onclick    : async () => {
                 let successRemoved: number = 0;
                 let errorRemoved: number   = 0;
                 search.setDisable(true);
@@ -78,9 +95,45 @@ export class DeleteManyGoodsCategoriesForm extends Component<HTMLDivElement> {
                 removeAllSelectedButton.setLoading(true);
 
                 const checked = checkboxes.filter((checkbox) => checkbox.getState());
-                this._progressBar.reset(checked.length);
+                this._deleteProgressBar.reset(checked.length);
+                this._deleteGoodsProgressBar.reset(checked.length);
 
-                this._promiseSplitter.exec(
+                if (removeWithGoodsCheckbox.getState()) {
+                    await this._promiseSplitter.exec(
+                        checked.map(
+                            (checkbox) => {
+                                return {
+                                    chain    : [
+                                        async () => getGoodsByCategoryRequestAction(this._bearer, this._clientId, checkbox.getValue(), this._logger),
+                                        async (goods: GoodApiResponseData) => new PromiseSplitter(1, 1).exec(
+                                            goods.map((good) => ({
+                                                chain: [
+                                                    () => deleteGoodRequestAction(this._clientId, good.good_id.toString(), new Fetch(), this._logger),
+                                                ],
+                                            })),
+                                        ),
+                                    ],
+                                    onBefore : () => {
+                                        this._logger.log(`удаление товаров категории "${ checkbox.getLabel() }"`);
+                                    },
+                                    onSuccess: () => {
+                                        this._logger.success(`товары категории "${ checkbox.getLabel() }" удалены`);
+                                        this._deleteGoodsProgressBar.setLeftProgress(++successRemoved);
+                                    },
+                                    onError  : () => {
+                                        this._logger.error(`не все товары категории "${ checkbox.getLabel() }" удалены`);
+                                        this._deleteGoodsProgressBar.setRightProgress(++errorRemoved);
+                                    },
+                                };
+                            },
+                        ),
+                    );
+                }
+
+                successRemoved = 0;
+                errorRemoved   = 0;
+
+                await this._promiseSplitter.exec(
                     checked.map(
                         (checkbox) => {
                             return {
@@ -92,13 +145,13 @@ export class DeleteManyGoodsCategoriesForm extends Component<HTMLDivElement> {
                                 },
                                 onSuccess: () => {
                                     this._logger.success(`категория "${ checkbox.getLabel() }" удалена`);
-                                    this._progressBar.setLeftProgress(++successRemoved);
+                                    this._deleteProgressBar.setLeftProgress(++successRemoved);
                                     checkbox.setChecked(false);
                                     checkbox.setDisable(true);
                                 },
                                 onError  : () => {
                                     this._logger.error(`категория "${ checkbox.getLabel() }" не удалена`);
-                                    this._progressBar.setRightProgress(++errorRemoved);
+                                    this._deleteProgressBar.setRightProgress(++errorRemoved);
                                 },
                             };
                         },
@@ -117,6 +170,7 @@ export class DeleteManyGoodsCategoriesForm extends Component<HTMLDivElement> {
             rows: [
                 selectAllButton,
                 unselectAllButton,
+                removeWithGoodsCheckbox,
                 removeAllSelectedButton,
             ],
         });
@@ -133,7 +187,10 @@ export class DeleteManyGoodsCategoriesForm extends Component<HTMLDivElement> {
         const footer = new Col({
             rows     : [
                 control,
-                this._progressBar,
+                new LabelDivider({ textContent: 'Удаление товаров' }),
+                this._deleteGoodsProgressBar,
+                new LabelDivider({ textContent: 'Удаление категорий' }),
+                this._deleteProgressBar,
                 this._logger,
             ],
             className: css.footer,
