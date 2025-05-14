@@ -218,7 +218,7 @@ export class SalaryCriteriaRuleCompareValue extends Component<HTMLDivElement> im
                 cols     : [
                     new Component<HTMLSpanElement>('span', { textContent: `С учетом скидки:` }),
                     new CompareSelectValue({
-                        defaultValue    : '0',
+                        defaultValue    : discount,
                         defaultLabel    : '',
                         showValue       : false,
                         showDefaultLabel: false,
@@ -242,7 +242,7 @@ export class SalaryCriteriaRuleCompareValue extends Component<HTMLDivElement> im
             });
         }
 
-        return this._nonEditableRow('С учетом скидки', discount, Converter.yesOrNo(!!discount));
+        return this._nonEditableRow('С учетом скидки', discount, Converter.yesOrNo(!!Number(discount)));
     }
 
     private _nonEditableRow (key: string, value: string | number | undefined, label?: string) {

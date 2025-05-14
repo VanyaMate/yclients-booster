@@ -10,7 +10,8 @@ export const salaryCriteriaUpdateDataToFormData = function (updateData: SalaryCr
     formData.set('title', updateData.title);
     formData.set('period_type', updateData.period);
 
-    updateData.rules.forEach((rule, index) => {
+    let unknownRuleIndex = 0;
+    updateData.rules.forEach((rule) => {
         if (rule.id) {
             formData.set(`criteria_items[${ rule.id }][id]`, rule.id);
             formData.set(`criteria_items[${ rule.id }][context]`, JSON.stringify(rule.context));
@@ -20,13 +21,14 @@ export const salaryCriteriaUpdateDataToFormData = function (updateData: SalaryCr
             formData.set(`criteria_items[${ rule.id }][amount]`, rule.amount);
             formData.set(`criteria_items[${ rule.id }][use_discount]`, rule.useDiscount);
         } else {
-            formData.set(`criteria_items[new_${ index }][id]`, '');
-            formData.set(`criteria_items[new_${ index }][context]`, JSON.stringify(rule.context));
-            formData.set(`criteria_items[new_${ index }][use_net_cost]`, rule.useNetCost);
-            formData.set(`criteria_items[new_${ index }][is_aggregate_individual]`, rule.individualType);
-            formData.set(`criteria_items[new_${ index }][targets_type]`, rule.targetType);
-            formData.set(`criteria_items[new_${ index }][amount]`, rule.amount);
-            formData.set(`criteria_items[new_${ index }][use_discount]`, rule.useDiscount);
+            formData.set(`criteria_items[new_${ unknownRuleIndex }][id]`, '');
+            formData.set(`criteria_items[new_${ unknownRuleIndex }][context]`, JSON.stringify(rule.context));
+            formData.set(`criteria_items[new_${ unknownRuleIndex }][use_net_cost]`, rule.useNetCost);
+            formData.set(`criteria_items[new_${ unknownRuleIndex }][is_aggregate_individual]`, rule.individualType);
+            formData.set(`criteria_items[new_${ unknownRuleIndex }][targets_type]`, rule.targetType);
+            formData.set(`criteria_items[new_${ unknownRuleIndex }][amount]`, rule.amount);
+            formData.set(`criteria_items[new_${ unknownRuleIndex }][use_discount]`, rule.useDiscount);
+            unknownRuleIndex += 1;
         }
     });
 

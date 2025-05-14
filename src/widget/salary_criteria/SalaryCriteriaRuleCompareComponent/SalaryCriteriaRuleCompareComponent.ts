@@ -122,10 +122,9 @@ export class SalaryCriteriaRuleCompareComponent extends CompareComponent<SalaryC
             this._ruleGoodsPart.map((category) => ({ chain: [ category.getAction() ] })),
         );
 
-        console.log('Category rule', this._targetRule, goodsCategories, partOfGoodsCategories);
-
         return {
             ...this._targetRule!,
+            id     : this._clientRule?.id ?? '',
             context: getSalaryContextByChildren({
                 serviceCategoryList      : serviceCategories.filter((category) => category !== null),
                 partOfServiceCategoryList: partOfServiceCategories.filter((category) => category !== null),

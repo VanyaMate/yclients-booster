@@ -221,21 +221,25 @@ export abstract class CompareComponent<ActionResponseType> extends Component<HTM
 
         switch (value) {
             case CompareType.ALL:
+                this.enable(true);
                 this._header?.enable(true);
                 this._compareRows.forEach((row) => row.enable(true));
                 this._compareChildren.forEach((row) => row.enable(true));
                 break;
             case CompareType.ITEM:
+                this.enable(true);
                 this._header?.enable(true);
                 this._compareRows.forEach((row) => row.enable(true));
                 this._compareChildren.forEach((row) => row.enable(false));
                 break;
             case CompareType.CHILDREN:
+                this.enable(true);
                 this._header?.enable(false);
                 this._compareRows.forEach((row) => row.enable(false));
                 this._compareChildren.forEach((row) => row.enable(true));
                 break;
             default:
+                this.enable(false);
                 this._header?.enable(false);
                 this._compareRows.forEach((row) => row.enable(false));
                 this._compareChildren.forEach((row) => row.enable(false));

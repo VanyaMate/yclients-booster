@@ -133,6 +133,16 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
             if (this._itemIsValid()) {
                 if (this._childrenIsValid()) {
                     // return item
+                    const services = await this._splitter
+                        .exec<SettingsServiceData | null>(
+                            this._serviceComponents.map(
+                                (service) => ({
+                                    chain: [ service.getAction(clientCategoryId) ],
+                                }),
+                            ),
+                        );
+
+                    this._clientCategory.children = services.filter((service) => !!service);
                     return this._clientCategory;
                 } else {
                     // action children
@@ -161,6 +171,17 @@ export class SettingsServiceCategoryCompareComponent extends CompareComponent<Se
                         this._fetcher,
                         this._logger,
                     );
+
+                    const services = await this._splitter
+                        .exec<SettingsServiceData | null>(
+                            this._serviceComponents.map(
+                                (service) => ({
+                                    chain: [ service.getAction(clientCategoryId) ],
+                                }),
+                            ),
+                        );
+
+                    this._clientCategory.children = services.filter((service) => !!service);
 
                     return {
                         ...this._clientCategory,

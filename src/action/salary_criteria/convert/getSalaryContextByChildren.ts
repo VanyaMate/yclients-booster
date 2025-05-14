@@ -1,5 +1,7 @@
 import {
-    SalaryCriteriaContext, SalaryCriteriaContextItem,
+    SalaryCriteriaContext,
+    SalaryCriteriaContextCategory,
+    SalaryCriteriaContextItem,
 } from '@/action/salary_criteria/types/salary-criteria.types.ts';
 import {
     SettingsServiceCategoryDataWithChildren,
@@ -17,15 +19,15 @@ export type GetSalaryCriteriaContextProps = {
 }
 
 
-const getGoodCategoryIdsWithGoods = function (categories: GoodsCategoryTreeFullData[]): Array<string> {
-    let result: Array<string> = [];
+const getGoodCategoryContextWithGoods = function (categories: Array<GoodsCategoryTreeFullData>): Array<SalaryCriteriaContextCategory> {
+    let result: Array<SalaryCriteriaContextCategory> = [];
 
     while (categories.length) {
         let newCategories: GoodsCategoryTreeFullData[] = [];
 
         categories.forEach((category) => {
             if (category.goods.length) {
-                result.push(category.id);
+                result.push({ category: category.id });
             } else if (category.children.length) {
                 newCategories.push(...category.children);
             }
@@ -37,9 +39,30 @@ const getGoodCategoryIdsWithGoods = function (categories: GoodsCategoryTreeFullD
     return result;
 };
 
-export const getSalaryContextByChildren = function (props: GetSalaryCriteriaContextProps): SalaryCriteriaContext {
-    console.log('getSalaryContextByChildren', props);
+const getGoodsWithCategory = function (categories: Array<GoodsCategoryTreeFullData>): Array<SalaryCriteriaContextItem> {
+    const items: Array<SalaryCriteriaContextItem> = [];
 
+    while (categories.length) {
+        let newCategories: GoodsCategoryTreeFullData[] = [];
+
+        categories.forEach((category) => {
+            if (category.goods.length) {
+                items.push(...category.goods.map((good) => ({
+                    item    : good.id.toString(),
+                    category: good.category_id.toString(),
+                })));
+            } else if (category.children.length) {
+                newCategories.push(...category.children);
+            }
+        });
+
+        categories = newCategories;
+    }
+
+    return items;
+};
+
+export const getSalaryContextByChildren = function (props: GetSalaryCriteriaContextProps): SalaryCriteriaContext {
     const context: SalaryCriteriaContext = {};
 
     if (props.serviceCategoryList.length || props.partOfServiceCategoryList.length) {
@@ -60,17 +83,9 @@ export const getSalaryContextByChildren = function (props: GetSalaryCriteriaCont
     }
 
     if (props.goodsCategoryList.length || props.partOfGoodsCategoryList.length) {
-        context.goods = { categories: [], items: [] };
-
-        context.goods!.categories = getGoodCategoryIdsWithGoods(props.goodsCategoryList).map((category) => ({ category }));
-        context.goods!.items      = props.partOfGoodsCategoryList
-            .reduce((items, category) =>
-                    items.concat(category.children.map((service) => ({
-                        category: category.id.toString(),
-                        item    : service.id.toString(),
-                    })))
-                , [] as Array<SalaryCriteriaContextItem>,
-            );
+        context.goods            = { categories: [], items: [] };
+        context.goods.categories = getGoodCategoryContextWithGoods(props.goodsCategoryList);
+        context.goods.items      = getGoodsWithCategory(props.partOfGoodsCategoryList);
     }
 
     return context;

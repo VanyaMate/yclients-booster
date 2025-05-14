@@ -117,6 +117,17 @@ export class GoodCategoryCompareComponent extends CompareComponent<GoodsCategory
                         this._logger,
                     );
 
+                    this._clientCategory.children = await new PromiseSplitter(1, 1).exec<GoodsCategoryTreeFullData>(
+                        this._getChildrenCategories().map((child) => ({
+                            chain: [ child.getAction(this._clientCategory!.id) ],
+                        })),
+                    );
+                    this._clientCategory.goods    = await new PromiseSplitter(1, 1).exec<GoodData>(
+                        this._getChildrenGoods().map((child) => ({
+                            chain: [ child.getAction(this._clientCategory!.id) ],
+                        })),
+                    );
+
                     this._clientCategory.title   = this._targetCategory.title;
                     this._clientCategory.comment = this._targetCategory.comment;
                     this._clientCategory.article = this._targetCategory.article;

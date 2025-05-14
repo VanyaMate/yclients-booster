@@ -119,15 +119,12 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
         if (this._clientCriteria) {
             if (this._itemIsValid()) {
                 if (this._childrenIsValid()) {
-                    // return item
-                    console.log('NOTHING');
                     return this._clientCriteria;
                 } else {
                     // action children
                     const splitter = new PromiseSplitter(5, 1);
                     const rules    = await splitter.exec<SalaryCriteriaRuleData>(this._rules.map((rule) => ({ chain: [ rule.getAction() ] })));
 
-                    console.log('UPDATE_CHILDREN', rules);
                     return await updateSalaryCriteria(
                         this._clientId,
                         this._clientCriteria.id, {
@@ -154,7 +151,6 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                     const splitter = new PromiseSplitter(5, 1);
                     const rules    = await splitter.exec<SalaryCriteriaRuleData>(this._rules.map((rule) => ({ chain: [ rule.getAction() ] })));
 
-                    console.log('UDPATE_CHILDREN', rules);
                     return await updateSalaryCriteria(
                         this._clientId,
                         this._clientCriteria.id, {
@@ -167,17 +163,13 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                 }
             }
         } else {
-            console.log('NO_ITEM');
             if (!this._isNoCreateNew()) {
                 if (!this._childrenIsValid()) {
-                    console.log('CREATE_WITH_CHILDREN');
                     const splitter = new PromiseSplitter(5, 1);
                     const rules    = await splitter
                         .exec<SalaryCriteriaRuleData>(
                             this._rules.map((rule) => ({ chain: [ rule.getAction() ] })),
                         );
-
-                    console.log('Rules is', rules);
 
                     return await createSalaryCriteria(
                         this._clientId,
@@ -190,7 +182,6 @@ export class SalaryCriteriaCompareComponent extends CompareComponent<SalaryCrite
                     );
                 }
 
-                console.log('CREATE_WITHOUT_CHILDREN');
                 return await createSalaryCriteria(
                     this._clientId,
                     {
