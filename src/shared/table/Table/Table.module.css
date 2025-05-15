@@ -1,5 +1,7 @@
 .container {
-    width : 100%;
+    width           : 100%;
+    border-collapse : separate;
+    border-spacing  : var(--offset-small) 0;
 
     .empty {
         color   : var(--text-color-invisible);
@@ -11,8 +13,9 @@
     }
 
     th {
-        background : var(--bg-second);
-        transition : var(--transition-fast);
+        background    : var(--bg-second);
+        transition    : var(--transition-fast);
+        border-radius : var(--offset-small);
 
         &.success {
             background : var(--success-color);

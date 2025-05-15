@@ -34,6 +34,10 @@ import {
     groupLoyaltyCertificate,
     isGroupLoyaltyCertificate,
 } from '@/pages/net/group_loyalty_certificate/groupLoyaltyCertificate.ts';
+import {
+    isSettingsFilialStuffPage,
+    settingsFilialStuffPageHandler,
+} from '@/pages/settings/filial_stuff';
 
 
 // document.body.classList.add('booster-dark');
@@ -60,6 +64,8 @@ if (isGoodsPage(pathParts)) {
     groupLoyaltyAbonement();
 } else if (isGroupLoyaltyCertificate(pathParts)) {
     groupLoyaltyCertificate();
+} else if (isSettingsFilialStuffPage(pathParts)) {
+    settingsFilialStuffPageHandler(pathParts);
 }
 
 commonPageHandler();

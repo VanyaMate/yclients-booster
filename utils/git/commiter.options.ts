@@ -7,7 +7,7 @@ const __dirname = import.meta.dirname;
 const gitFolder = resolve(__dirname, '..', '..');
 
 export default {
-    types                  : [ '💡 Update', '🙏 Fix', '🔥 New feature' ],
+    types                  : [ '❤️ Update', '🙏 Fix', '🔥 New feature' ],
     entities               : [
         'UI Kit',
         'Общее',
@@ -23,6 +23,7 @@ export default {
         'Параметры ЗП',
         'Типы абонементов',
         'Типы сертификатов',
+        'Сотрудники',
     ],
     postfixes              : [ 'wip', 'temp' ],
     postfixesSeparator     : ', ',

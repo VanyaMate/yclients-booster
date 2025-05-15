@@ -28,8 +28,9 @@ export class DeleteManyCategoriesButton extends Button {
                 bearer  : this.getBearer(),
             });
             this._modal   = new Modal({
-                content: this._content,
-                label  : 'Удаление категорий',
+                content    : this._content,
+                label      : 'Удаление категорий',
+                preferWidth: Modal.getPreferWidthByNesting(3),
             });
         }
 
