@@ -8,6 +8,9 @@ import {
 import {
     getBearerTokenDomAction,
 } from '@/action/bearer/dom-action/getBearerToken/getBearerToken.dom-action.ts';
+import {
+    SettingsFilialStuffGetIdsModal,
+} from '@/widget/settings/filial_stuff/SettingsFilialStuffGetIdsModal/SettingsFilialStuffGetIdsModal.ts';
 
 
 export const isSettingsFilialStuffPage = function (pathname: Array<string>) {
@@ -31,6 +34,10 @@ export const settingsFilialStuffPageHandler = function (pathname: Array<string>)
                             content: new Col({
                                 rows: [
                                     new SettingsFilialStuffCreateModal({
+                                        clientId,
+                                        bearer,
+                                    }),
+                                    new SettingsFilialStuffGetIdsModal({
                                         clientId,
                                         bearer,
                                     }),

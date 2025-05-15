@@ -8,7 +8,7 @@ import {
 } from '@/helper/action/fetchResponseToDom/fetchResponseToDom.ts';
 
 
-export const getStuffListRequestAction = function (clientId: string, logger?: ILogger): Promise<Array<StuffItem>> {
+export const getStuffListRequestAction = async function (clientId: string, logger?: ILogger): Promise<Array<StuffItem>> {
     logger?.log(`получение списка сотрудников клиента "${ clientId }"`);
 
     return fetch(`https://yclients.com/settings/filial_staff/${ clientId }?position_id=-1&fired=2&deleted=2&user_linked=2&is_paid=2`, {
@@ -17,11 +17,11 @@ export const getStuffListRequestAction = function (clientId: string, logger?: IL
         .then(fetchResponseToDom)
         .then(getStuffListDomAction)
         .then((list) => {
-            logger?.success(`сотрудника клиента "${ clientId }" успешно получены`);
+            logger?.success(`сотрудники клиента "${ clientId }" успешно получены`);
             return list;
         })
         .catch((error) => {
-            logger?.error(`сотрудника клиента "${ clientId }" не получены. ${ error.message }`);
+            logger?.error(`сотрудники клиента "${ clientId }" не получены. ${ error.message }`);
             throw error;
         });
 };
