@@ -4,6 +4,9 @@ import {
 import { UnitMapper } from '@/mapper/UnitMapper.ts';
 import { VatMapper } from '@/mapper/VatMapper.ts';
 import { TaxMapper } from '@/mapper/TaxMapper.ts';
+import {
+    FinancesSupplierType,
+} from '@/action/finances/suppliers/types/FinancesSuplier.types.ts';
 
 
 export namespace Converter {
@@ -35,4 +38,21 @@ export namespace Converter {
                 return 'Неизвестно';
         }
     };
+
+    export namespace Finances {
+        export namespace Supplier {
+            export const type = function (type: number) {
+                switch (type) {
+                    case FinancesSupplierType.FIZ:
+                        return 'Физ.лицо';
+                    case FinancesSupplierType.IP:
+                        return 'ИП';
+                    case FinancesSupplierType.YR:
+                        return 'Юр.лицо';
+                    default:
+                        return 'Неизвестный тип';
+                }
+            };
+        }
+    }
 }

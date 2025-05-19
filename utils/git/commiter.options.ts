@@ -24,6 +24,7 @@ export default {
         'Типы абонементов',
         'Типы сертификатов',
         'Сотрудники',
+        'Контрагенты',
     ],
     postfixes              : [ 'wip', 'temp' ],
     postfixesSeparator     : ', ',

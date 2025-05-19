@@ -38,6 +38,10 @@ import {
     isSettingsFilialStuffPage,
     settingsFilialStuffPageHandler,
 } from '@/pages/settings/filial_stuff';
+import {
+    financesSuppliersPageHandler,
+    isFinancesSuppliersPage,
+} from '@/pages/finances/suppliers';
 
 
 // document.body.classList.add('booster-dark');
@@ -66,6 +70,8 @@ if (isGoodsPage(pathParts)) {
     groupLoyaltyCertificate();
 } else if (isSettingsFilialStuffPage(pathParts)) {
     settingsFilialStuffPageHandler(pathParts);
+} else if (isFinancesSuppliersPage(pathParts)) {
+    financesSuppliersPageHandler(pathParts);
 }
 
 commonPageHandler();
