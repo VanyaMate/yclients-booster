@@ -23,7 +23,17 @@ export type FinancesSupplierCreateData = {
 
 export const createFinancesSupplierRequestAction = async function (clientId: string, createData: FinancesSupplierCreateData, fetcher: IFetcher = new Fetch(), logger?: ILogger): Promise<void> {
     logger?.log(`попытка создать контрагента "${ createData.title }" для клиента "${ clientId }"`);
-    const body = convertToFormData(createData);
+    const body = convertToFormData({
+        type   : createData.type,
+        title  : createData.title,
+        inn    : createData.inn,
+        kpp    : createData.kpp,
+        contact: createData.contact,
+        phone  : createData.phone,
+        email  : createData.email,
+        addr   : createData.addr,
+        comment: createData.comment,
+    });
     return fetcher.fetch(`https://yclients.com/finances/suppliers_save/${ clientId }/0?title=${ createData.title }`, {
         method: 'POST',
         body,

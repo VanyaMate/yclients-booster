@@ -25,6 +25,7 @@ export default {
         'Типы сертификатов',
         'Сотрудники',
         'Контрагенты',
+        'Статьи платежей',
     ],
     postfixes              : [ 'wip', 'temp' ],
     postfixesSeparator     : ', ',

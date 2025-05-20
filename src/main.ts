@@ -42,6 +42,10 @@ import {
     financesSuppliersPageHandler,
     isFinancesSuppliersPage,
 } from '@/pages/finances/suppliers';
+import {
+    financesExpensesPageHandler,
+    isFinancesExpenses,
+} from '@/pages/finances/expenses';
 
 
 // document.body.classList.add('booster-dark');
@@ -72,6 +76,8 @@ if (isGoodsPage(pathParts)) {
     settingsFilialStuffPageHandler(pathParts);
 } else if (isFinancesSuppliersPage(pathParts)) {
     financesSuppliersPageHandler(pathParts);
+} else if (isFinancesExpenses(pathParts)) {
+    financesExpensesPageHandler(pathParts);
 }
 
 commonPageHandler();

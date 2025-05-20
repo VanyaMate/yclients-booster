@@ -2,6 +2,10 @@ import { startHandler } from '@/shared/lib/startHandler.ts';
 import {
     CopyFinancesSuppliersModal,
 } from '@/widget/finances/suppliers/CopyFinancesSuppliersModal/CopyFinancesSuppliersModal.ts';
+import { Col } from '@/shared/box/Col/Col.ts';
+import {
+    AddFinancesSuppliersModal,
+} from '@/widget/finances/suppliers/AddFinancesSuppliersModal/AddFinancesSuppliersModal.ts';
 
 
 export const isFinancesSuppliersPage = function (pathname: Array<string>): boolean {
@@ -10,11 +14,16 @@ export const isFinancesSuppliersPage = function (pathname: Array<string>): boole
 
 export const financesSuppliersPageHandler = function (pathname: Array<string>) {
     startHandler(() => {
-        const container        = document.querySelector('.page-heading-content');
+        const container        = document.querySelector('.form .filters-controls');
         const clientId: string = pathname[4];
 
         if (container) {
-            new CopyFinancesSuppliersModal({ clientId }).insert(container, 'beforeend');
+            new Col({
+                rows: [
+                    new CopyFinancesSuppliersModal({ clientId }),
+                    new AddFinancesSuppliersModal({ clientId }),
+                ],
+            }).insert(container, 'beforeend');
         }
     });
 };

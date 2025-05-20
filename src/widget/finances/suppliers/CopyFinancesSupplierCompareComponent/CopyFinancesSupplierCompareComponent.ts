@@ -146,6 +146,9 @@ export class CopyFinancesSupplierCompareComponent extends CompareComponent<Finan
                                     label   : Converter.Finances.Supplier.type(FinancesSupplierType.FIZ),
                                 },
                             ],
+                            onChange        : (option) => {
+                                this._targetSupplier.type = option.value;
+                            },
                         }),
                         clientValue: new CompareTextValue({
                             value: this._clientSupplier?.type,
