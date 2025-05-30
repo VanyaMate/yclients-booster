@@ -1,10 +1,13 @@
 import { ILogger } from '@/action/_logger/Logger.interface.ts';
+import {
+    GroupLoyaltyFullDataResponse,
+} from '@/action/net/group-loyalty-abonement/types/types.ts';
 
 
-export const getLoyaltyAmonement = async function (bearer: string, clientId: string, abonementId: string, include: Array<string>, logger?: ILogger) {
+export const getLoyaltyAmonement = async function (bearer: string, clientId: string, abonementId: string, include: Array<string>, logger?: ILogger): Promise<GroupLoyaltyFullDataResponse> {
     logger?.log(`попытка получения абонемента "${ abonementId }" клиента "${ clientId }"`);
     const includes = include.map((item, index) => `include[${ index }]=${ item }`);
-    return fetch(`https://yclients.com/api/v1/chain/1093672/loyalty/abonement_types/930235?${ includes }`, {
+    return fetch(`https://yclients.com/api/v1/chain/${ clientId }/loyalty/abonement_types/${ abonementId }?${ includes }`, {
         method : 'GET',
         headers: {
             'Content-Type': 'application/json',

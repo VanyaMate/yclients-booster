@@ -1,6 +1,6 @@
 export type GroupLoyaltyAbonementServiceAmount = {
-    categoryId: string;
-    serviceId: string;
+    categoryId: number;
+    serviceId: number;
     count: number;
 }
 

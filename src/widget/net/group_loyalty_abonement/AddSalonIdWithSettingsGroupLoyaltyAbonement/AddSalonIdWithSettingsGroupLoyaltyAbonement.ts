@@ -28,21 +28,21 @@ import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 // 557451
 
 
-export type AddSalonIdGroupLoyaltyAbonementFormProps =
+export type AddSalonIdWithSettingsGroupLoyaltyAbonementProps =
     ComponentPropsOptional<HTMLDivElement>
     & {
         bearer: string;
         clientId: string;
     };
 
-export class AddSalonIdGroupLoyaltyAbonementForm extends Component<HTMLDivElement> {
+export class AddSalonIdWithSettingsGroupLoyaltyAbonement extends Component<HTMLDivElement> {
     private readonly _logger: Logger;
     private readonly _fetcher: IFetcher;
     private readonly _content: Col;
     private readonly _bearer: string;
     private readonly _clientId: string;
 
-    constructor (props: AddSalonIdGroupLoyaltyAbonementFormProps) {
+    constructor (props: AddSalonIdWithSettingsGroupLoyaltyAbonementProps) {
         const { bearer, clientId, ...other } = props;
         super('div', other);
         this._content  = new Col({ rows: [] });
@@ -56,36 +56,22 @@ export class AddSalonIdGroupLoyaltyAbonementForm extends Component<HTMLDivElemen
 
     // продолжить тут
     public _renderInitialForm () {
-        const clientIdInput    = new TextInput({
+        const clientEtalonIdInput = new TextInput({
+            type       : 'text',
+            placeholder: 'Введите ID филиала который должен быть',
+        });
+        const clientIdInput       = new TextInput({
             type       : 'text',
             placeholder: 'Введите ID филиала который нужно добавить',
         });
-        const testButton       = new Button({
-            textContent: 'Test',
-            onclick    : async () => {
-                uploadDataButton.setLoading(true);
-                testButton.setLoading(true);
-
-                const abonements = await getGroupLoyaltyAmonements(this._bearer, this._clientId, 1, [ 'attached_salon_ids', 'availability', 'online_sale_image' ], this._logger);
-                const data       = await new PromiseSplitter(3, 1)
-                    .exec(
-                        abonements.map((abonement) => ({
-                            chain: [
-                                () => getLoyaltyAmonement(this._bearer, this._clientId, abonement.id.toString(), [ 'balance_container', 'abonements_count', 'attached_salon_ids' ], this._logger),
-                            ],
-                        })),
-                    );
-
-                console.log(data);
-            },
-        });
-        const uploadDataButton = new Button({
+        const uploadDataButton    = new Button({
             textContent: 'Добавить',
             styleType  : ButtonStyleType.PRIMARY,
             onclick    : async () => {
-                const clientIdToAdd = clientIdInput.getValue();
+                const clientIdEtalon = clientEtalonIdInput.getValue();
+                const clientIdToAdd  = clientIdInput.getValue();
 
-                if (clientIdToAdd) {
+                if (clientIdEtalon && clientIdToAdd) {
                     uploadDataButton.setLoading(true);
 
                     const abonements = await getGroupLoyaltyAmonements(this._bearer, this._clientId, 1, [ 'attached_salon_ids', 'availability', 'online_sale_image' ], this._logger);
@@ -95,7 +81,10 @@ export class AddSalonIdGroupLoyaltyAbonementForm extends Component<HTMLDivElemen
                                 chain: [
                                     () => getLoyaltyAmonement(this._bearer, this._clientId, abonement.id.toString(), [ 'balance_container', 'abonements_count', 'attached_salon_ids' ], this._logger),
                                     async (fulldata: GroupLoyaltyFullDataResponse) => {
-                                        if (fulldata.attached_salon_ids.includes(Number(clientIdToAdd))) {
+                                        if (
+                                            fulldata.attached_salon_ids.includes(Number(clientIdToAdd)) ||
+                                            !fulldata.attached_salon_ids.includes(Number(clientIdEtalon))
+                                        ) {
                                             return fulldata;
                                         }
 
@@ -121,8 +110,8 @@ export class AddSalonIdGroupLoyaltyAbonementForm extends Component<HTMLDivElemen
             },
         });
         this._content.add(this._logger);
+        this._content.add(clientEtalonIdInput);
         this._content.add(clientIdInput);
-        this._content.add(testButton);
         this._content.add(uploadDataButton);
     }
 }

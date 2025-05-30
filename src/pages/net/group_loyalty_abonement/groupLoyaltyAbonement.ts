@@ -7,13 +7,14 @@ import {
     getBearerTokenDomAction,
 } from '@/action/bearer/dom-action/getBearerToken/getBearerToken.dom-action.ts';
 import { ModalButton } from '@/shared/buttons/ModalButton/ModalButton.ts';
-import { Button, ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
+import { ButtonStyleType } from '@/shared/buttons/Button/Button.ts';
 import {
-    getGroupLoyaltyAmonements,
-} from '@/action/net/group-loyalty-abonement/getGroupLoyaltyAmonements.ts';
+    AddSalonIdGroupLoyaltyAbonementForm,
+} from '@/widget/net/group_loyalty_abonement/AddSalonIdGroupLoyaltyAbonement/AddSalonIdGroupLoyaltyAbonementForm.ts';
+import { Modal } from '@/shared/modal/Modal/Modal.ts';
 import {
-    getLoyaltyAmonement,
-} from '@/action/net/group-loyalty-abonement/getLoyaltyAmonement.ts';
+    AddSalonIdWithSettingsGroupLoyaltyAbonement,
+} from '@/widget/net/group_loyalty_abonement/AddSalonIdWithSettingsGroupLoyaltyAbonement/AddSalonIdWithSettingsGroupLoyaltyAbonement.ts';
 
 
 let clientId: string = '';
@@ -42,24 +43,29 @@ export const groupLoyaltyAbonement = function () {
                                     bearer,
                                 }),
                                 label      : 'Добавить множество абонементов',
-                                preferWidth: 700,
+                                preferWidth: Modal.getPreferWidthByNesting(1),
                             },
                         }),
                         new ModalButton({
-                            textContent: 'Установить филиал везде где',
-                            styleType  : ButtonStyleType.PRIMARY,
+                            textContent: 'Установить филиал везде где [wip]',
+                            styleType  : ButtonStyleType.WARNING,
                             modalProps : {
-                                content: new Button({
-                                    onclick    : async () => {
-                                        console.log('start');
-                                        const targetAbonementId = 930235;
-                                        const abonements        = await getGroupLoyaltyAmonements(bearer, clientId, 1, [ 'attached_salon_ids', 'availability', 'online_sale_image' ]);
-                                        const abonement         = abonements.find((abonement) => abonement.id === targetAbonementId)!;
-                                        const abonementFullData = await getLoyaltyAmonement(bearer, clientId, abonement.id.toString(), [ 'attached_salon_ids' ]);
-                                        console.log(abonementFullData);
-                                    },
-                                    textContent: 'Получить',
+                                content    : new AddSalonIdWithSettingsGroupLoyaltyAbonement({
+                                    clientId, bearer,
                                 }),
+                                label      : `Добавить филиал ко всем абонементам`,
+                                preferWidth: Modal.getPreferWidthByNesting(1),
+                            },
+                        }),
+                        new ModalButton({
+                            textContent: 'Установить филиал везде [wip]',
+                            styleType  : ButtonStyleType.WARNING,
+                            modalProps : {
+                                content    : new AddSalonIdGroupLoyaltyAbonementForm({
+                                    clientId, bearer,
+                                }),
+                                label      : 'Добавить филиал ко всем абонементам',
+                                preferWidth: Modal.getPreferWidthByNesting(1),
                             },
                         }),
                     ],

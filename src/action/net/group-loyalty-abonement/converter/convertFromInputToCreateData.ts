@@ -54,7 +54,7 @@ export const convertFromInputToCreateData = async function (data: GroupLoyaltyAb
         online_sale_price             : data.online?.price ?? data.price,
         online_sale_description       : data.online?.description ?? '',
         delete_online_image           : false,
-        salon_ids                     : data.salonIds,
+        salon_ids                     : data.salonIds.map((id) => Number(id)),
         balance_edit_type_id          : data.salonChangeType,
 
         //

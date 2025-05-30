@@ -365,8 +365,8 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
                 if (isNull(visitNumber)) {
                     if (count) {
                         return {
-                            categoryId: categoryId,
-                            serviceId : '0',
+                            categoryId: Number(categoryId),
+                            serviceId : 0,
                             count     : count,
                         };
                     }
@@ -377,8 +377,8 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
                 }
 
                 return {
-                    categoryId: categoryId,
-                    serviceId : '0',
+                    categoryId: Number(categoryId),
+                    serviceId : 0,
                     count     : 0,
                 };
             }
@@ -402,8 +402,8 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
                 if (isNull(visitNumber)) {
                     if (count) {
                         return {
-                            categoryId: categoryId,
-                            serviceId : serviceId,
+                            categoryId: Number(categoryId),
+                            serviceId : Number(serviceId),
                             count     : count,
                         };
                     }
@@ -414,8 +414,8 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
                 }
 
                 return {
-                    categoryId: categoryId,
-                    serviceId : serviceId,
+                    categoryId: Number(categoryId),
+                    serviceId : Number(serviceId),
                     count     : 0,
                 };
             }
