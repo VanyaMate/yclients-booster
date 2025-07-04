@@ -1,7 +1,13 @@
 .container {
-    display : inline-block;
+    display     : inline-flex;
+    align-items : center;
 
-    > label {
+    &.disabled {
+        pointer-events : none;
+        opacity        : .5;
+    }
+
+    > .toggle {
         width         : 50px;
         height        : 30px;
         border-radius : 15px;
@@ -24,6 +30,10 @@
         }
     }
 
+    > .label {
+        margin-left : var(--offset-small);
+    }
+
     > input {
         visibility : hidden;
         width      : 0;
@@ -35,7 +45,7 @@
         overflow   : hidden;
     }
 
-    > input:checked ~ label {
+    > input:checked ~ .toggle {
         background : var(--success-color);
         border     : 1px solid var(--success-color);
 

@@ -17,8 +17,11 @@ export class Toggle extends Component<HTMLDivElement> {
     private _value: boolean;
 
     constructor (props: ToggleProps) {
-        const id                                                      = `id-${ Math.random().toString(16) }`;
-        const { value, onChange, executeOnChangeAfterInit, ...other } = props;
+        const id = `id-${ Math.random().toString(16) }`;
+        const {
+                  value, onChange, executeOnChangeAfterInit, textContent,
+                  ...other
+              }  = props;
         super('div', other, [
             new Component<HTMLInputElement>('input', {
                 type    : 'checkbox',
@@ -30,9 +33,20 @@ export class Toggle extends Component<HTMLDivElement> {
                 },
             }),
             new Component<HTMLLabelElement>('label', {
-                htmlFor: id,
+                htmlFor  : id,
+                className: css.toggle,
             }),
         ]);
+
+        if (textContent) {
+            new Component<HTMLLabelElement>('label', {
+                htmlFor    : id,
+                textContent: textContent,
+                className  : css.label,
+            })
+                .insert(this.element, 'beforeend');
+        }
+
         this._value = value;
         this.element.classList.add(css.container);
 
@@ -43,5 +57,13 @@ export class Toggle extends Component<HTMLDivElement> {
 
     getValue (): boolean {
         return this._value;
+    }
+
+    setDisable (state: boolean) {
+        if (state) {
+            this.element.classList.add(css.disabled);
+        } else {
+            this.element.classList.remove(css.disabled);
+        }
     }
 }
