@@ -21,6 +21,9 @@ import {
 import {
     SettingsServiceGetIdsForm,
 } from '@/widget/settings/service/SettingsServiceGetIdsForm/SettingsServiceGetIdsForm.ts';
+import {
+    SettingsServiceDescriptionUpdateForm,
+} from '@/widget/settings/service/SettingsServiceDescriptionUpdateForm/SettingsServiceDescriptionUpdateForm.ts';
 
 
 export const isSettingsServicePage = function (pathname: Array<string>) {
@@ -67,6 +70,17 @@ export const settingsServicePageHandler = function (pathname: Array<string>) {
                             }),
                             preferWidth: Modal.getPreferWidthByNesting(1),
                             label      : 'Изменить чек и оз',
+                        },
+                    }),
+                    new ModalButton({
+                        textContent: 'Обновить описание',
+                        modalProps : {
+                            content    : new SettingsServiceDescriptionUpdateForm({
+                                clientId,
+                                bearer,
+                            }),
+                            preferWidth: Modal.getPreferWidthByNesting(1),
+                            label      : 'Изменить описание',
                         },
                     }),
                     new ModalButton({
