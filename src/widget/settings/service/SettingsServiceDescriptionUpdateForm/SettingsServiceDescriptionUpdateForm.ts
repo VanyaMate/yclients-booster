@@ -7,9 +7,6 @@ import { Col } from '@/shared/box/Col/Col.ts';
 import { TextArea } from '@/shared/input/TextArea/TextArea.ts';
 import { Button } from '@/shared/buttons/Button/Button.ts';
 import { Table } from '@/shared/table/Table/Table.ts';
-import {
-    SettingsServiceOnlineTitleUpdateAction,
-} from '@/widget/settings/service/SettingsServiceOnlineTitleUpdateAction/SettingsServiceOnlineTitleUpdateAction.ts';
 import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 import {
     getSettingsServicesRequestAction,
@@ -21,6 +18,9 @@ import {
 import { LabelDivider } from '@/shared/divider/LabelDivider/LabelDivider.ts';
 import { ProgressBar } from '@/shared/progress/ProgressBar/ProgressBar.ts';
 import css from './SettingsServiceDescriptionUpdateForm.module.css';
+import {
+    SettingsServiceDescriptionUpdateAction,
+} from '@/widget/settings/service/SettingsServiceDescriptionUpdateAction/SettingsServiceDescriptionUpdateAction.ts';
 
 
 export type SettingsServiceDescriptionUpdateFormProps =
@@ -146,7 +146,7 @@ export class SettingsServiceDescriptionUpdateForm extends Component<HTMLDivEleme
         let error: number   = 0;
 
         const actionComponents = services.map((service) => {
-            return new SettingsServiceOnlineTitleUpdateAction({
+            return new SettingsServiceDescriptionUpdateAction({
                 clientId   : this._clientId,
                 bearer     : this._bearer,
                 serviceData: service.data!,
@@ -162,7 +162,7 @@ export class SettingsServiceDescriptionUpdateForm extends Component<HTMLDivEleme
             textContent: 'Преобразовать',
             onclick    : () => {
                 button.setLoading(true);
-                new PromiseSplitter(1, 1)
+                new PromiseSplitter(4, 1)
                     .exec(
                         actionComponents.map((component) => ({
                             chain    : [ component.getAction() ],

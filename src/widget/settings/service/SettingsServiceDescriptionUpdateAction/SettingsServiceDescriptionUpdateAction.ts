@@ -58,7 +58,7 @@ export class SettingsServiceDescriptionUpdateAction extends ActionComponent<void
             cols            : [
                 this._process = new ProcessStatus({ initialStatus: ProcessStatusType.NONE }),
                 new Component('span', {
-                    textContent: `[${ this._serviceData.id }] описание: ${ this._serviceData.comment }`,
+                    textContent: `[${ this._serviceData.id }] ${ this._serviceData.title }`,
                 }),
             ],
         });

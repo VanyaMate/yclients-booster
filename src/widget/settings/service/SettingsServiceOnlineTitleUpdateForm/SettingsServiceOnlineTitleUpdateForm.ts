@@ -169,7 +169,7 @@ export class SettingsServiceOnlineTitleUpdateForm extends Component<HTMLDivEleme
             textContent: 'Преобразовать',
             onclick    : () => {
                 button.setLoading(true);
-                new PromiseSplitter(1, 1)
+                new PromiseSplitter(4, 1)
                     .exec(
                         actionComponents.map((component) => ({
                             chain    : [ component.getAction() ],
