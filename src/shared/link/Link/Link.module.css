@@ -1,0 +1,10 @@
+.container {
+    color   : var(--primary-color);
+    padding : 0;
+    margin  : 0;
+
+    &:hover {
+        color           : var(--primary-color);
+        text-decoration : underline;
+    }
+}

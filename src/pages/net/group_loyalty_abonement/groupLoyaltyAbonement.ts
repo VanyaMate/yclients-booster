@@ -47,8 +47,8 @@ export const groupLoyaltyAbonement = function () {
                             },
                         }),
                         new ModalButton({
-                            textContent: 'Установить филиал везде где [wip]',
-                            styleType  : ButtonStyleType.WARNING,
+                            textContent: 'Установить филиал везде где',
+                            styleType  : ButtonStyleType.PRIMARY,
                             modalProps : {
                                 content    : new AddSalonIdWithSettingsGroupLoyaltyAbonement({
                                     clientId, bearer,
@@ -58,8 +58,8 @@ export const groupLoyaltyAbonement = function () {
                             },
                         }),
                         new ModalButton({
-                            textContent: 'Установить филиал везде [wip]',
-                            styleType  : ButtonStyleType.WARNING,
+                            textContent: 'Установить филиал везде',
+                            styleType  : ButtonStyleType.PRIMARY,
                             modalProps : {
                                 content    : new AddSalonIdGroupLoyaltyAbonementForm({
                                     clientId, bearer,

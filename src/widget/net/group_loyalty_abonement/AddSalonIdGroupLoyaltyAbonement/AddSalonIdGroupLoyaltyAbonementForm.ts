@@ -25,8 +25,6 @@ import {
 import { MemoFetch } from '@/service/Fetcher/implementations/MemoFetch.ts';
 import { IFetcher } from '@/service/Fetcher/Fetcher.interface.ts';
 
-// 557451
-
 
 export type AddSalonIdGroupLoyaltyAbonementFormProps =
     ComponentPropsOptional<HTMLDivElement>
@@ -54,31 +52,12 @@ export class AddSalonIdGroupLoyaltyAbonementForm extends Component<HTMLDivElemen
         this._renderInitialForm();
     }
 
-    // продолжить тут
     public _renderInitialForm () {
-        const clientIdInput    = new TextInput({
+        const clientIdInput = new TextInput({
             type       : 'text',
             placeholder: 'Введите ID филиала который нужно добавить',
         });
-        const testButton       = new Button({
-            textContent: 'Test',
-            onclick    : async () => {
-                uploadDataButton.setLoading(true);
-                testButton.setLoading(true);
 
-                const abonements = await getGroupLoyaltyAmonements(this._bearer, this._clientId, 1, [ 'attached_salon_ids', 'availability', 'online_sale_image' ], this._logger);
-                const data       = await new PromiseSplitter(3, 1)
-                    .exec(
-                        abonements.map((abonement) => ({
-                            chain: [
-                                () => getLoyaltyAmonement(this._bearer, this._clientId, abonement.id.toString(), [ 'balance_container', 'abonements_count', 'attached_salon_ids' ], this._logger),
-                            ],
-                        })),
-                    );
-
-                console.log(data);
-            },
-        });
         const uploadDataButton = new Button({
             textContent: 'Добавить',
             styleType  : ButtonStyleType.PRIMARY,
@@ -122,7 +101,6 @@ export class AddSalonIdGroupLoyaltyAbonementForm extends Component<HTMLDivElemen
         });
         this._content.add(this._logger);
         this._content.add(clientIdInput);
-        this._content.add(testButton);
         this._content.add(uploadDataButton);
     }
 }

@@ -6,18 +6,18 @@ import {
     fetchResponseToDom,
 } from '@/helper/action/fetchResponseToDom/fetchResponseToDom.ts';
 import {
-    getGroupLoyaltyCertificatesFromDom,
-} from '@/action/net/group-loyalty-certificate/dom-action/getGroupLoyaltyCertificatesFromDom.ts';
+    getGroupLoyaltyCertificatesShortDataFromDom,
+} from '@/action/net/group-loyalty-certificate/dom-action/getGroupLoyaltyCertificatesShortDataFromDom.ts';
 
 
-export const getGroupLoyaltyCertificates = async function (salonId: string, logger?: ILogger): Promise<Array<GroupLoyaltyCertificateShortData>> {
+export const getGroupLoyaltyShortDataCertificates = async function (salonId: string, logger?: ILogger): Promise<Array<GroupLoyaltyCertificateShortData>> {
     logger?.log(`получение списка сертификатов клиента "${ salonId }"`);
 
     return fetch(`https://yclients.com/group_loyalty_certificate_types/${ salonId }`, {
         method: 'GET',
     })
         .then(fetchResponseToDom)
-        .then(getGroupLoyaltyCertificatesFromDom)
+        .then(getGroupLoyaltyCertificatesShortDataFromDom)
         .then((items) => {
             logger?.success(`список сертификатов клиента "${ salonId }" получен. ${ items.length } шт.`);
             return items;

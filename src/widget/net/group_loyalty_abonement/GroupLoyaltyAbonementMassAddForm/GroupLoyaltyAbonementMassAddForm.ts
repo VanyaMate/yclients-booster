@@ -34,6 +34,7 @@ import {
     getGroupLoyaltyAmonements,
 } from '@/action/net/group-loyalty-abonement/getGroupLoyaltyAmonements.ts';
 import { delay } from '@/helper/lib/delay/delay';
+import { Link } from '@/shared/link/Link/Link.ts';
 
 
 export type GroupLoyaltyAbonementMassAddFormProps =
@@ -72,6 +73,12 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
             label: 'Не создавать если с таким заголовком уже создано',
         });
 
+        const formatLink = new Link({
+            href       : 'https://docs.google.com/spreadsheets/d/1lTgqdFum0bbN5RHeKB8-VzxjOdKyEXF5Ja2VLfzDhJg/edit?usp=sharing',
+            textContent: '🛈 Формат',
+            target     : '_blank',
+        });
+
         const acceptButton = new Button({
             textContent: 'Проверить',
             onclick    : async () => {
@@ -103,6 +110,7 @@ export class GroupLoyaltyAbonementMassAddForm extends Component<HTMLDivElement> 
             },
         });
 
+        this._content.add(formatLink);
         this._content.add(dataTextarea);
         this._content.add(noCreateSimilarRowsCheckbox);
         this._content.add(acceptButton);
