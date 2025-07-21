@@ -17,7 +17,7 @@ export const getGroupLoyaltyCertificate = async function (clientId: string, cert
         method: 'GET',
     })
         .then(fetchResponseToDom)
-        .then(getGroupLoyaltyCertificateDataFromDom)
+        .then((dom) => getGroupLoyaltyCertificateDataFromDom(dom, logger))
         .then((data) => {
             logger?.success(`сертификат "${ certificateId }" клиента "${ clientId }" получен`);
             return data;

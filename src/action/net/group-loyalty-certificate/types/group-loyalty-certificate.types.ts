@@ -100,3 +100,40 @@ export type GroupLoyaltyCertificateShortData = {
     title: string;
     id: string;
 }
+
+export type GroupLoyaltyCeriticateApiResponseItem = {
+    balance: number;
+    balance_edit_type_id: number;
+    category_id: number | null;
+    company_group_id: number;
+    date_archived: boolean | null;
+    expiration_date: number | string;
+    expiration_timeout: number;
+    expiration_timeout_unit_id: number;
+    expiration_type_id: number;
+    id: number;
+    is_allow_empty_code: boolean;
+    is_archived: boolean;
+    is_multi: boolean;
+    is_serial_number_limited: boolean;
+    item_type: { id: number, title: string };
+    item_type_id: number;
+    online_sale_description: string;
+    online_sale_image: string | null;
+    online_sale_is_enabled: boolean;
+    online_sale_price: number;
+    online_sale_title: string;
+    released_total: number;
+    salon_ids: Array<number>;
+    service_ids: Array<number>
+    title: string;
+    weight: number;
+}
+
+export type GroupLoyaltyCertificateApiResponse = {
+    data: Array<GroupLoyaltyCeriticateApiResponseItem>;
+    meta: {
+        total_count: number;
+    },
+    success: boolean;
+}
