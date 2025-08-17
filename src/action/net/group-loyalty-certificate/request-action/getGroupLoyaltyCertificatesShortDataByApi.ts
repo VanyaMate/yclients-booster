@@ -15,7 +15,7 @@ export const getGroupLoyaltyCertificatesShortDataByApi = async function (bearer:
 
     while (!isFinish) {
         logger?.log(`получение списка из "${ limit }" не архивированных сертификатов клиента "${ clientId }" страницы "${ page }"`);
-        await fetch(`https://yclients.com/api/v1/chain/${ clientId }/loyalty/certificate_types/?page=${ page }&limit=${ limit }&category_id=0&is_archived=false`, {
+        await fetch(`https://yclients.com/api/v1/chain/${ clientId }/loyalty/certificate_types/?page=${ page }&limit=${ limit }&is_archived=false`, {
             method : 'GET',
             headers: {
                 'Authorization': `Bearer ${ bearer }`,
