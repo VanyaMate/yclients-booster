@@ -46,6 +46,10 @@ import {
     financesExpensesPageHandler,
     isFinancesExpenses,
 } from '@/pages/finances/expenses';
+import {
+    isTehnologicalCardsPage,
+    tehnologicalCardsPageHandler,
+} from '@/pages/tehnological_cards';
 
 
 // document.body.classList.add('booster-dark');
@@ -78,6 +82,8 @@ if (isGoodsPage(pathParts)) {
     financesSuppliersPageHandler(pathParts);
 } else if (isFinancesExpenses(pathParts)) {
     financesExpensesPageHandler(pathParts);
+} else if (isTehnologicalCardsPage(pathParts)) {
+    tehnologicalCardsPageHandler(pathParts);
 }
 
 commonPageHandler();

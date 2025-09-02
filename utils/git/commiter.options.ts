@@ -26,6 +26,7 @@ export default {
         'Сотрудники',
         'Контрагенты',
         'Статьи платежей',
+        'Технологические карты',
     ],
     postfixes              : [ 'wip', 'temp' ],
     postfixesSeparator     : ', ',
