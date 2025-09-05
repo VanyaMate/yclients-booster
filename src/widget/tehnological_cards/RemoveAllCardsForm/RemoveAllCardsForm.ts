@@ -16,6 +16,9 @@ import { PromiseSplitter } from '@/service/PromiseSplitter/PromiseSplitter.ts';
 import {
     removeTechnologicalCardRequestAction,
 } from '@/action/technological_cards/removeTechnologicalCard.request-action.ts';
+import {
+    getTechnologicalCardsDomAction,
+} from '@/action/technological_cards/getTechnologicalCards.dom-action.ts';
 
 
 export type RemoveAllCardsFormProps =
@@ -38,32 +41,7 @@ export class RemoveAllCardsForm extends Component<HTMLDivElement> {
         this._clientId = clientId;
         this._content.insert(this.element, 'beforeend');
         this._content.add(this._logger);
-        this._content.add(this._getForm());
-    }
-
-    private _getCardsInfo (): Array<RemoveCardInfo> {
-        const table = document.querySelector('.page-table');
-        if (!table) return [];
-
-        const rows = table.querySelectorAll('.client-box');
-
-        return [ ...rows ]
-            .map((row) => {
-                const link  = row.querySelector<HTMLAnchorElement>('.project-actions > a');
-                const title = row.querySelector<HTMLLIElement>(`.project-title > a`);
-                if (title && link) {
-                    return {
-                        id   : link.href.split('/').slice(-1)[0],
-                        title: title.textContent?.trim() ?? '[Неизвестный]',
-                    };
-                }
-
-                return {
-                    id   : '',
-                    title: '',
-                };
-            })
-            .filter((item) => item.id.length > 0);
+        this._content.add(this._getInitialForm());
     }
 
     private _getCardSelectForm (list: Array<RemoveCardInfo>): Array<CheckboxWithLabel> {
@@ -157,7 +135,7 @@ export class RemoveAllCardsForm extends Component<HTMLDivElement> {
     }
 
     private _getForm () {
-        const cards                = this._getCardsInfo();
+        const cards                = getTechnologicalCardsDomAction(document, this._logger);
         const checkboxes           = this._getCardSelectForm(cards);
         const checkAllButton       = this._getToggleAsCheckedButton(checkboxes);
         const uncheckAllButton     = this._getToggleAsUncheckedButton(checkboxes);
@@ -172,5 +150,16 @@ export class RemoveAllCardsForm extends Component<HTMLDivElement> {
         content.add(removeDivider);
         content.add(removeSelectedButton);
         return content;
+    }
+
+    private _getInitialForm () {
+        const initButton = new Button({
+            textContent: 'Загрузить текущий список',
+            onclick    : () => {
+                this._content.add(this._getForm());
+                initButton.remove();
+            },
+        });
+        return initButton;
     }
 }
