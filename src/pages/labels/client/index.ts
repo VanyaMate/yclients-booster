@@ -14,7 +14,6 @@ export const labelsClientPageHandler = function () {
     startHandler(() => {
         const container = document.querySelector(`#page-wrapper .wrapper-content .row`);
         const clientId  = location.pathname.split('/')[3];
-        console.log(container, clientId);
 
         if (container) {
             new Col({

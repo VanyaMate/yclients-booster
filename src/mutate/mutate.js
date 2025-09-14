@@ -75,10 +75,10 @@ const url = function () {
 
 	const get = function () {
 		const hasCondition = hasList.length
-			? hasList.every((has) => !!location.href.match(has))
+			? hasList.every((has) => !!location.href.includes(has))
 			: true;
 		const orCondition = orList.length
-			? orList.some((or) => !!location.href.match(or))
+			? orList.some((or) => !!location.href.includes(or))
 			: true;
 		const condition = hasCondition && orCondition;
 
