@@ -4,6 +4,8 @@ import './index.css';
 import {
     CopyLabelsClientButton,
 } from '@/widget/labels/client/CopyLabelsClientButton/CopyLabelsClientButton.ts';
+import { GetLabelsClientIdsModalButton } from '@/widget/labels/client/GetLabelsClientIdsModalButton/GetLabelsClientIdsModalButton';
+import { CreateClientLabelsModalButton } from '@/widget/labels/client/CreateClientLabelsModalButton/CreateClientLabelsModalButton';
 
 
 export const isLabelsClientPage = function (pathname: Array<string>) {
@@ -19,6 +21,8 @@ export const labelsClientPageHandler = function () {
             new Col({
                 rows: [
                     new CopyLabelsClientButton({ clientId }),
+                    new GetLabelsClientIdsModalButton({ clientId }),
+                    new CreateClientLabelsModalButton({ clientId })
                 ],
             }).insert(container, 'beforebegin');
         }

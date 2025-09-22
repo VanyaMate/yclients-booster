@@ -38,7 +38,7 @@ export const getGroupLoyaltyCertificateDataFromDom = async function (dom: Docume
             const image                             = getValueFromForm(form, '.online_image');
             const data: GroupLoyaltyCertificateData = {
                 title                     : getValueFromForm(form, '#title-input'),
-                multi                     : Number(getValueFromForm(form, '#multi-select')),
+                multi                     : Number(getValueFromForm(form, 'input[type="radio"][name="multi"]:checked')),
                 balance                   : Number(getValueFromForm(form, 'input[data-locator="input_nominal"]')),
                 category_id               : Number(getValueFromForm(form, '#category-select')),
                 item_type_id              : Number(getValueFromForm(form, '#item-type-select')),
