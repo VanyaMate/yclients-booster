@@ -1,6 +1,7 @@
 import { ButtonStyleType } from "@/shared/buttons/Button/Button";
 import { ModalButton } from "@/shared/buttons/ModalButton/ModalButton";
 import { CreateClientsForm } from "../CreateClientsForm/CreateClientsForm";
+import { Modal } from "@/shared/modal/Modal/Modal";
 
 export type CreateClientsFormModalButtonProps = {
     clientId: string;
@@ -14,7 +15,8 @@ export class CreateClientsFormModalButton extends ModalButton {
             styleType: ButtonStyleType.PRIMARY,
             modalProps: {
                 label: 'Массовое добавление клиентов',
-                content: new CreateClientsForm({ clientId })
+                content: new CreateClientsForm({ clientId }),
+                preferWidth: Modal.getPreferWidthByNesting(3),
             }
         });
     }

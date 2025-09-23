@@ -19,23 +19,27 @@ export type DropdownProps =
 export class Dropdown extends Component<HTMLDivElement> {
     private readonly _hideOnDomClickHandler: (event: MouseEvent) => void;
     private readonly _stopPropagation: boolean;
+    private readonly _button: Button;
 
     constructor (props: DropdownProps) {
         const { buttonProps, content, stopPropagation, ...other } = props;
-        let button: Button;
         super('div', other, [
-            button = new Button(buttonProps),
             new Component<HTMLDivElement>(
                 'div',
                 { className: css.dropdown },
                 [ content ],
             ),
         ]);
+        this._button = new Button(buttonProps);
         this._stopPropagation = stopPropagation ?? false;
         this.element.classList.add(css.container);
+        if (buttonProps.fullWidth) {
+            this.element.classList.add(css.fullWidth);
+        }
         this._hideOnDomClickHandler = this._hideOnDocumentClick.bind(this);
-        button.element.addEventListener('click', this._toggle.bind(this));
+        this._button.element.addEventListener('click', this._toggle.bind(this));
         this.element.addEventListener(DropdownHideEvent.type, this.hide.bind(this));
+        this._button.insert(this.element, 'afterbegin');
     }
 
     private _toggle () {
@@ -60,6 +64,10 @@ export class Dropdown extends Component<HTMLDivElement> {
 
         this.element.classList.remove(css.opened);
         document.removeEventListener('click', this._hideOnDomClickHandler);
+    }
+
+    public setTextButton (text: string) {
+        this._button.element.textContent = text;
     }
 
     private _hideOnDocumentClick (event: MouseEvent) {

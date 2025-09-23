@@ -7,7 +7,7 @@ import css from './Table.module.css';
 
 export type TableProps =
     {
-        header: Array<string>;
+        header: Array<string> | Array<Component<HTMLElement>>;
     }
     & ComponentPropsOptional<HTMLTableElement>;
 
@@ -24,7 +24,11 @@ export class Table extends Component<HTMLTableElement> {
         this._thead = this.element.querySelector('thead')!;
         this._tbody = this.element.querySelector('tbody')!;
         this._empty = this.element.querySelector(`.${ css.empty }`)!;
-        this.setHeader(header);
+        if (typeof header[0] === 'string') {
+            this.setHeader(header as Array<string>);
+        } else {
+            this.setCustomHeader(header as Array<Component<HTMLElement>>);
+        }
     }
 
     addRow (items: Array<string>) {
@@ -54,6 +58,17 @@ export class Table extends Component<HTMLTableElement> {
         tr.querySelectorAll('th').forEach((title, index) => {
             title.addEventListener('click', () => this.copyColumn(index));
         });
+
+        this._thead.insertAdjacentElement('afterbegin', tr);
+    }
+
+    private setCustomHeader (headers: Array<Component<HTMLElement>>) {
+        const tr     = document.createElement('tr');
+        headers.forEach((header) => {
+            const th = document.createElement('th');
+            header.insert(th, 'afterbegin');
+            tr.insertAdjacentElement('beforeend', th);
+        })
 
         this._thead.insertAdjacentElement('afterbegin', tr);
     }

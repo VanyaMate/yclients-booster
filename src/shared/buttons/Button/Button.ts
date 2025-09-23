@@ -80,4 +80,12 @@ export class Button extends Component<HTMLButtonElement> {
             this.element.classList.add(css.warning);
         }
     }
+
+    setDisable (status: boolean) {
+        this.element.disabled = status;
+    }
+
+    setText (text: string) {
+        this.element.textContent = text;
+    }
 }
