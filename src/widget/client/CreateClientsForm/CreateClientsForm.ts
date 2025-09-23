@@ -268,7 +268,7 @@ export class CreateClientsForm extends Component<HTMLDivElement> {
                 "label": "Оплачено",
                 "name": "paid_money",
                 "isCustom": false
-            }
+            },
         ]
     }
 }

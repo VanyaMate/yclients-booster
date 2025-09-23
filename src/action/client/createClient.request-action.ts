@@ -35,6 +35,11 @@ export const createClientRequestAction = async function (clientId: string, creat
 
     logger?.log(`попытка создать нового клиента "${createClientData.fullname} ${createClientData.patronymic} ${createClientData.surname}" для пользователя ${clientId}`);
     const formData = convertToFormData(createClientData);
+    const labels = formData.get('labels[]');
+    if (labels) {
+        formData.delete('labels[]');
+        labels.toString().split(',').forEach((label) => formData.append('labels[]', label));
+    }
 
     return fetcher.fetch(`https://yclients.com/clients/addClient/${clientId}?name=${createClientData.fullname}&tel=${createClientData.phone}`, {
         method: 'POST',

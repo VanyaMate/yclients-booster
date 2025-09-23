@@ -17,6 +17,7 @@ export class CreateClientsFormModalButton extends ModalButton {
                 label: 'Массовое добавление клиентов',
                 content: new CreateClientsForm({ clientId }),
                 preferWidth: Modal.getPreferWidthByNesting(3),
+                minHeight: 800
             }
         });
     }
