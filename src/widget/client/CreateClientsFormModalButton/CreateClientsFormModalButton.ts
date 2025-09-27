@@ -5,17 +5,18 @@ import { Modal } from "@/shared/modal/Modal/Modal";
 
 export type CreateClientsFormModalButtonProps = {
     clientId: string;
+    bearer: string;
 }
 
 export class CreateClientsFormModalButton extends ModalButton {
     constructor(props: CreateClientsFormModalButtonProps) {
-        const { clientId } = props;
+        const { clientId, bearer } = props;
         super({
             textContent: 'Массовое добавление',
             styleType: ButtonStyleType.PRIMARY,
             modalProps: {
                 label: 'Массовое добавление клиентов',
-                content: new CreateClientsForm({ clientId }),
+                content: new CreateClientsForm({ clientId, bearer }),
                 preferWidth: Modal.getPreferWidthByNesting(3),
                 minHeight: 800
             }

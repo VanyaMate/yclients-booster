@@ -17,4 +17,9 @@ export type CreateClientDefaultType = {
     paid_money: string;
 }
 
+export type ClientWithPhoneType = {
+    phone: string;
+    id: number;
+}
+
 export type CreateClientType = Record<string, string | number> & CreateClientDefaultType; 

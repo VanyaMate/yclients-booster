@@ -1,3 +1,4 @@
+import { getBearerTokenDomAction } from "@/action/bearer/dom-action/getBearerToken/getBearerToken.dom-action";
 import { Row } from "@/shared/box/Row/Row";
 import { startHandler } from "@/shared/lib/startHandler";
 import { CreateClientsFormModalButton } from "@/widget/client/CreateClientsFormModalButton/CreateClientsFormModalButton";
@@ -14,9 +15,11 @@ export const clientsBasePageHandler = function (pathnames: Array<string>) {
     
     startHandler(() => {
         const container = document.querySelector('#clients-base-app');
+        const bearer = getBearerTokenDomAction();
+        
         if (container) {
             const row = new Row({ cols: [
-                new CreateClientsFormModalButton({ clientId })
+                new CreateClientsFormModalButton({ clientId, bearer })
             ]});
 
             row.insert(container, 'afterbegin');
