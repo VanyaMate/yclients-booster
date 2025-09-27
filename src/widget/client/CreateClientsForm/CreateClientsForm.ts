@@ -180,7 +180,7 @@ export class CreateClientsForm extends Component<HTMLDivElement> {
         });
 
         clientData.forEach((client) => {
-            if (existedPhones[client[phonePropIndex].trim()]) {
+            if (existedPhones[client[phonePropIndex]?.trim()]) {
                 existedClients.push(client);
             } else {
                 notExistedClients.push(client);
