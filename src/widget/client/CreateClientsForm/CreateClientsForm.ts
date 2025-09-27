@@ -18,6 +18,7 @@ import { LabelDivider } from "@/shared/divider/LabelDivider/LabelDivider";
 import { Dropdown } from "@/shared/dropdown/Dropdown/Dropdown";
 import { CheckboxWithLabel } from "@/shared/input/CheckboxWithLabel/CheckboxWithLabel";
 import { TextArea } from "@/shared/input/TextArea/TextArea";
+import { ProgressBar } from "@/shared/progress/ProgressBar/ProgressBar";
 import { Table } from "@/shared/table/Table/Table";
 
 
@@ -32,6 +33,7 @@ export class CreateClientsForm extends Component<HTMLDivElement> {
     private readonly _logger: Logger = new Logger({});
     private readonly _content: Col = new Col({ rows: [ this._logger ]});
     private readonly _fetcher: IFetcher = new MemoFetch();
+    private readonly _progressBar: ProgressBar = new ProgressBar({ max: 0 });
 
     constructor(props: CreateClientsFormProps) {
         const { clientId, bearer } = props;
@@ -45,6 +47,7 @@ export class CreateClientsForm extends Component<HTMLDivElement> {
     private _renderInitialForm () {
         const clientsDataTextArea = new TextArea({
             placeholder: 'Введите данные',
+            preferHeight: 600,
         });
         const parseButton = new Button({
             textContent: 'Начать сопоставление',
@@ -150,6 +153,8 @@ export class CreateClientsForm extends Component<HTMLDivElement> {
             textContent: 'Выберите все поля',
             disabled: true,
             onclick: async () => {
+                confirmDataButton.setLoading(true);
+                confirmDataButton.setText("Получение списка телефонов");
                 await this._renderConfirmForm(clientsData, selectedProps);
                 comparisonTable.remove();
                 confirmDataButton.remove();
@@ -175,7 +180,7 @@ export class CreateClientsForm extends Component<HTMLDivElement> {
         });
 
         clientData.forEach((client) => {
-            if (existedPhones[client[phonePropIndex]]) {
+            if (existedPhones[client[phonePropIndex].trim()]) {
                 existedClients.push(client);
             } else {
                 notExistedClients.push(client);
@@ -207,6 +212,11 @@ export class CreateClientsForm extends Component<HTMLDivElement> {
             checked: false,
         })
 
+
+        this._progressBar.reset(clientData.length);
+        let success = 0;
+        let errors = 0;
+
         const confirmButton = new Button({
             textContent: 'Создать',
             onclick: async () => {
@@ -225,7 +235,13 @@ export class CreateClientsForm extends Component<HTMLDivElement> {
                         chain: [
                             () => createClientRequestAction(this._clientId, createClientData, this._fetcher, this._logger),
                             async () => notExistedClientsTable.updateRow(index, ['+', ...client]),
-                        ]
+                        ],
+                        onError: () => {
+                            this._progressBar.setRightProgress(++errors);
+                        },
+                        onSuccess: () => {
+                            this._progressBar.setLeftProgress(++success);
+                        }
                     }
                 }));
 
@@ -241,7 +257,13 @@ export class CreateClientsForm extends Component<HTMLDivElement> {
                                     this._logger
                                 ),
                                 async () => existedClientsTable.updateRow(index, ['+', ...clientInput]),
-                            ]
+                            ],
+                            onError: () => {
+                                this._progressBar.setRightProgress(++errors);
+                            },
+                            onSuccess: () => {
+                                this._progressBar.setLeftProgress(++success);
+                            }
                         }
                     }));
                 }
@@ -252,6 +274,7 @@ export class CreateClientsForm extends Component<HTMLDivElement> {
             }
         })
 
+        this._content.add(this._progressBar);
         this._content.add(notExistedClientsDivider);
         this._content.add(notExistedClientsTable);
         this._content.add(existedClientsDivider);

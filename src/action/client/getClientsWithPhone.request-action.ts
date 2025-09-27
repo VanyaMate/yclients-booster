@@ -2,6 +2,8 @@ import { ILogger } from "../_logger/Logger.interface";
 import { ClientWithPhoneType } from "./types/CreateClientType";
 
 export const getClientsWithPhoneRequestAction = async function (bearer: string, clientId: string, logger?: ILogger): Promise<Array<ClientWithPhoneType>> {
+    logger?.log(`получения списка телефонов всех клиентов пользователя "${clientId}"`);
+    
     const clients: Array<ClientWithPhoneType> = [];
     let clientsAmount: number = 0;
     let page: number = 1;
@@ -37,7 +39,7 @@ export const getClientsWithPhoneRequestAction = async function (bearer: string, 
             throw new Error(`ошибка ответа. ${JSON.stringify(response)}`);
         })
         .catch((error) => {
-            logger?.error(`не получилось получить список клиентов. ${error.message}`);
+            logger?.error(`не получилось получить список телефонов всех клиентов. ${error.message}`);
             throw error;
         });
 
@@ -71,7 +73,7 @@ export const getClientsWithPhoneRequestAction = async function (bearer: string, 
             throw new Error(`ошибка ответа. ${JSON.stringify(response)}`);
         })
         .catch((error) => {
-            logger?.error(`не получилось получить список клиентов со страницы ${page}. ${error.message}`);
+            logger?.error(`не получилось получить список телефонов клиентов со страницы ${page}. ${error.message}`);
             throw error;
         });
     }
